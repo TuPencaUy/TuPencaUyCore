@@ -1,2 +1,6 @@
 .vs/
 .git/
+**/appsettings.json
+**/bin/
+**/Debug/
+**/obj/
