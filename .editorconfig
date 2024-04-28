@@ -1,0 +1,25 @@
+[*.{cs,vb}]
+
+root = true
+
+# Indentation
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# Private attributes
+dotnet_naming_rule.private_field_style.severity = suggestion
+dotnet_naming_rule.private_field_style.symbols = private_field
+dotnet_naming_rule.private_field_style.style = _camel_case
+
+# Names of public classes, methods, properties, and events
+dotnet_naming_rule.pascal_case_style.severity = suggestion
+dotnet_naming_rule.pascal_case_style.symbols = public_class, public_method, public_property, public_event
+dotnet_naming_rule.pascal_case_style.style = pascal_case
+
+# Parameter names and local variables
+dotnet_naming_rule.camel_case_style.severity = suggestion
+dotnet_naming_rule.camel_case_style.symbols = local_parameter, local_variable
+dotnet_naming_rule.camel_case_style.style = camel_case
+
