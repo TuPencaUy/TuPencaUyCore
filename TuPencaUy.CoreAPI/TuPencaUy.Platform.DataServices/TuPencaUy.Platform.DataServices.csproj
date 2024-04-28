@@ -10,4 +10,10 @@
     <Folder Include="Facades\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TuPencaUy.DTOs\TuPencaUy.DTOs.csproj" />
+    <ProjectReference Include="..\TuPencaUy.Exceptions\TuPencaUy.Exceptions.csproj" />
+    <ProjectReference Include="..\TuPencaUy.Platform.DAO\TuPencaUy.Platform.DAO.csproj" />
+  </ItemGroup>
+
 </Project>
