@@ -44,14 +44,14 @@ namespace TuPencaUy.Platform.DataServices.Services
 
     public string GenerateToken(UserDTO user)
     {
-      var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+      var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JwtSettings:Key"]));
       var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
       //Crear los claims
       var claims = new[]
       {
         new Claim(ClaimTypes.Email, user.Email),
-        new Claim(ClaimTypes.Role, user.Role.Id.ToString()),
+        new Claim(ClaimTypes.Role, user.Role?.Id.ToString() ?? "undefined"),
       };
 
       var token = new JwtSecurityToken(
