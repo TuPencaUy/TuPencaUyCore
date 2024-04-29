@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity.Data;
+﻿using Azure;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 using TuPencaUy.CoreAPI.Controllers.Base;
 using TuPencaUy.DTOs;
 using TuPencaUy.Platform.DataServices.Services;
@@ -28,7 +29,7 @@ namespace TuPencaUy.CoreAPI.Controllers
         return Ok(token);
       }
 
-      return NotFound("UserNotFound");
+      return StatusCode((int)HttpStatusCode.Unauthorized ,"UserNotFound");
     }
   }
 }
