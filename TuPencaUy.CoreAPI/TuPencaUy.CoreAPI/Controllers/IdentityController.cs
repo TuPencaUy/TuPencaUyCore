@@ -31,5 +31,20 @@ namespace TuPencaUy.CoreAPI.Controllers
 
       return StatusCode((int)HttpStatusCode.Unauthorized ,"UserNotFound");
     }
+
+    [HttpPost]
+    public IActionResult Login([FromBody] string authToken)
+    {
+      var user = _authService.Authenticate(authToken);
+
+      if (user != null)
+      {
+        var token = _authService.GenerateToken(user);
+
+        return Ok(token);
+      }
+
+      return StatusCode((int)HttpStatusCode.Unauthorized, "UserNotFound");
+    }
   }
 }

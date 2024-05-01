@@ -5,6 +5,7 @@
   public interface IAuthService
   {
     UserDTO? Authenticate(LoginRequestDTO login);
+    UserDTO? Authenticate(string token);
     string GenerateToken(UserDTO user);
   }
 }
