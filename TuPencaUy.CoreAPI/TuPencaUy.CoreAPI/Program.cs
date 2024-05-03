@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using TuPencaUy.Core.DataAccessLogic;
 using TuPencaUy.Platform.DAO.Models.Data;
-using TuPencaUy.Platform.DAO.Models.Logic;
 using TuPencaUy.Platform.DataServices.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,7 +14,7 @@ builder.Services.AddDbContext<PlatformDbContext>(options =>
   options.UseSqlServer(builder.Configuration.GetConnectionString("Platform"))
   .LogTo(s => System.Diagnostics.Debug.WriteLine(s)); // To log queries
 });
-builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(PlatformGenericRepository<>));
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 

@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>02e1da87-8543-4088-bf24-9643a056d574</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,7 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TuPencaUy.Platform.DataServices\TuPencaUy.Platform.DataServices.csproj" />
+    <ProjectReference Include="..\TuPencaUy.Core.DataAccessLogic\TuPencaUy.Core.DataAccessLogic.csproj" />
+    <ProjectReference Include="..\TuPencaUy.Platform.DataServices\TuPencaUy.Core.DataServices.csproj" />
   </ItemGroup>
 
 </Project>
