@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Facades\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation" Version="8.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TuPencaUy.Core.DataAccessLogic\TuPencaUy.Core.DataAccessLogic.csproj" />
+    <ProjectReference Include="..\TuPencaUy.Core.Enums\TuPencaUy.Core.Enums.csproj" />
+    <ProjectReference Include="..\TuPencaUy.DTOs\TuPencaUy.Core.DTOs.csproj" />
+    <ProjectReference Include="..\TuPencaUy.Exceptions\TuPencaUy.Core.Exceptions.csproj" />
+    <ProjectReference Include="..\TuPencaUy.Platform.DAO\TuPencaUy.Platform.DAO.csproj" />
+  </ItemGroup>
+
+</Project>

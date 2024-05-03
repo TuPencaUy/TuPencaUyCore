@@ -1,8 +1,8 @@
 ﻿using System.Linq.Expressions;
+using TuPencaUy.Core.DataAccessLogic;
 using TuPencaUy.DTOs;
 using TuPencaUy.Exceptions;
 using TuPencaUy.Platform.DAO.Models;
-using TuPencaUy.Platform.DAO.Models.Logic;
 
 namespace TuPencaUy.Platform.DataServices.Services
 {
