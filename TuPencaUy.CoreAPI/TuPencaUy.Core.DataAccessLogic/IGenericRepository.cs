@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
+using TuPencaUy.Platform.DAO;
 
-namespace TuPencaUy.Platform.DAO.Models.Logic
+namespace TuPencaUy.Core.DataAccessLogic
 {
   public interface IGenericRepository<TEntity> where TEntity : class
   {

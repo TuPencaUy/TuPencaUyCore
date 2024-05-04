@@ -3,15 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34714.143
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TuPencaUy.CoreAPI", "TuPencaUy.CoreAPI\TuPencaUy.CoreAPI.csproj", "{DF8B9477-CE4F-4D94-8C3A-76C7EDA0030F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TuPencaUy.Core.API", "TuPencaUy.CoreAPI\TuPencaUy.Core.API.csproj", "{DF8B9477-CE4F-4D94-8C3A-76C7EDA0030F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TuPencaUy.Platform.DAO", "TuPencaUy.Platform.DAO\TuPencaUy.Platform.DAO.csproj", "{61778F25-08A9-4CB2-B4F8-2C9E441C555C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TuPencaUy.Platform.DataServices", "TuPencaUy.Platform.DataServices\TuPencaUy.Platform.DataServices.csproj", "{E7ECC8B6-A172-4D47-BCD2-6ECE9B8DF410}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TuPencaUy.Core.DataServices", "TuPencaUy.Platform.DataServices\TuPencaUy.Core.DataServices.csproj", "{E7ECC8B6-A172-4D47-BCD2-6ECE9B8DF410}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TuPencaUy.DTOs", "TuPencaUy.DTOs\TuPencaUy.DTOs.csproj", "{EF1E7342-49B6-4ADF-8C7E-945207005267}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TuPencaUy.Core.DTOs", "TuPencaUy.DTOs\TuPencaUy.Core.DTOs.csproj", "{EF1E7342-49B6-4ADF-8C7E-945207005267}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TuPencaUy.Exceptions", "TuPencaUy.Exceptions\TuPencaUy.Exceptions.csproj", "{F072A94C-8BF4-4D13-AE94-8FFCC0A96F58}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TuPencaUy.Core.Exceptions", "TuPencaUy.Exceptions\TuPencaUy.Core.Exceptions.csproj", "{F072A94C-8BF4-4D13-AE94-8FFCC0A96F58}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TuPencaUy.Core.DataAccessLogic", "TuPencaUy.Core.DataAccessLogic\TuPencaUy.Core.DataAccessLogic.csproj", "{923BADFF-11D3-41AA-A574-205DC50123A8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TuPencaUy.Core.Enums", "TuPencaUy.Core.Enums\TuPencaUy.Core.Enums.csproj", "{3190E450-176C-4FEF-8CC1-E3CE2152FA53}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +43,14 @@ Global
 		{F072A94C-8BF4-4D13-AE94-8FFCC0A96F58}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F072A94C-8BF4-4D13-AE94-8FFCC0A96F58}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F072A94C-8BF4-4D13-AE94-8FFCC0A96F58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{923BADFF-11D3-41AA-A574-205DC50123A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{923BADFF-11D3-41AA-A574-205DC50123A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{923BADFF-11D3-41AA-A574-205DC50123A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{923BADFF-11D3-41AA-A574-205DC50123A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3190E450-176C-4FEF-8CC1-E3CE2152FA53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3190E450-176C-4FEF-8CC1-E3CE2152FA53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3190E450-176C-4FEF-8CC1-E3CE2152FA53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3190E450-176C-4FEF-8CC1-E3CE2152FA53}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

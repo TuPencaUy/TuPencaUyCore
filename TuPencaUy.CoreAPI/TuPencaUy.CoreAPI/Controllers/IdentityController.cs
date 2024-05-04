@@ -1,6 +1,7 @@
 ﻿using Azure;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using TuPencaUy.Core.API.Model;
 using TuPencaUy.CoreAPI.Controllers.Base;
 using TuPencaUy.DTOs;
 using TuPencaUy.Platform.DataServices.Services;
@@ -17,34 +18,61 @@ namespace TuPencaUy.CoreAPI.Controllers
       _authService = authService; 
     }
 
-    [HttpPost]
-    public IActionResult Login([FromBody] LoginRequestDTO login)
+    [HttpPost("BasicLogin")]
+    public IActionResult BasicLogin([FromBody] LoginRequestDTO login)
     {
       var user = _authService.Authenticate(login);
 
       if (user != null)
       {
-        var token = _authService.GenerateToken(user);
+        var tokenTuple = _authService.GenerateToken(user);
+        var token = tokenTuple.Item1;
+        var expiration = tokenTuple.Item2;
 
-        return Ok(token);
+        var successResponse = new ApiResponse
+        {
+          Message = $"Wellcome {user.Name}",
+          Data = new { token, expiration, user },
+        };
+
+        return Ok(successResponse);
       }
 
-      return StatusCode((int)HttpStatusCode.Unauthorized ,"UserNotFound");
+      var errorResponse = new ApiResponse
+      {
+        Error = true,
+        Message = "User not found",
+      };
+
+      return StatusCode((int)HttpStatusCode.NotFound, errorResponse);
     }
 
-    [HttpPost]
-    public IActionResult Login([FromBody] string authToken)
+    [HttpPost("OAuthLogin")]
+    public IActionResult OAuthLogin([FromBody] string authToken)
     {
       var user = _authService.Authenticate(authToken);
 
       if (user != null)
       {
-        var token = _authService.GenerateToken(user);
+        var tokenTuple = _authService.GenerateToken(user);
+        var token = tokenTuple.Item1;
+        var expiration = tokenTuple.Item2;
 
-        return Ok(token);
+        var successResponse = new ApiResponse
+        {
+          Message = $"Wellcome {user.Name}",
+          Data = new { token, expiration, user },
+        };
+
+        return Ok(successResponse);
       }
 
-      return StatusCode((int)HttpStatusCode.Unauthorized, "UserNotFound");
+      var errorResponse = new ApiResponse
+      {
+        Error = true,
+        Message = "User not found",
+      };
+      return StatusCode((int)HttpStatusCode.NotFound, errorResponse);
     }
   }
 }

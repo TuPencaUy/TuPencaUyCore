@@ -1,23 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+using TuPencaUy.Platform.DAO;
 using TuPencaUy.Platform.DAO.Models.Base;
 using TuPencaUy.Platform.DAO.Models.Data;
 
-namespace TuPencaUy.Platform.DAO.Models.Logic
+namespace TuPencaUy.Core.DataAccessLogic
 {
-  public class GenericRepository<TEntity> : IGenericRepository<TEntity>
+  public class PlatformGenericRepository<TEntity> : IGenericRepository<TEntity>
     where TEntity : LogicDelete
   {
     internal PlatformDbContext _context;
     internal DbSet<TEntity> _dbSet;
 
-    public GenericRepository(PlatformDbContext context)
+    public PlatformGenericRepository(PlatformDbContext context)
     {
       _context = context;
       _context.Database.SetCommandTimeout(3600);

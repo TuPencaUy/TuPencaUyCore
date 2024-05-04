@@ -1,6 +1,5 @@
 @TuPencaUy.CoreAPI_HostAddress = http://localhost:5045
 
-GET {{TuPencaUy.CoreAPI_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
