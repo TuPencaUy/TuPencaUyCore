@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using TuPencaUy.Platform.DAO;
 using TuPencaUy.Platform.DAO.Models.Base;
 using TuPencaUy.Platform.DAO.Models.Data;
 
