@@ -33,6 +33,7 @@ namespace TuPencaUy.Core.DataServices
         options.UseSqlServer(_configuration.GetConnectionString("Platform"))
         .LogTo(s => System.Diagnostics.Debug.WriteLine(s)); // To log queries
       });
+      _serviceCollection.AddScoped<IConfiguration>(_ => _configuration);
       _serviceCollection.AddScoped(typeof(IGenericRepository<>), typeof(PlatformGenericRepository<>));
       _serviceCollection.AddScoped<ISiteService, SiteService>();
     }
@@ -59,6 +60,7 @@ namespace TuPencaUy.Core.DataServices
         options.UseSqlServer(_configuration.GetConnectionString(connectionString))
         .LogTo(s => System.Diagnostics.Debug.WriteLine(s)); // To log queries
       });
+      _serviceCollection.AddScoped<IConfiguration>(_ => _configuration);
       _serviceCollection.AddScoped(typeof(IGenericRepository<>), typeof(SiteGenericRepository<>));
       _serviceCollection.AddScoped<IAuthService, AuthService>();
       _serviceCollection.AddScoped<IUserService, UserService>();
