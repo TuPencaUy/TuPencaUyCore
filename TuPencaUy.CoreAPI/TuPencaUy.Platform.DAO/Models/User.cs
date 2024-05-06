@@ -27,5 +27,7 @@
     [Column("RoleId", Order = 4)]
     public int? roleId { get; set; } 
     public virtual Role? Role { get; set; }
+
+    public virtual ICollection<Site> Sites { get; set; }
   }
 }
