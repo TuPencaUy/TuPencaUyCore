@@ -1,23 +1,13 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using TuPencaUy.Core.DataAccessLogic;
-using TuPencaUy.Platform.DAO.Models.Data;
-using TuPencaUy.Platform.DataServices.Services;
+using TuPencaUy.Core.API.Middlewares;
+using TuPencaUy.Core.DataServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddDbContext<PlatformDbContext>(options =>
-{
-  options.UseSqlServer(builder.Configuration.GetConnectionString("Platform"))
-  .LogTo(s => System.Diagnostics.Debug.WriteLine(s)); // To log queries
-});
-builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(PlatformGenericRepository<>));
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IUserService, UserService>();
-
+builder.Services.AddScoped<IServiceFactory, ServiceFactory>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -42,6 +32,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+app.UseMiddleware<RequestContentMiddleware>();
 
 /* To run code migrations
 using(var scope = app.Services.CreateScope())
