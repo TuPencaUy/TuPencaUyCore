@@ -91,7 +91,7 @@
         throw;
       }
     }
-    public Tuple<string, DateTime> GenerateToken(UserDTO user)
+    public Tuple<string, DateTime> GenerateToken(UserDTO user, string? currentTenant = null)
     {
       var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JwtSettings:Key"]));
       var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -100,7 +100,7 @@
       {
         new Claim(ClaimTypes.Email, user.Email),
         new Claim(ClaimTypes.Role, user.Role?.Id.ToString() ?? "undefined"),
-        new Claim("currentTenant", ""), // TODO
+        new Claim("currentTenant", currentTenant ?? string.Empty),
       };
       var expires = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_config["Jwt:Audience"]));
 
