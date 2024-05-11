@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using TuPencaUy.Core.API.Model;
+using TuPencaUy.Core.DataServices;
 using TuPencaUy.CoreAPI.Controllers.Base;
 using TuPencaUy.DTOs;
 using TuPencaUy.Platform.DataServices.Services;
@@ -13,19 +14,20 @@ namespace TuPencaUy.CoreAPI.Controllers
   public class IdentityController : BaseController
   {
     private readonly IAuthService _authService;
-    public IdentityController(IAuthService authService)
+    public IdentityController(IServiceFactory serviceFactory)
     {
-      _authService = authService; 
+      _authService = serviceFactory.GetService<IAuthService>(); 
     }
 
     [HttpPost("BasicLogin")]
     public IActionResult BasicLogin([FromBody] LoginRequestDTO login)
     {
       var user = _authService.Authenticate(login);
-
+      
       if (user != null)
       {
-        var tokenTuple = _authService.GenerateToken(user);
+        Request.Headers.TryGetValue("currentTenant", out var currentTenant);
+        var tokenTuple = _authService.GenerateToken(user, currentTenant);
         var token = tokenTuple.Item1;
         var expiration = tokenTuple.Item2;
 
@@ -54,6 +56,7 @@ namespace TuPencaUy.CoreAPI.Controllers
 
       if (user != null)
       {
+        Request.Headers.TryGetValue("currentTenant", out var currentTenant);
         var tokenTuple = _authService.GenerateToken(user);
         var token = tokenTuple.Item1;
         var expiration = tokenTuple.Item2;

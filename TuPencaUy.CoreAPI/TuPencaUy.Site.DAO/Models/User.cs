@@ -1,8 +1,8 @@
-﻿namespace TuPencaUy.Platform.DAO.Models
+﻿namespace TuPencaUy.Site.DAO.Models
 {
   using System.ComponentModel.DataAnnotations;
   using System.ComponentModel.DataAnnotations.Schema;
-  using TuPencaUy.Platform.DAO.Models.Base;
+  using TuPencaUy.Site.DAO.Models.Base;
 
   public class User : ControlDate
   {
@@ -25,9 +25,7 @@
 
     [ForeignKey("Role")]
     [Column("RoleId", Order = 4)]
-    public int? roleId { get; set; } 
+    public int? roleId { get; set; }
     public virtual Role? Role { get; set; }
-
-    public virtual ICollection<Site> Sites { get; set; }
   }
 }

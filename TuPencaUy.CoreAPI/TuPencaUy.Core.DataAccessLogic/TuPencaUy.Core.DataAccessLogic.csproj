@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TuPencaUy.Platform.DAO\TuPencaUy.Platform.DAO.csproj" />
+    <ProjectReference Include="..\TuPencaUy.Site.DAO\TuPencaUy.Site.DAO.csproj" />
   </ItemGroup>
 
 </Project>

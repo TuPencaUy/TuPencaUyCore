@@ -15,8 +15,4 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\TuPencaUy.Core.Enums\TuPencaUy.Core.Enums.csproj" />
-  </ItemGroup>
-
 </Project>

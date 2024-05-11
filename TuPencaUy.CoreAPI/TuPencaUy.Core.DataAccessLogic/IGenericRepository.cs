@@ -1,5 +1,4 @@
 ﻿using System.Linq.Expressions;
-using TuPencaUy.Platform.DAO;
 
 namespace TuPencaUy.Core.DataAccessLogic
 {

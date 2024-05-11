@@ -1,5 +1,5 @@
 ﻿
-namespace TuPencaUy.Platform.DAO
+namespace TuPencaUy.Core.DataAccessLogic
 {
   public enum EnumDataStatus 
   {
