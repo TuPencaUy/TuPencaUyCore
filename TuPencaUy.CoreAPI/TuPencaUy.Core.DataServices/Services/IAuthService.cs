@@ -1,4 +1,4 @@
-﻿namespace TuPencaUy.Platform.DataServices.Services
+﻿namespace TuPencaUy.Core.DataServices.Services
 {
   using TuPencaUy.DTOs;
 

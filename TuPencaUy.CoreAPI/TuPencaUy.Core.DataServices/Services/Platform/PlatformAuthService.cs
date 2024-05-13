@@ -1,4 +1,4 @@
-﻿namespace TuPencaUy.Platform.DataServices.Services
+﻿namespace TuPencaUy.Core.DataServices.Services.Platform
 {
   using System.Linq.Expressions;
   using System.Text;
@@ -14,12 +14,12 @@
   using TuPencaUy.Core.Enums;
   using TuPencaUy.Exceptions;
 
-  public class AuthService : IAuthService
+  public class PlatformAuthService : IAuthService
   {
     private readonly IGenericRepository<User> _userDAL;
     private readonly IGenericRepository<Role> _roleDAL;
     private readonly IConfiguration _config;
-    public AuthService(
+    public PlatformAuthService(
       IGenericRepository<User> userDAL,
       IGenericRepository<Role> roleDAL,
       IConfiguration config)

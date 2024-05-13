@@ -6,6 +6,6 @@ namespace TuPencaUy.Core.DataServices.Services
   {
     SiteDTO GetSiteByDomain(string domain);
 
-    bool CreateNewSite(SiteDTO site, out string? errorMessage);
+    bool CreateNewSite(string ownerEmail, SiteDTO site, out string? errorMessage, out string? connectionString);
   }
 }

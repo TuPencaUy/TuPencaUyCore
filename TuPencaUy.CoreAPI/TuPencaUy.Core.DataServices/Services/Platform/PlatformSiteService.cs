@@ -1,26 +1,32 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 using TuPencaUy.Core.DataAccessLogic;
 using TuPencaUy.Core.DTOs;
 using TuPencaUy.Core.Exceptions;
 using TuPencaUy.Site.DAO.Models.Data;
 
-namespace TuPencaUy.Core.DataServices.Services
+namespace TuPencaUy.Core.DataServices.Services.Platform
 {
-  public class SiteService : ISiteService
+  public class PlatformSiteService : ISiteService
   {
-    private readonly IGenericRepository<Platform.DAO.Models.Site> _siteDAL;
+    private readonly IGenericRepository<TuPencaUy.Platform.DAO.Models.Site> _siteDAL;
+    private readonly IGenericRepository<TuPencaUy.Platform.DAO.Models.User> _userDAL;
     private readonly IConfiguration _configuration;
-    public SiteService(IGenericRepository<Platform.DAO.Models.Site> siteDAL, IConfiguration configuration)
+    public PlatformSiteService(
+      IGenericRepository<TuPencaUy.Platform.DAO.Models.Site> siteDAL,
+      IGenericRepository<TuPencaUy.Platform.DAO.Models.User> userDAL,
+      IConfiguration configuration)
     {
       _siteDAL = siteDAL;
+      _userDAL = userDAL;
       _configuration = configuration;
     }
 
     public SiteDTO GetSiteByDomain(string domain)
     {
-      return _siteDAL.Get(new List<Expression<Func<Platform.DAO.Models.Site, bool>>> { x => x.Domain == domain })
+      return _siteDAL.Get(new List<Expression<Func<TuPencaUy.Platform.DAO.Models.Site, bool>>> { x => x.Domain == domain })
         .Select(x => new SiteDTO
         {
           Id = x.Id,
@@ -33,10 +39,11 @@ namespace TuPencaUy.Core.DataServices.Services
         .FirstOrDefault() ?? throw new SiteNotFoundException($"No site was found with domain {domain}");
     }
 
-    public bool CreateNewSite(SiteDTO site, out string? errorMessage)
+    public bool CreateNewSite(string ownerEmail, SiteDTO site, out string? errorMessage, out string? connectionString)
     {
       errorMessage = null;
-      var existingSites = _siteDAL.Get(new List<Expression<Func<Platform.DAO.Models.Site, bool>>>
+      connectionString = null;
+      var existingSites = _siteDAL.Get(new List<Expression<Func<TuPencaUy.Platform.DAO.Models.Site, bool>>>
       {
         x => x.Name == site.Name ||
         x.Domain == site.Domain
@@ -50,20 +57,22 @@ namespace TuPencaUy.Core.DataServices.Services
         return false;
       }
 
-      var connString = _configuration.GetConnectionString("DefaultTenant")
+      connectionString = _configuration.GetConnectionString("DefaultTenant")
         .Replace("Tenant_DB", $"Tenant_{site.Name}_DB");
 
       var options = new DbContextOptionsBuilder<SiteDbContext>()
-            .UseSqlServer(connString)
+            .UseSqlServer(connectionString)
             .Options;
       var dbContext = new SiteDbContext(options);
 
       dbContext.Database.EnsureCreated();
       dbContext.Database.Migrate();
 
-      var newSite = new Platform.DAO.Models.Site
+      dbContext.Dispose();
+
+      var newSite = new TuPencaUy.Platform.DAO.Models.Site
       {
-        ConnectionString = connString,
+        ConnectionString = connectionString,
         Name = site.Name,
         Domain = site.Domain,
         Color = site.Color,
@@ -74,6 +83,14 @@ namespace TuPencaUy.Core.DataServices.Services
 
       _siteDAL.Insert(newSite);
       _siteDAL.SaveChanges();
+
+      var owner = _userDAL.Get(new List<Expression<Func<TuPencaUy.Platform.DAO.Models.User, bool>>> { x => x.Email == ownerEmail })
+        .FirstOrDefault();
+
+      if (owner.Sites is null || !owner.Sites.Any()) owner.Sites = new List<TuPencaUy.Platform.DAO.Models.Site>() { newSite };
+      else owner.Sites.Add(newSite);
+      
+      _userDAL.SaveChanges();
 
       return true;
     }
