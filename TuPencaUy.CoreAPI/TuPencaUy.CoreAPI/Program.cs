@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TuPencaUy.Core.API.Middlewares;
 using TuPencaUy.Core.DataServices;
+using TuPencaUy.Platform.DAO.Models.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +29,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
       };
     });
 
+/*
+ To run migrations
+builder.Services.AddDbContext<PlatformDbContext>(options =>
+{
+  options.UseSqlServer(builder.Configuration.GetConnectionString("Platform"))
+  .LogTo(s => System.Diagnostics.Debug.WriteLine(s)); // To log queries
+});
+*/
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -33,14 +45,6 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 app.UseMiddleware<RequestContentMiddleware>();
-
-/* To run code migrations
-using(var scope = app.Services.CreateScope())
-{
-  var context = scope.ServiceProvider.GetRequiredService<PlatformDbContext>();
-  context.Database.Migrate();
-}
-*/
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -50,7 +54,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

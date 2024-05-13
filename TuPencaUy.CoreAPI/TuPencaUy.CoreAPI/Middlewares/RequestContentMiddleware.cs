@@ -2,6 +2,7 @@
 using System.Net;
 using System.Text.Json;
 using TuPencaUy.Core.API.Model;
+using TuPencaUy.Core.API.Model.Responses;
 using TuPencaUy.Core.DataAccessLogic;
 using TuPencaUy.Core.DataServices;
 using TuPencaUy.Core.DataServices.Services;
