@@ -24,7 +24,8 @@ namespace TuPencaUy.CoreAPI.Controllers
 
       if (user != null)
       {
-        var tokenTuple = _authService.GenerateToken(user);
+        Request.Headers.TryGetValue("currentTenant", out var currentTenant);
+        var tokenTuple = _authService.GenerateToken(user, currentTenant);
         var token = tokenTuple.Item1;
         var expiration = tokenTuple.Item2;
 
@@ -53,6 +54,7 @@ namespace TuPencaUy.CoreAPI.Controllers
 
       if (user != null)
       {
+        Request.Headers.TryGetValue("currentTenant", out var currentTenant);
         var tokenTuple = _authService.GenerateToken(user);
         var token = tokenTuple.Item1;
         var expiration = tokenTuple.Item2;
