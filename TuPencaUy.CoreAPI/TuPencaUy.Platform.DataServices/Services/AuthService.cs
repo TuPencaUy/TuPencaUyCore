@@ -28,17 +28,17 @@
       _roleDAL = roleDAL;
       _config = config;
     }
-    public UserDTO? Authenticate(LoginRequestDTO login)
+    public UserDTO? Authenticate(string email, string password)
     {
       var user = _userDAL
-        .Get(new List<Expression<Func<User, bool>>> { x => x.Email == login.Email })
+        .Get(new List<Expression<Func<User, bool>>> { x => x.Email == email })
           .FirstOrDefault();
 
       if (user == null) throw new InvalidCredentialsException();
 
-      return VerifyPassword(login.Password, user.Password) ? new UserDTO
+      return VerifyPassword(password, user.Password) ? new UserDTO
       {
-        Email = login.Email,
+        Email = email,
         Id = user.Id,
         Name = user.Name,
         Role = user.Role != null ? new RoleDTO

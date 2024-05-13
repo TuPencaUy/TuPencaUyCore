@@ -4,7 +4,7 @@
 
   public interface IAuthService
   {
-    UserDTO? Authenticate(LoginRequestDTO login);
+    UserDTO? Authenticate(string email, string password);
     UserDTO? Authenticate(string token);
     Tuple<string, DateTime> GenerateToken(UserDTO user);
   }

@@ -50,6 +50,7 @@ namespace TuPencaUy.Core.DataServices
       _serviceCollection.AddScoped(typeof(IGenericRepository<>), typeof(PlatformGenericRepository<>));
       _serviceCollection.AddScoped<IAuthService, AuthService>();
       _serviceCollection.AddScoped<IUserService, UserService>();
+      _serviceCollection.AddScoped<ISiteService, SiteService>();
     }
 
     public void CreateTenantServices(string connectionString)
