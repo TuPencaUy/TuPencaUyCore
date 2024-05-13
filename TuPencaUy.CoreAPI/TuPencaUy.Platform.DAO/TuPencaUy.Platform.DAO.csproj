@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TuPencaUy.Core.DAO\TuPencaUy.Core.DAO.csproj" />
     <ProjectReference Include="..\TuPencaUy.Core.Enums\TuPencaUy.Core.Enums.csproj" />
   </ItemGroup>
 

@@ -1,4 +1,4 @@
-﻿namespace TuPencaUy.Platform.DAO.Models.Base
+﻿namespace TuPencaUy.Core.DAO
 {
   public class ControlDate : LogicDelete
   {

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using TuPencaUy.Core.Enums;
-using TuPencaUy.Platform.DAO.Models.Base;
+using TuPencaUy.Core.DAO;
 
 namespace TuPencaUy.Platform.DAO.Models
 {
