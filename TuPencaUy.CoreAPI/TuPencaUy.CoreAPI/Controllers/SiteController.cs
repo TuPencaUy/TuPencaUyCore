@@ -17,7 +17,7 @@ namespace TuPencaUy.Core.API.Controllers
 
     public SiteController(IServiceFactory serviceFactory) => _siteService = serviceFactory.GetService<ISiteService>();
 
-    //[Authorize]
+    [Authorize]
     [HttpPost("CreateSite")]
     public IActionResult CreateSite(SiteRequest site)
     {
