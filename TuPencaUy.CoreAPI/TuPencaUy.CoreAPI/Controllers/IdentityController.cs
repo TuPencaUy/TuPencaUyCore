@@ -1,12 +1,10 @@
-﻿using Azure;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using TuPencaUy.Core.API.Model;
 using TuPencaUy.Core.API.Model.Requests;
 using TuPencaUy.Core.API.Model.Responses;
 using TuPencaUy.Core.DataServices;
+using TuPencaUy.Core.DataServices.Services;
 using TuPencaUy.CoreAPI.Controllers.Base;
-using TuPencaUy.Platform.DataServices.Services;
 
 namespace TuPencaUy.CoreAPI.Controllers
 {
