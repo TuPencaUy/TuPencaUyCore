@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using TuPencaUy.Site.DAO;
-using TuPencaUy.Site.DAO.Models.Base;
+using TuPencaUy.Core.DAO;
 using TuPencaUy.Site.DAO.Models.Data;
 
 namespace TuPencaUy.Core.DataAccessLogic
@@ -83,6 +82,11 @@ namespace TuPencaUy.Core.DataAccessLogic
       {
         throw;
       }
+    }
+
+    public void Dispose()
+    {
+      _context.Dispose();
     }
 
     private IQueryable<TEntity> FilterRegistersByStatus(EnumDataStatus status)

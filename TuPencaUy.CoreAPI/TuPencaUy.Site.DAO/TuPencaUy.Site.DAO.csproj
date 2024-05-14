@@ -15,4 +15,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TuPencaUy.Core.DAO\TuPencaUy.Core.DAO.csproj" />
+  </ItemGroup>
+
 </Project>

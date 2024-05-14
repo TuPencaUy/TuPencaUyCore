@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using TuPencaUy.Core.Enums;
+using TuPencaUy.Core.DAO;
 
 namespace TuPencaUy.Platform.DAO.Models
 {
-  public class Site
+  public class Site : ControlDate
   {
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Column("Id", Order = 0)]
@@ -18,7 +19,7 @@ namespace TuPencaUy.Platform.DAO.Models
     [Column("Domain", Order = 2, TypeName = "varchar")]
     public required string Domain { get; set; }
 
-    [MaxLength(100)]
+    [MaxLength(500)]
     [Column("ConnectionString", Order = 3, TypeName = "varchar")]
     public required string ConnectionString { get; set; }
     public SiteAccessTypeEnum? AccessType { get; set; }

@@ -1,11 +1,9 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Text.Json;
-using TuPencaUy.Core.API.Model;
-using TuPencaUy.Core.DataAccessLogic;
+using TuPencaUy.Core.API.Model.Responses;
 using TuPencaUy.Core.DataServices;
 using TuPencaUy.Core.DataServices.Services;
-using TuPencaUy.Platform.DataServices.Services;
 
 namespace TuPencaUy.Core.API.Middlewares
 {

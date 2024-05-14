@@ -13,6 +13,7 @@ namespace TuPencaUy.Core.DataAccessLogic
     void Delete(object id);
     void Delete(TEntity entity);
     void Update(TEntity entity);
+    void Dispose();
     void SaveChanges();
   }
 }

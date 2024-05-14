@@ -1,10 +1,10 @@
-﻿namespace TuPencaUy.Platform.DataServices.Services
+﻿namespace TuPencaUy.Core.DataServices.Services
 {
   using TuPencaUy.DTOs;
 
   public interface IAuthService
   {
-    UserDTO? Authenticate(LoginRequestDTO login);
+    UserDTO? Authenticate(string email, string password);
     UserDTO? Authenticate(string token);
     Tuple<string, DateTime> GenerateToken(UserDTO user, string? currentTenant = null);
   }

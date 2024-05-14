@@ -3,8 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TuPencaUy.Core.DataAccessLogic;
 using TuPencaUy.Core.DataServices.Services;
+using TuPencaUy.Core.DataServices.Services.Platform;
 using TuPencaUy.Platform.DAO.Models.Data;
-using TuPencaUy.Platform.DataServices.Services;
 using TuPencaUy.Site.DAO.Models.Data;
 
 namespace TuPencaUy.Core.DataServices
@@ -35,7 +35,7 @@ namespace TuPencaUy.Core.DataServices
       });
       _serviceCollection.AddScoped<IConfiguration>(_ => _configuration);
       _serviceCollection.AddScoped(typeof(IGenericRepository<>), typeof(PlatformGenericRepository<>));
-      _serviceCollection.AddScoped<ISiteService, SiteService>();
+      _serviceCollection.AddScoped<ISiteService, PlatformSiteService>();
     }
 
     public void CreatePlatformServices()
@@ -48,8 +48,9 @@ namespace TuPencaUy.Core.DataServices
       });
       _serviceCollection.AddScoped<IConfiguration>(_ => _configuration);
       _serviceCollection.AddScoped(typeof(IGenericRepository<>), typeof(PlatformGenericRepository<>));
-      _serviceCollection.AddScoped<IAuthService, AuthService>();
-      _serviceCollection.AddScoped<IUserService, UserService>();
+      _serviceCollection.AddScoped<IAuthService, PlatformAuthService>();
+      _serviceCollection.AddScoped<IUserService, PlatformUserService>();
+      _serviceCollection.AddScoped<ISiteService, PlatformSiteService>();
     }
 
     public void CreateTenantServices(string connectionString)
@@ -62,8 +63,8 @@ namespace TuPencaUy.Core.DataServices
       });
       _serviceCollection.AddScoped<IConfiguration>(_ => _configuration);
       _serviceCollection.AddScoped(typeof(IGenericRepository<>), typeof(SiteGenericRepository<>));
-      _serviceCollection.AddScoped<IAuthService, AuthService>();
-      _serviceCollection.AddScoped<IUserService, UserService>();
+      _serviceCollection.AddScoped<IAuthService, SiteAuthService>();
+      _serviceCollection.AddScoped<IUserService, SiteUserService>();
     }
   }
 }

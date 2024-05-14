@@ -1,4 +1,4 @@
-﻿namespace TuPencaUy.Core.API.Model
+﻿namespace TuPencaUy.Core.API.Model.Responses
 {
   public class ApiResponse
   {

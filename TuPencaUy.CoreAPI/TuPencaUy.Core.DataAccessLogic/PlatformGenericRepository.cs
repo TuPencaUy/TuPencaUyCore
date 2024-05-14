@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using TuPencaUy.Platform.DAO.Models.Base;
+using TuPencaUy.Core.DAO;
 using TuPencaUy.Platform.DAO.Models.Data;
 
 namespace TuPencaUy.Core.DataAccessLogic
@@ -18,90 +18,95 @@ namespace TuPencaUy.Core.DataAccessLogic
       _dbSet = _context.Set<TEntity>();
     }
 
-  public IQueryable<TEntity> Get(
-    List<Expression<Func<TEntity, bool>>>? conditions = null,
-    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-    EnumDataStatus dataStatus = EnumDataStatus.Active)
-  {
-    var query = FilterRegistersByStatus(dataStatus);
-
-    if (conditions is not null)
+    public IQueryable<TEntity> Get(
+      List<Expression<Func<TEntity, bool>>>? conditions = null,
+      Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+      EnumDataStatus dataStatus = EnumDataStatus.Active)
     {
-      foreach (Expression<Func<TEntity, bool>> condition in conditions)
+      var query = FilterRegistersByStatus(dataStatus);
+
+      if (conditions is not null)
       {
-        query = query.Where(condition);
+        foreach (Expression<Func<TEntity, bool>> condition in conditions)
+        {
+          query = query.Where(condition);
+        }
+      }
+
+      return orderBy is not null ? orderBy(query) : query;
+    }
+
+    public void Insert(TEntity entity)
+    {
+      if (entity is ControlDate controlDateEntity)
+      {
+        controlDateEntity.CreationDate = DateTime.Now;
+        controlDateEntity.LastModificationDate = DateTime.Now;
+      }
+
+      _dbSet.Add(entity);
+    }
+
+    public void Delete(object id)
+    {
+      TEntity entityToDelete = _dbSet.Find(id);
+      this.Delete(entityToDelete);
+    }
+    public void Delete(TEntity entity)
+    {
+      if (_context.Entry(entity).State == EntityState.Detached)
+      {
+        _dbSet.Attach(entity);
+      }
+
+      _dbSet.Remove(entity);
+    }
+    public void Update(TEntity entity)
+    {
+      if (entity is ControlDate controlDateEntity)
+      {
+        controlDateEntity.LastModificationDate = DateTime.Now;
+      }
+
+      _dbSet.Attach(entity);
+      _context.Entry(entity).State = EntityState.Modified;
+    }
+
+    public void SaveChanges()
+    {
+      try
+      {
+        _context.SaveChanges();
+      }
+      catch (Exception)
+      {
+        throw;
       }
     }
 
-    return orderBy is not null ? orderBy(query) : query;
-  }
-
-  public void Insert(TEntity entity)
-  {
-    if (entity is ControlDate controlDateEntity)
+    public void Dispose()
     {
-      controlDateEntity.CreationDate = DateTime.Now;
-      controlDateEntity.LastModificationDate = DateTime.Now;
+      _context.Dispose();
     }
 
-    _dbSet.Add(entity);
-  }
-
-  public void Delete(object id)
-  {
-    TEntity entityToDelete = _dbSet.Find(id);
-    this.Delete(entityToDelete);
-  }
-  public void Delete(TEntity entity)
-  {
-    if (_context.Entry(entity).State == EntityState.Detached)
+    private IQueryable<TEntity> FilterRegistersByStatus(EnumDataStatus status)
     {
-      _dbSet.Attach(entity);
-    }
+      IQueryable<TEntity> query;
 
-    _dbSet.Remove(entity);
-  }
-  public void Update(TEntity entity)
-  {
-    if (entity is ControlDate controlDateEntity)
-    {
-      controlDateEntity.LastModificationDate = DateTime.Now;
-    }
+      switch (status)
+      {
+        case EnumDataStatus.Active:
+          query = _dbSet.Where(q => !q.Inactive);
+          break;
+        case EnumDataStatus.Inactive:
+          query = _dbSet.Where(q => q.Inactive);
+          break;
+        default:
+          query = _dbSet;
+          break;
+      }
 
-    _dbSet.Attach(entity);
-    _context.Entry(entity).State = EntityState.Modified;
-  }
-
-  public void SaveChanges()
-  {
-    try
-    {
-      _context.SaveChanges();
-    }
-    catch (Exception)
-    {
-      throw;
+      return query;
     }
   }
-
-  private IQueryable<TEntity> FilterRegistersByStatus(EnumDataStatus status)
-  {
-    IQueryable<TEntity> query;
-
-    switch (status)
-    {
-      case EnumDataStatus.Active:
-        query = _dbSet.Where(q => !q.Inactive);
-        break;
-      case EnumDataStatus.Inactive:
-        query = _dbSet.Where(q => q.Inactive);
-        break;
-      default:
-        query = _dbSet;
-        break;
-    }
-
-    return query;
-  }
-}
 }
