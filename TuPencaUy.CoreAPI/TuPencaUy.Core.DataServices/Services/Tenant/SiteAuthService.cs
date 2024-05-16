@@ -36,7 +36,7 @@
 
       if (user == null) throw new InvalidCredentialsException();
 
-      return VerifyPassword(password, user.Password) ? new UserDTO
+      return VerifyPassword(HashPassword(password), user.Password) ? new UserDTO
       {
         Email = email,
         Id = user.Id,
