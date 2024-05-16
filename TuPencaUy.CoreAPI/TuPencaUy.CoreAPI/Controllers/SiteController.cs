@@ -26,7 +26,7 @@ namespace TuPencaUy.Core.API.Controllers
 
     [Authorize]
     [HttpPost("CreateSite")]
-    public IActionResult CreateSite(SiteRequest site)
+    public IActionResult CreateSite([FromBody] SiteRequest site)
     {
       var siteDTO = new SiteDTO { Name = site.Name, AccessType = site.AccessType, Color = site.Color, Domain = site.Domain };
 

@@ -98,15 +98,16 @@
 
       var claims = new[]
       {
+        new Claim(ClaimTypes.Name, user.Name),
         new Claim(ClaimTypes.Email, user.Email),
         new Claim(ClaimTypes.Role, user.Role?.Id.ToString() ?? "undefined"),
         new Claim("currentTenant", currentTenant ?? string.Empty),
       };
-      var expires = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_config["Jwt:Audience"]));
+      var expires = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_config["JwtSettings:MinutesTokenLifeTime"]));
 
       var token = new JwtSecurityToken(
-        _config["Jwt:Issuer"],
-        _config["Jwt:Audience"],
+        _config["JwtSettings:Issuer"],
+        _config["JwtSettings:Audience"],
         claims,
         expires: expires,
         signingCredentials: credentials);
