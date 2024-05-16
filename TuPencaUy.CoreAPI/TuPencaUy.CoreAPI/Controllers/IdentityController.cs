@@ -29,7 +29,7 @@ namespace TuPencaUy.CoreAPI.Controllers
 
         var successResponse = new ApiResponse
         {
-          Message = $"Wellcome {user.Name}",
+          Message = $"Welcome {user.Name}",
           Data = new { token, expiration, user },
         };
 
@@ -59,7 +59,7 @@ namespace TuPencaUy.CoreAPI.Controllers
 
         var successResponse = new ApiResponse
         {
-          Message = $"Wellcome {user.Name}",
+          Message = $"Welcome {user.Name}",
           Data = new { token, expiration, user },
         };
 
