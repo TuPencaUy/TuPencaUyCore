@@ -20,12 +20,12 @@ namespace TuPencaUy.Core.DAO
     public required string Name { get; set; }
 
     [Column("StartDate", Order = 2, TypeName = "DateTime")]
-    public required DateTime StartDate { get; set; }
+    public required DateTime? StartDate { get; set; }
 
     [Column("EndDate", Order = 3, TypeName = "DateTime")]
-    public required DateTime EndDate { get; set; }
+    public required DateTime? EndDate { get; set; }
 
     [Column("Comission", Order = 4, TypeName = "float")]
-    public required float Comission { get; set; }
+    public required float? Comission { get; set; }
   }
 }

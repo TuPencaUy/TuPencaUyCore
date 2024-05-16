@@ -10,7 +10,6 @@ namespace TuPencaUy.Core.DAO
 {
   public abstract class BaseTeam : ControlDate
   {
-
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Key]
     [Column("Id", Order = 0)]
