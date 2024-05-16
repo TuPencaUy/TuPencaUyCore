@@ -36,7 +36,7 @@
 
       if (user == null) throw new InvalidCredentialsException();
 
-      return VerifyPassword(HashPassword(password), user.Password) ? new UserDTO
+      return VerifyPassword(password, user.Password) ? new UserDTO
       {
         Email = email,
         Id = user.Id,
@@ -174,23 +174,23 @@
 
       return combinedHash;
     }
-    private bool VerifyPassword(string hashedPassword, string password)
+    private bool VerifyPassword(string bodyPassword, string password)
     {
-      string[] hashParts = hashedPassword.Split('$');
-      byte[] salt = Convert.FromBase64String(hashParts[0]);
-      string storedHashedPassword = hashParts[1];
+      string[] passwordHashParts = password.Split("$");
+      string passwordToCompare = passwordHashParts[1];
+      byte[] salt = Convert.FromBase64String(passwordHashParts[0]);
 
       string hashedPasswordToVerify = Convert.ToBase64String(
-          KeyDerivation.Pbkdf2(
-              password: password,
-              salt: salt,
-              prf: KeyDerivationPrf.HMACSHA256,
-              iterationCount: 10000,
-              numBytesRequested: 32
-          )
+        KeyDerivation.Pbkdf2(
+          password: bodyPassword,
+          salt: salt,
+          prf: KeyDerivationPrf.HMACSHA256,
+          iterationCount: 10000,
+          numBytesRequested: 32
+        )
       );
 
-      return storedHashedPassword.Equals(hashedPasswordToVerify);
+      return passwordToCompare.Equals(hashedPasswordToVerify);
     }
   }
 }
