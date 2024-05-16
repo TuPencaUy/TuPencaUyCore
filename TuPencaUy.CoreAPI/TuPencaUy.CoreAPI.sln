@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TuPencaUy.Core.API", "TuPen
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TuPencaUy.Platform.DAO", "TuPencaUy.Platform.DAO\TuPencaUy.Platform.DAO.csproj", "{61778F25-08A9-4CB2-B4F8-2C9E441C555C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TuPencaUy.Core.DataServices", "TuPencaUy.Platform.DataServices\TuPencaUy.Core.DataServices.csproj", "{E7ECC8B6-A172-4D47-BCD2-6ECE9B8DF410}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TuPencaUy.Core.DataServices", "TuPencaUy.Core.DataServices\TuPencaUy.Core.DataServices.csproj", "{E7ECC8B6-A172-4D47-BCD2-6ECE9B8DF410}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TuPencaUy.Core.DTOs", "TuPencaUy.DTOs\TuPencaUy.Core.DTOs.csproj", "{EF1E7342-49B6-4ADF-8C7E-945207005267}"
 EndProject
