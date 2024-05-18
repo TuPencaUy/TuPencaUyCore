@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using TuPencaUy.Core.Enums;
 
 namespace TuPencaUy.Core.DAO
 {
-  public abstract class BaseEvent : ControlDate
+  public class Event : ControlDate
   {
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Key]
@@ -27,5 +23,8 @@ namespace TuPencaUy.Core.DAO
 
     [Column("Comission", Order = 4, TypeName = "float")]
     public required float? Comission { get; set; }
+    public virtual ICollection<Sport>? Sports { get; set; }
+    public virtual ICollection<Match>? Matches { get; set; }
+    public TeamTypeEnum? TeamType { get; set; }
   }
 }

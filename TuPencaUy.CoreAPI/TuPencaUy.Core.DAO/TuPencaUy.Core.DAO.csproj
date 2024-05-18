@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TuPencaUy.Core.Enums\TuPencaUy.Core.Enums.csproj" />
+  </ItemGroup>
+
 </Project>

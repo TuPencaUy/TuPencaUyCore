@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Linq.Expressions;
+using TuPencaUy.Core.DAO;
 using TuPencaUy.Core.DataAccessLogic;
 using TuPencaUy.Core.DTOs;
 using TuPencaUy.Core.Enums;
@@ -42,7 +43,8 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         Name = eventDTO.Name,
         StartDate = eventDTO.StartDate,
         EndDate = eventDTO.EndDate,
-        Comission = eventDTO.Comission
+        Comission = eventDTO.Comission,
+        TeamType = eventDTO.TeamType
       };
       _eventDAL.Insert(newEvent);
       _eventDAL.SaveChanges();
@@ -93,7 +95,8 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       var newTeam = new Team
       {
         Name = teamDTO.Name,
-        
+        Logo = teamDTO.Logo,
+        TeamType = teamDTO.TeamType,
       };
       _teamDAL.Insert(newTeam);
       _teamDAL.SaveChanges();

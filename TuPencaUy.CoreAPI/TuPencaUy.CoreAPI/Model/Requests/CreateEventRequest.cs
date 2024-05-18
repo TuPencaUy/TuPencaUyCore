@@ -1,4 +1,6 @@
-﻿namespace TuPencaUy.Core.API.Model.Requests
+﻿using TuPencaUy.Core.Enums;
+
+namespace TuPencaUy.Core.API.Model.Requests
 {
   public class CreateEventRequest
   {
@@ -6,5 +8,6 @@
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public float? Comission { get; set; }
+    public TeamTypeEnum TeamType { get; set; }
   }
 }

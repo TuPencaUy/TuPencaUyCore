@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using TuPencaUy.Core.Enums;
 
 namespace TuPencaUy.Core.DAO
 {
-  public abstract class BaseTeam : ControlDate
+  public class Team : ControlDate
   {
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Key]
@@ -22,5 +18,6 @@ namespace TuPencaUy.Core.DAO
     [MaxLength(50)]
     [Column("Logo", Order = 2)]
     public byte[]? Logo { get; set; }
+    public TeamTypeEnum? TeamType { get; set; }
   }
 }
