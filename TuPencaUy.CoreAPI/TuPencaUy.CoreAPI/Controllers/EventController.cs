@@ -24,8 +24,8 @@ namespace TuPencaUy.Core.API.Controllers
       _serviceFactory = serviceFactory;
     }
 
-    [HttpPost("CreateEvent")]
-    public IActionResult CreateSite([FromBody] CreateEventRequest requestEvent)
+    [HttpPost]
+    public IActionResult CreateEvent([FromBody] CreateEventRequest requestEvent)
     {
       var eventDTO = new EventDTO {
         Name = requestEvent.Name,
@@ -41,7 +41,30 @@ namespace TuPencaUy.Core.API.Controllers
       return StatusCode((int)HttpStatusCode.Created ,new ApiResponse { Message = "Successfully created event" });
     }
 
-    [HttpPost("CreateSport")]
+    [HttpGet]
+    public IActionResult GetEvents()
+    {
+      try
+      {
+        var list = _eventService.GetEvents();
+        var successResponse = new ApiResponse
+        {
+          Data = list,
+        };
+        return Ok(successResponse);
+      }
+      catch (Exception ex)
+      {
+        var errorResponse = new ApiResponse
+        {
+          Message = ex.Message,
+          Error = true
+        };
+        return BadRequest(errorResponse);
+      }      
+    }
+
+    [HttpPost("Sport")]
     public IActionResult CreateSport([FromBody] CreateSportRequest sport)
     {
       var sportDTO = new SportDTO
@@ -59,7 +82,30 @@ namespace TuPencaUy.Core.API.Controllers
       return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Message = "Successfully created sport" });
     }
 
-    [HttpPost("CreateTeam")]
+    [HttpGet("Sport")]
+    public IActionResult GetSport()
+    {
+      try
+      {
+        var list = _eventService.GetSports();
+        var successResponse = new ApiResponse
+        {
+          Data = list,
+        };
+        return Ok(successResponse);
+      }
+      catch (Exception ex)
+      {
+        var errorResponse = new ApiResponse
+        {
+          Message = ex.Message,
+          Error = true
+        };
+        return BadRequest(errorResponse);
+      }
+    }
+
+    [HttpPost("Team")]
     public IActionResult CreateTeam([FromBody] CreateTeamRequest team)
     {
       var teamDTO = new TeamDTO
@@ -75,7 +121,30 @@ namespace TuPencaUy.Core.API.Controllers
       return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Message = "Successfully created team" });
     }
 
-    [HttpPost("CreateMatch")]
+    [HttpGet("Team")]
+    public IActionResult GetTeams()
+    {
+      try
+      {
+        var list = _eventService.GetTeams();
+        var successResponse = new ApiResponse
+        {
+          Data = list,
+        };
+        return Ok(successResponse);
+      }
+      catch (Exception ex)
+      {
+        var errorResponse = new ApiResponse
+        {
+          Message = ex.Message,
+          Error = true
+        };
+        return BadRequest(errorResponse);
+      }
+    }
+
+    [HttpPost("Match")]
     public IActionResult CreateMatch([FromBody] CreateMatchRequest match)
     {
       var matchDTO = new MatchDTO
@@ -92,6 +161,29 @@ namespace TuPencaUy.Core.API.Controllers
       if (!created) return BadRequest(new ApiResponse { Error = true, Message = errorMessage });
 
       return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Message = "Successfully created match" });
+    }
+
+    [HttpGet("Match")]
+    public IActionResult GetMatches()
+    {
+      try
+      {
+        var list = _eventService.GetMatches();
+        var successResponse = new ApiResponse
+        {
+          Data = list,
+        };
+        return Ok(successResponse);
+      }
+      catch (Exception ex)
+      {
+        var errorResponse = new ApiResponse
+        {
+          Message = ex.Message,
+          Error = true
+        };
+        return BadRequest(errorResponse);
+      }
     }
   }
 }

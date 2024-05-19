@@ -1,12 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.Diagnostics;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using TuPencaUy.Core.DAO;
 using TuPencaUy.Core.DataAccessLogic;
 using TuPencaUy.Core.DTOs;
-using TuPencaUy.Core.Enums;
-using TuPencaUy.DTOs;
-using TuPencaUy.Exceptions;
-using TuPencaUy.Platform.DAO.Models;
 
 namespace TuPencaUy.Core.DataServices.Services.Platform
 {
@@ -52,6 +47,20 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       return true;
     }
 
+    public List<EventDTO> GetEvents()
+    {
+      return _eventDAL.Get()
+        .Select(x => new EventDTO
+        {
+          Id = x.Id,
+          Name = x.Name,
+          StartDate = x.StartDate,
+          EndDate = x.EndDate,
+          Comission = x.Comission,
+          TeamType = x.TeamType
+        }).ToList();
+    }
+
     public bool CreateSport(SportDTO sportDTO, out string? errorMessage) {
       errorMessage = null;
       var existingSport = _sportDAL.Get(new List<Expression<Func<Sport, bool>>>
@@ -78,6 +87,19 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       return true;
     }
 
+    public List<SportDTO> GetSports()
+    {
+      return _sportDAL.Get()
+        .Select(x => new SportDTO
+        {
+          Id = x.Id,
+          Name = x.Name,
+          Tie = x.Tie,
+          ExactPoints = x.ExactPoints,
+          PartialPoints = x.PartialPoints,
+        }).ToList();
+    }
+
     public bool CreateTeam(TeamDTO teamDTO, out string? errorMessage)
     {
       errorMessage = null;
@@ -102,6 +124,18 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       _teamDAL.SaveChanges();
 
       return true;
+    }
+
+    public List<TeamDTO> GetTeams()
+    {
+      return _teamDAL.Get()
+        .Select(x => new TeamDTO
+        {
+          Id = x.Id,
+          Name = x.Name,
+          Logo = x.Logo,
+          TeamType = x.TeamType
+        }).ToList();
     }
 
     public bool CreateMatch(int eventID, MatchDTO matchDTO, out string? errorMessage)
@@ -138,6 +172,20 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       _eventDAL.SaveChanges();
 
       return true;
+    }
+
+    public List<MatchDTO> GetMatches()
+    {
+      return _matchDAL.Get()
+        .Select(x => new MatchDTO
+        {
+          Id = x.Id,
+          Date = x.Date,
+          FirstTeam = x.FirstTeam,
+          FirstTeamScore= x.FirstTeamScore,
+          SecondTeam = x.SecondTeam,
+          SecondTeamScore = x.SecondTeamScore
+        }).ToList();
     }
   }
 }

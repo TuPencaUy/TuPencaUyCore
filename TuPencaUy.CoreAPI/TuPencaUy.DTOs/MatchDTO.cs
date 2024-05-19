@@ -2,7 +2,7 @@
 {
   public class MatchDTO
   {
-    public int? ID { get; set; }
+    public int? Id { get; set; }
     public int? FirstTeam { get; set; }
     public int? SecondTeam { get; set; }
     public int? FirstTeamScore { get; set; }
