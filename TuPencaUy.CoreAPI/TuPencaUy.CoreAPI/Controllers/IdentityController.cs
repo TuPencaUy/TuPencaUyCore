@@ -29,7 +29,7 @@ namespace TuPencaUy.CoreAPI.Controllers
 
         var successResponse = new ApiResponse
         {
-          Message = $"Wellcome {user.Name}",
+          Message = $"Welcome {user.Name}",
           Data = new { token, expiration, user },
         };
 
@@ -43,6 +43,36 @@ namespace TuPencaUy.CoreAPI.Controllers
       };
 
       return StatusCode((int)HttpStatusCode.NotFound, errorResponse);
+    }
+
+    [HttpPost("BasicSignup")]
+    public IActionResult BasicSignup([FromBody] SignUpRequest request)
+    {
+      var user = _authService.SignUp(request.Email, request.Password, request.Name);
+
+      if (user != null)
+      {
+        Request.Headers.TryGetValue("currentTenant", out var currentTenant);
+        var tokenTuple = _authService.GenerateToken(user, currentTenant);
+        var token = tokenTuple.Item1;
+        var expiration = tokenTuple.Item2;
+
+        var successResponse = new ApiResponse
+        {
+          Message = $"Welcome {user.Name}",
+          Data = new { token, expiration, user },
+        };
+
+        return StatusCode((int)HttpStatusCode.Created, successResponse);
+      }
+
+      var errorResponse = new ApiResponse
+      {
+        Error = true,
+        Message = $"The email { request.Email } is in use",
+      };
+
+      return StatusCode((int)HttpStatusCode.Conflict, errorResponse);
     }
 
     [HttpPost("OAuthLogin")]

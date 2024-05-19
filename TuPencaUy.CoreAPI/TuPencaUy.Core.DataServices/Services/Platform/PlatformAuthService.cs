@@ -91,6 +91,14 @@
         throw;
       }
     }
+
+    public UserDTO? SignUp(string email, string password, string name)
+    {
+      var existingUser = _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Email == email });
+      if (existingUser.Any()) return null;
+
+      return CreateNewUser(email, name, HashPassword(password));
+    }
     public Tuple<string, DateTime> GenerateToken(UserDTO user, string? currentTenant = null)
     {
       var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JwtSettings:Key"]));
@@ -99,14 +107,15 @@
       var claims = new[]
       {
         new Claim(ClaimTypes.Email, user.Email),
+        new Claim(ClaimTypes.Name, user.Name),
         new Claim(ClaimTypes.Role, user.Role?.Id.ToString() ?? "undefined"),
         new Claim("currentTenant", currentTenant ?? string.Empty),
       };
-      var expires = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_config["Jwt:Audience"]));
+      var expires = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_config["JwtSettings:MinutesTokenLifeTime"]));
 
       var token = new JwtSecurityToken(
-        _config["Jwt:Issuer"],
-        _config["Jwt:Audience"],
+        _config["JwtSettings:Issuer"],
+        _config["JwtSettings:Audience"],
         claims,
         expires: expires,
         signingCredentials: credentials);
@@ -116,7 +125,7 @@
       return new Tuple<string, DateTime>(stringToken, expires);
     }
 
-    public UserDTO CreateNewUser(string email, string name)
+    private UserDTO CreateNewUser(string email, string name, string password = null)
     {
       Role role = _roleDAL
         .Get(new List<Expression<Func<Role, bool>>> { x => x.Id == (int)UserRoleEnum.BasicUser })
@@ -127,6 +136,7 @@
         Email = email,
         Name = name,
         Role = role,
+        Password = password
       });
 
       _userDAL.SaveChanges();
@@ -164,15 +174,15 @@
 
       return combinedHash;
     }
-    private bool VerifyPassword(string hashedPassword, string password)
+    private bool VerifyPassword(string bodyPassword, string password)
     {
-      string[] hashParts = hashedPassword.Split('$');
-      byte[] salt = Convert.FromBase64String(hashParts[0]);
-      string storedHashedPassword = hashParts[1];
+      string[] passwordHashParts = password.Split("$");
+      string passwordToCompare = passwordHashParts[1];
+      byte[] salt = Convert.FromBase64String(passwordHashParts[0]);
 
       string hashedPasswordToVerify = Convert.ToBase64String(
           KeyDerivation.Pbkdf2(
-              password: password,
+              password: bodyPassword,
               salt: salt,
               prf: KeyDerivationPrf.HMACSHA256,
               iterationCount: 10000,
@@ -180,7 +190,7 @@
           )
       );
 
-      return storedHashedPassword.Equals(hashedPasswordToVerify);
+      return passwordToCompare.Equals(hashedPasswordToVerify);
     }
   }
 }

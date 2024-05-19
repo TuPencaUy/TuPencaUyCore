@@ -58,7 +58,7 @@ namespace TuPencaUy.Core.DataServices
       _serviceCollection = new ServiceCollection();
       _serviceCollection.AddDbContext<SiteDbContext>(options =>
       {
-        options.UseSqlServer(_configuration.GetConnectionString(connectionString))
+        options.UseSqlServer(connectionString)
         .LogTo(s => System.Diagnostics.Debug.WriteLine(s)); // To log queries
       });
       _serviceCollection.AddScoped<IConfiguration>(_ => _configuration);
