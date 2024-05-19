@@ -7,6 +7,7 @@ using TuPencaUy.Core.DataServices;
 using TuPencaUy.Core.DataServices.Services;
 using TuPencaUy.Core.DTOs;
 using TuPencaUy.Core.Enums;
+using TuPencaUy.Core.Exceptions;
 using TuPencaUy.CoreAPI.Controllers.Base;
 using TuPencaUy.DTOs;
 
@@ -22,7 +23,20 @@ namespace TuPencaUy.Core.API.Controllers
     {
       _siteService = serviceFactory.GetService<ISiteService>();
       _serviceFactory = serviceFactory;
-    } 
+    }
+
+    [HttpGet("{domain}")]
+    public IActionResult GetSite(string domain)
+    {
+      try
+      {
+        return Ok(new ApiResponse { Data = _siteService.GetSiteByDomain(domain) });
+      }
+      catch (SiteNotFoundException)
+      {
+        return NotFound(new ApiResponse { Error = true, Message = "Site not found" });
+      }
+    }
 
     [Authorize]
     [HttpPost("CreateSite")]
@@ -36,7 +50,7 @@ namespace TuPencaUy.Core.API.Controllers
         .CreateNewSite(userFromToken.Email, siteDTO, out string? errorMessage, out string? connectionString);
 
       if (!created) return BadRequest(new ApiResponse { Error = true, Message = errorMessage });
-      
+
       _serviceFactory
         .CreateTenantServices(connectionString);
       _serviceFactory
