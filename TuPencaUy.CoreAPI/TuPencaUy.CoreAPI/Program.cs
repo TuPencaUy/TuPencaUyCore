@@ -29,14 +29,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
       };
     });
 
-/*
- To run migrations
-builder.Services.AddDbContext<PlatformDbContext>(options =>
-{
-  options.UseSqlServer(builder.Configuration.GetConnectionString("Platform"))
-  .LogTo(s => System.Diagnostics.Debug.WriteLine(s)); // To log queries
-});
-*/
+// Creates platform db if not exists
+var options = new DbContextOptionsBuilder<PlatformDbContext>()
+      .UseSqlServer(builder.Configuration.GetConnectionString("Platform"))
+      .Options;
+var dbContext = new PlatformDbContext(options);
+
+dbContext.Database.EnsureCreated();
+dbContext.Database.Migrate();
+
+dbContext.Dispose();
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
