@@ -6,6 +6,7 @@ namespace TuPencaUy.Core.API.Model.Requests
 {
   public class CreateTeamRequest
   {
+    [Required]
     public required string Name { get; set; }
     public byte[]? Logo { get; set; }
     public TeamTypeEnum TeamType { get; set; }
