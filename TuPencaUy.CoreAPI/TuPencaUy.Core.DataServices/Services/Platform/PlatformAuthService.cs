@@ -13,20 +13,21 @@
   using TuPencaUy.Core.DataAccessLogic;
   using TuPencaUy.Core.Enums;
   using TuPencaUy.Exceptions;
+  using TuPencaUy.Core.DataServices.Services.CommonLogic;
 
   public class PlatformAuthService : IAuthService
   {
     private readonly IGenericRepository<User> _userDAL;
     private readonly IGenericRepository<Role> _roleDAL;
-    private readonly IConfiguration _config;
+    private readonly IAuthLogic _authLogic;
     public PlatformAuthService(
       IGenericRepository<User> userDAL,
       IGenericRepository<Role> roleDAL,
-      IConfiguration config)
+      IAuthLogic authLogic)
     {
       _userDAL = userDAL;
       _roleDAL = roleDAL;
-      _config = config;
+      _authLogic = authLogic;
     }
     public UserDTO? Authenticate(string email, string password)
     {
@@ -36,7 +37,7 @@
 
       if (user == null) throw new InvalidCredentialsException();
 
-      return VerifyPassword(password, user.Password) ? new UserDTO
+      return user.Password.Equals(_authLogic.HashPassword(password, user.Password.Split('$')[0])) ? new UserDTO
       {
         Email = email,
         Id = user.Id,
@@ -52,6 +53,7 @@
       } : null;
 
     }
+
     public UserDTO? Authenticate(string token)
     {
       var tokenHandler = new JwtSecurityTokenHandler();
@@ -97,32 +99,7 @@
       var existingUser = _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Email == email });
       if (existingUser.Any()) return null;
 
-      return CreateNewUser(email, name, HashPassword(password));
-    }
-    public Tuple<string, DateTime> GenerateToken(UserDTO user, string? currentTenant = null)
-    {
-      var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JwtSettings:Key"]));
-      var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-      var claims = new[]
-      {
-        new Claim(ClaimTypes.Email, user.Email),
-        new Claim(ClaimTypes.Name, user.Name),
-        new Claim(ClaimTypes.Role, user.Role?.Id.ToString() ?? "undefined"),
-        new Claim("currentTenant", currentTenant ?? string.Empty),
-      };
-      var expires = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_config["JwtSettings:MinutesTokenLifeTime"]));
-
-      var token = new JwtSecurityToken(
-        _config["JwtSettings:Issuer"],
-        _config["JwtSettings:Audience"],
-        claims,
-        expires: expires,
-        signingCredentials: credentials);
-
-      var stringToken = new JwtSecurityTokenHandler().WriteToken(token);
-
-      return new Tuple<string, DateTime>(stringToken, expires);
+      return CreateNewUser(email, name, _authLogic.HashPassword(password));
     }
 
     private UserDTO CreateNewUser(string email, string name, string password = null)
@@ -141,56 +118,29 @@
 
       _userDAL.SaveChanges();
 
-      return new UserDTO
+      var userDTO =  new UserDTO
       {
         Email = email,
-        Name = name,
-        Role = role != null ? new RoleDTO
+        Name = name
+      };
+
+      if (role != null) {
+        userDTO.Role = new RoleDTO
         {
           Name = role.Name,
-          Id = role.Id,
-          Permissions = role.Permissions
+          Id = role.Id
+        };
+
+        if (role.Permissions != null)
+        {
+          userDTO.Role.Permissions = role.Permissions
             .Select(y => new PermissionDTO { Id = y.Id, Name = y.Name })
-            .ToList() ?? new List<PermissionDTO>()
-        } : null
-      };
+            .ToList() ?? new List<PermissionDTO>();
+        }
+      }
+
+      return userDTO;
     }
-    private string HashPassword(string password)
-    {
-      byte[] salt = new byte[16];
-      RandomNumberGenerator.Create().GetBytes(salt);
-
-      string hashedPassword = Convert.ToBase64String(
-          KeyDerivation.Pbkdf2(
-              password: password,
-              salt: salt,
-              prf: KeyDerivationPrf.HMACSHA256,
-              iterationCount: 10000,
-              numBytesRequested: 32
-          )
-      );
-
-      string combinedHash = $"{Convert.ToBase64String(salt)}${hashedPassword}";
-
-      return combinedHash;
-    }
-    private bool VerifyPassword(string bodyPassword, string password)
-    {
-      string[] passwordHashParts = password.Split("$");
-      string passwordToCompare = passwordHashParts[1];
-      byte[] salt = Convert.FromBase64String(passwordHashParts[0]);
-
-      string hashedPasswordToVerify = Convert.ToBase64String(
-          KeyDerivation.Pbkdf2(
-              password: bodyPassword,
-              salt: salt,
-              prf: KeyDerivationPrf.HMACSHA256,
-              iterationCount: 10000,
-              numBytesRequested: 32
-          )
-      );
-
-      return passwordToCompare.Equals(hashedPasswordToVerify);
-    }
+    
   }
 }

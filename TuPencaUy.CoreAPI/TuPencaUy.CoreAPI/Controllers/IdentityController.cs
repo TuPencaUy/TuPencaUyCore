@@ -4,6 +4,7 @@ using TuPencaUy.Core.API.Model.Requests;
 using TuPencaUy.Core.API.Model.Responses;
 using TuPencaUy.Core.DataServices;
 using TuPencaUy.Core.DataServices.Services;
+using TuPencaUy.Core.DataServices.Services.CommonLogic;
 using TuPencaUy.CoreAPI.Controllers.Base;
 
 namespace TuPencaUy.CoreAPI.Controllers
@@ -12,8 +13,13 @@ namespace TuPencaUy.CoreAPI.Controllers
   [ApiController]
   public class IdentityController : BaseController
   {
+    private readonly IAuthLogic _authLogic;
     private readonly IAuthService _authService;
-    public IdentityController(IServiceFactory serviceFactory) => _authService = serviceFactory.GetService<IAuthService>(); 
+    public IdentityController(IServiceFactory serviceFactory)
+    {
+      _authService = serviceFactory.GetService<IAuthService>();
+      _authLogic = serviceFactory.GetService<IAuthLogic>();
+    }
 
     [HttpPost("BasicLogin")]
     public IActionResult BasicLogin([FromBody] LoginRequest login)
@@ -23,7 +29,7 @@ namespace TuPencaUy.CoreAPI.Controllers
       if (user != null)
       {
         Request.Headers.TryGetValue("currentTenant", out var currentTenant);
-        var tokenTuple = _authService.GenerateToken(user, currentTenant);
+        var tokenTuple = _authLogic.GenerateToken(user, currentTenant);
         var token = tokenTuple.Item1;
         var expiration = tokenTuple.Item2;
 
@@ -53,7 +59,7 @@ namespace TuPencaUy.CoreAPI.Controllers
       if (user != null)
       {
         Request.Headers.TryGetValue("currentTenant", out var currentTenant);
-        var tokenTuple = _authService.GenerateToken(user, currentTenant);
+        var tokenTuple = _authLogic.GenerateToken(user, currentTenant);
         var token = tokenTuple.Item1;
         var expiration = tokenTuple.Item2;
 
@@ -83,7 +89,7 @@ namespace TuPencaUy.CoreAPI.Controllers
       if (user != null)
       {
         Request.Headers.TryGetValue("currentTenant", out var currentTenant);
-        var tokenTuple = _authService.GenerateToken(user);
+        var tokenTuple = _authLogic.GenerateToken(user);
         var token = tokenTuple.Item1;
         var expiration = tokenTuple.Item2;
 
