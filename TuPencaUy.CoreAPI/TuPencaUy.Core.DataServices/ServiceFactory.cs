@@ -68,8 +68,6 @@ namespace TuPencaUy.Core.DataServices
 
     public void CreateTenantServices(string connectionString)
     {
-      CommonInjections();
-
       _serviceCollection = new ServiceCollection();
       _serviceCollection.AddDbContext<SiteDbContext>(options =>
       {
