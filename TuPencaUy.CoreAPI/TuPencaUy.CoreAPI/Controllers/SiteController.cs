@@ -42,6 +42,17 @@ namespace TuPencaUy.Core.API.Controllers
     [HttpPost("CreateSite")]
     public IActionResult CreateSite([FromBody] SiteRequest site)
     {
+      if(site.Name.Contains(' '))
+      {
+        var response = new ApiResponse
+        {
+          Error = true,
+          Message = "The site name can't contain withespaces"
+        };
+
+        return BadRequest(response);
+      }
+
       var siteDTO = new SiteDTO { Name = site.Name, AccessType = site.AccessType, Color = site.Color, Domain = site.Domain };
 
       UserDTO userFromToken = ObtainUserFromToken();
