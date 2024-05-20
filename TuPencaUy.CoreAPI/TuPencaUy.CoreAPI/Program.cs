@@ -5,12 +5,14 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TuPencaUy.Core.API.Middlewares;
 using TuPencaUy.Core.DataServices;
+using TuPencaUy.Core.DataServices.Services.CommonLogic;
 using TuPencaUy.Platform.DAO.Models.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddScoped<IServiceFactory, ServiceFactory>();
+builder.Services.AddScoped<IAuthLogic, AuthLogic>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
