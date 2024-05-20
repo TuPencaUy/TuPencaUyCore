@@ -65,7 +65,6 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
             .Options;
       var dbContext = new SiteDbContext(options);
 
-      dbContext.Database.EnsureCreated();
       dbContext.Database.Migrate();
 
       dbContext.Dispose();

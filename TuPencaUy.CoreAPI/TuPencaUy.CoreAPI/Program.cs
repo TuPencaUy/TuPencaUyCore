@@ -7,6 +7,7 @@ using TuPencaUy.Core.API.Middlewares;
 using TuPencaUy.Core.DataServices;
 using TuPencaUy.Core.DataServices.Services.CommonLogic;
 using TuPencaUy.Platform.DAO.Models.Data;
+using TuPencaUy.Site.DAO.Models.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +40,17 @@ builder.Services.AddDbContext<PlatformDbContext>(options =>
   .LogTo(s => System.Diagnostics.Debug.WriteLine(s)); // To log queries
 });
 */
+
+// Creates platform db if not exists
+var options = new DbContextOptionsBuilder<PlatformDbContext>()
+      .UseSqlServer(builder.Configuration.GetConnectionString("Platform"))
+      .Options;
+var dbContext = new PlatformDbContext(options);
+
+dbContext.Database.Migrate();
+
+dbContext.Dispose();
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
