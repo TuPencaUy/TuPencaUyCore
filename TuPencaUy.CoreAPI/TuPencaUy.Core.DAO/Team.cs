@@ -18,6 +18,11 @@ namespace TuPencaUy.Core.DAO
     [MaxLength(50)]
     [Column("Logo", Order = 2)]
     public byte[]? Logo { get; set; }
+
+    [ForeignKey("Sport")]
+    [Column("Sport", Order = 3)]
+    public int? Sport { get; set; }
+
     public TeamTypeEnum? TeamType { get; set; }
   }
 }

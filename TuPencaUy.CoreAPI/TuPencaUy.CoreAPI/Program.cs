@@ -38,12 +38,6 @@ builder.Services.AddDbContext<PlatformDbContext>(options =>
 });
 */
 
-builder.Services.AddDbContext<PlatformDbContext>(options =>
-{
-  options.UseSqlServer(builder.Configuration.GetConnectionString("Platform"))
-  .LogTo(s => System.Diagnostics.Debug.WriteLine(s)); // To log queries
-});
-
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

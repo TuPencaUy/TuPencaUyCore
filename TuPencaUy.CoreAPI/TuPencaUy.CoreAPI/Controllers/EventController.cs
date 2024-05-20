@@ -42,11 +42,11 @@ namespace TuPencaUy.Core.API.Controllers
     }
 
     [HttpGet]
-    public IActionResult GetEvents()
+    public IActionResult GetEvents(int page, int pageSize)
     {
       try
       {
-        var list = _eventService.GetEvents();
+        var list = _eventService.GetEvents(page, pageSize);
         var successResponse = new ApiResponse
         {
           Data = list,
@@ -83,11 +83,11 @@ namespace TuPencaUy.Core.API.Controllers
     }
 
     [HttpGet("Sport")]
-    public IActionResult GetSport()
+    public IActionResult GetSport(int page, int pageSize)
     {
       try
       {
-        var list = _eventService.GetSports();
+        var list = _eventService.GetSports(page, pageSize);
         var successResponse = new ApiResponse
         {
           Data = list,
@@ -112,6 +112,8 @@ namespace TuPencaUy.Core.API.Controllers
       {
         Name = team.Name,
         Logo = team.Logo,
+        Sport = team.Sport,
+        TeamType = team.TeamType,
       };
 
       var created = _eventService.CreateTeam(teamDTO, out string? errorMessage);
@@ -122,11 +124,11 @@ namespace TuPencaUy.Core.API.Controllers
     }
 
     [HttpGet("Team")]
-    public IActionResult GetTeams()
+    public IActionResult GetTeams(int page, int pageSize)
     {
       try
       {
-        var list = _eventService.GetTeams();
+        var list = _eventService.GetTeams(page, pageSize);
         var successResponse = new ApiResponse
         {
           Data = list,
@@ -164,11 +166,11 @@ namespace TuPencaUy.Core.API.Controllers
     }
 
     [HttpGet("Match")]
-    public IActionResult GetMatches()
+    public IActionResult GetMatches(int page, int pageSize)
     {
       try
       {
-        var list = _eventService.GetMatches();
+        var list = _eventService.GetMatches(page, pageSize);
         var successResponse = new ApiResponse
         {
           Data = list,
