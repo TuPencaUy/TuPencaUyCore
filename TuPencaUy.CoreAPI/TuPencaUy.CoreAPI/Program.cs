@@ -6,6 +6,7 @@ using System.Text;
 using TuPencaUy.Core.API.Middlewares;
 using TuPencaUy.Core.DataServices;
 using TuPencaUy.Platform.DAO.Models.Data;
+using TuPencaUy.Site.DAO.Models.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,13 +30,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
       };
     });
 
+/*
+ To run migrations
+builder.Services.AddDbContext<PlatformDbContext>(options =>
+{
+  options.UseSqlServer(builder.Configuration.GetConnectionString("Platform"))
+  .LogTo(s => System.Diagnostics.Debug.WriteLine(s)); // To log queries
+});
+*/
+
 // Creates platform db if not exists
 var options = new DbContextOptionsBuilder<PlatformDbContext>()
       .UseSqlServer(builder.Configuration.GetConnectionString("Platform"))
       .Options;
 var dbContext = new PlatformDbContext(options);
 
-dbContext.Database.EnsureCreated();
 dbContext.Database.Migrate();
 
 dbContext.Dispose();

@@ -32,15 +32,18 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
 
     public bool CreateUser(string email, string name, UserRoleEnum role)
     {
+      Role userRole = _roleDAL.Get(new List<Expression<Func<Role, bool>>>
+        {
+          x => x.Id == (int)role
+        }).FirstOrDefault();
+
       var newUser = new User
       {
         Email = email,
-        Name = name,
-        Role = _roleDAL.Get(new List<Expression<Func<Role, bool>>>
-        {
-          x => x.Id == (int)role
-        }).FirstOrDefault(),
+        Name = name
       };
+      if (userRole is not null) newUser.Role = userRole;
+
       _userDAL.Insert(newUser);
       _userDAL.SaveChanges();
 
