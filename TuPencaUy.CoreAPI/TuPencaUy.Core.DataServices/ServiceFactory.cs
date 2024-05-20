@@ -63,6 +63,7 @@ namespace TuPencaUy.Core.DataServices
       _serviceCollection.AddScoped<IAuthService, PlatformAuthService>();
       _serviceCollection.AddScoped<IUserService, PlatformUserService>();
       _serviceCollection.AddScoped<ISiteService, PlatformSiteService>();
+      _serviceCollection.AddScoped<IEventService, PlatformEventService>();
     }
 
     public void CreateTenantServices(string connectionString)
