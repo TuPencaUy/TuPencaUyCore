@@ -106,6 +106,7 @@
 
       var claims = new[]
       {
+        new Claim(ClaimTypes.Name, user.Name),
         new Claim(ClaimTypes.Email, user.Email),
         new Claim(ClaimTypes.Name, user.Name),
         new Claim(ClaimTypes.Role, user.Role?.Id.ToString() ?? "undefined"),

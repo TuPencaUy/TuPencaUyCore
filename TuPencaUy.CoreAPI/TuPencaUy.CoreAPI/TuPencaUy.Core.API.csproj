@@ -20,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\TuPencaUy.Core.DataAccessLogic\TuPencaUy.Core.DataAccessLogic.csproj" />
     <ProjectReference Include="..\TuPencaUy.Core.DataServices\TuPencaUy.Core.DataServices.csproj" />
+    <ProjectReference Include="..\TuPencaUy.Core.Enums\TuPencaUy.Core.Enums.csproj" />
   </ItemGroup>
 
 </Project>
