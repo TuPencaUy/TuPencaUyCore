@@ -6,6 +6,7 @@ using TuPencaUy.Core.DataServices;
 using TuPencaUy.Core.DataServices.Services;
 using TuPencaUy.Core.DataServices.Services.CommonLogic;
 using TuPencaUy.CoreAPI.Controllers.Base;
+using TuPencaUy.Exceptions;
 
 namespace TuPencaUy.CoreAPI.Controllers
 {
@@ -24,31 +25,54 @@ namespace TuPencaUy.CoreAPI.Controllers
     [HttpPost("BasicLogin")]
     public IActionResult BasicLogin([FromBody] LoginRequest login)
     {
-      var user = _authService.Authenticate(login.Email, login.Password);
-
-      if (user != null)
+      try
       {
-        Request.Headers.TryGetValue("currentTenant", out var currentTenant);
-        var tokenTuple = _authLogic.GenerateToken(user, currentTenant);
-        var token = tokenTuple.Item1;
-        var expiration = tokenTuple.Item2;
-
-        var successResponse = new ApiResponse
+        var user = _authService.Authenticate(login.Email, login.Password);
+        if (user != null)
         {
-          Message = $"Welcome {user.Name}",
-          Data = new { token, expiration, user },
+          Request.Headers.TryGetValue("currentTenant", out var currentTenant);
+          var tokenTuple = _authLogic.GenerateToken(user, currentTenant);
+          var token = tokenTuple.Item1;
+          var expiration = tokenTuple.Item2;
+
+          var successResponse = new ApiResponse
+          {
+            Message = $"Welcome {user.Name}",
+            Data = new { token, expiration, user },
+          };
+
+          return Ok(successResponse);
+        }
+
+        var errorResponse = new ApiResponse
+        {
+          Error = true,
+          Message = "User not found",
         };
 
-        return Ok(successResponse);
+        return StatusCode((int)HttpStatusCode.NotFound, errorResponse);
+
       }
-
-      var errorResponse = new ApiResponse
+      catch (InvalidCredentialsException ex)
       {
-        Error = true,
-        Message = "User not found",
-      };
+        var errorResponse = new ApiResponse
+        {
+          Error = true,
+          Message = ex.Message,
+        };
 
-      return StatusCode((int)HttpStatusCode.NotFound, errorResponse);
+        return StatusCode((int)HttpStatusCode.BadRequest, errorResponse);
+      }
+      catch(Exception)
+      {
+        var errorResponse = new ApiResponse
+        {
+          Error = true,
+          Message = "An internal error has occurred",
+        };
+
+        return StatusCode((int)HttpStatusCode.InternalServerError, errorResponse);
+      }
     }
 
     [HttpPost("BasicSignup")]
@@ -75,7 +99,7 @@ namespace TuPencaUy.CoreAPI.Controllers
       var errorResponse = new ApiResponse
       {
         Error = true,
-        Message = $"The email { request.Email } is in use",
+        Message = $"The email {request.Email} is in use",
       };
 
       return StatusCode((int)HttpStatusCode.Conflict, errorResponse);
