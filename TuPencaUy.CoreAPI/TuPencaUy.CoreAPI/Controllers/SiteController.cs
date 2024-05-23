@@ -38,11 +38,25 @@ namespace TuPencaUy.Core.API.Controllers
       }
     }
 
+    [HttpGet("{domain}/Users")]
+    public IActionResult GetUsers(string domain)
+    {
+      try
+      {
+        return Ok(new ApiResponse { Data = _siteService.GetUsers(domain) });
+      }
+      catch (SiteNotFoundException)
+      {
+        return NotFound(new ApiResponse { Error = true, Message = "Site not found" });
+      }
+    }
+
     [Authorize]
     [HttpPost("CreateSite")]
     public IActionResult CreateSite([FromBody] SiteRequest site)
     {
-      var siteDTO = new SiteDTO { Name = site.Name, AccessType = site.AccessType, Color = site.Color, Domain = site.Domain };
+      var siteDTO = new SiteDTO
+        { Name = site.Name, AccessType = site.AccessType, Color = site.Color, Domain = site.Domain };
 
       UserDTO userFromToken = ObtainUserFromToken();
 
@@ -57,7 +71,7 @@ namespace TuPencaUy.Core.API.Controllers
         .GetService<IUserService>()
         .CreateUser(userFromToken.Email, userFromToken.Name, UserRoleEnum.Admin);
 
-      return StatusCode((int)HttpStatusCode.Created ,new ApiResponse { Message = "Successfully created site" });
+      return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Message = "Successfully created site" });
     }
   }
 }

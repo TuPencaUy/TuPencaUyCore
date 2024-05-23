@@ -1,4 +1,5 @@
 ﻿using TuPencaUy.Core.DTOs;
+using TuPencaUy.DTOs;
 
 namespace TuPencaUy.Core.DataServices.Services
 {
@@ -7,5 +8,7 @@ namespace TuPencaUy.Core.DataServices.Services
     SiteDTO GetSiteByDomain(string domain);
 
     bool CreateNewSite(string ownerEmail, SiteDTO site, out string? errorMessage, out string? connectionString);
+
+    List<UserDTO> GetUsers(string domain);
   }
 }
