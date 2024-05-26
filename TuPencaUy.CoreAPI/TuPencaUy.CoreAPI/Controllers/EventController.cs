@@ -46,11 +46,17 @@ namespace TuPencaUy.Core.API.Controllers
     {
       try
       {
-        var list = _eventService.GetEvents(page, pageSize);
+        var list = _eventService.GetEvents(page, pageSize, out int count);
+
         var successResponse = new ApiResponse
         {
-          Data = list,
+          Data = new
+          {
+            list,
+            count
+          },
         };
+
         return Ok(successResponse);
       }
       catch (Exception ex)
@@ -87,11 +93,17 @@ namespace TuPencaUy.Core.API.Controllers
     {
       try
       {
-        var list = _eventService.GetSports(page, pageSize);
+        var list = _eventService.GetSports(page, pageSize, out int count);
+
         var successResponse = new ApiResponse
         {
-          Data = list,
+          Data = new
+          {
+            list,
+            count
+          },
         };
+
         return Ok(successResponse);
       }
       catch (Exception ex)
@@ -128,11 +140,17 @@ namespace TuPencaUy.Core.API.Controllers
     {
       try
       {
-        var list = _eventService.GetTeams(page, pageSize);
+        var list = _eventService.GetTeams(page, pageSize, out int count);
+
         var successResponse = new ApiResponse
         {
-          Data = list,
+          Data = new
+          {
+            list,
+            count
+          },
         };
+
         return Ok(successResponse);
       }
       catch (Exception ex)
@@ -170,11 +188,17 @@ namespace TuPencaUy.Core.API.Controllers
     {
       try
       {
-        var list = _eventService.GetMatches(page, pageSize);
+        var list = _eventService.GetMatches(page, pageSize, out int count);
+
         var successResponse = new ApiResponse
         {
-          Data = list,
+          Data = new
+          {
+            list,
+            count
+          },
         };
+
         return Ok(successResponse);
       }
       catch (Exception ex)
