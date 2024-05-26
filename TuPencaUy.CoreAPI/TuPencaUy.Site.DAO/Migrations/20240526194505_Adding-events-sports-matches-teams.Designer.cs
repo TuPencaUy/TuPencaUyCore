@@ -5,15 +5,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using TuPencaUy.Platform.DAO.Models.Data;
+using TuPencaUy.Site.DAO.Models.Data;
 
 #nullable disable
 
-namespace TuPencaUy.Platform.DAO.Migrations
+namespace TuPencaUy.Site.DAO.Migrations
 {
-    [DbContext(typeof(PlatformDbContext))]
-    [Migration("20240515034015_Adding-Matches-Sports-Teams")]
-    partial class AddingMatchesSportsTeams
+    [DbContext(typeof(SiteDbContext))]
+    [Migration("20240526194505_Adding-events-sports-matches-teams")]
+    partial class Addingeventssportsmatchesteams
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -40,7 +40,7 @@ namespace TuPencaUy.Platform.DAO.Migrations
                     b.ToTable("PermissionRole");
                 });
 
-            modelBuilder.Entity("TuPencaUy.Platform.DAO.Models.Event", b =>
+            modelBuilder.Entity("TuPencaUy.Core.DAO.BaseEvent", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -50,7 +50,7 @@ namespace TuPencaUy.Platform.DAO.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<double>("Comission")
+                    b.Property<double?>("Comission")
                         .HasColumnType("float")
                         .HasColumnName("Comission")
                         .HasColumnOrder(4);
@@ -58,13 +58,18 @@ namespace TuPencaUy.Platform.DAO.Migrations
                     b.Property<DateTime?>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("EndDate")
+                    b.Property<DateTime?>("EndDate")
                         .HasColumnType("DateTime")
                         .HasColumnName("EndDate")
                         .HasColumnOrder(3);
 
                     b.Property<bool>("Inactive")
                         .HasColumnType("bit");
+
+                    b.Property<bool>("Instantiable")
+                        .HasColumnType("bit")
+                        .HasColumnName("Instantiable")
+                        .HasColumnOrder(5);
 
                     b.Property<DateTime?>("LastModificationDate")
                         .HasColumnType("datetime2");
@@ -76,17 +81,27 @@ namespace TuPencaUy.Platform.DAO.Migrations
                         .HasColumnName("Name")
                         .HasColumnOrder(1);
 
-                    b.Property<DateTime>("StartDate")
+                    b.Property<DateTime?>("StartDate")
                         .HasColumnType("DateTime")
                         .HasColumnName("StartDate")
                         .HasColumnOrder(2);
 
+                    b.Property<int?>("TeamType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserEmail")
+                        .HasColumnType("varchar(50)");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Event", (string)null);
+                    b.HasIndex("UserEmail");
+
+                    b.ToTable("BaseEvent");
+
+                    b.UseTptMappingStrategy();
                 });
 
-            modelBuilder.Entity("TuPencaUy.Platform.DAO.Models.Match", b =>
+            modelBuilder.Entity("TuPencaUy.Site.DAO.Models.Match", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -99,18 +114,23 @@ namespace TuPencaUy.Platform.DAO.Migrations
                     b.Property<DateTime?>("CreationDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("Date")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("Date")
+                        .HasColumnOrder(5);
+
                     b.Property<int?>("EventId")
                         .HasColumnType("int");
-
-                    b.Property<int?>("FirstTeam")
-                        .HasColumnType("int")
-                        .HasColumnName("FirstTeam")
-                        .HasColumnOrder(2);
 
                     b.Property<int?>("FirstTeamScore")
                         .HasColumnType("int")
                         .HasColumnName("FirstTeamScore")
-                        .HasColumnOrder(4);
+                        .HasColumnOrder(3);
+
+                    b.Property<int?>("FirstTeam_id")
+                        .HasColumnType("int")
+                        .HasColumnName("FirstTeam")
+                        .HasColumnOrder(1);
 
                     b.Property<bool>("Inactive")
                         .HasColumnType("bit");
@@ -118,31 +138,35 @@ namespace TuPencaUy.Platform.DAO.Migrations
                     b.Property<DateTime?>("LastModificationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar")
-                        .HasColumnName("Name")
-                        .HasColumnOrder(1);
-
-                    b.Property<int?>("SecondTeam")
-                        .HasColumnType("int")
-                        .HasColumnName("SecondTeam")
-                        .HasColumnOrder(3);
-
                     b.Property<int?>("SecondTeamScore")
                         .HasColumnType("int")
                         .HasColumnName("SecondTeamScore")
-                        .HasColumnOrder(5);
+                        .HasColumnOrder(4);
+
+                    b.Property<int?>("SecondTeam_id")
+                        .HasColumnType("int")
+                        .HasColumnName("SecondTeam")
+                        .HasColumnOrder(2);
+
+                    b.Property<int?>("Sport_id")
+                        .HasColumnType("int")
+                        .HasColumnName("Sport")
+                        .HasColumnOrder(6);
 
                     b.HasKey("Id");
 
                     b.HasIndex("EventId");
 
+                    b.HasIndex("FirstTeam_id");
+
+                    b.HasIndex("SecondTeam_id");
+
+                    b.HasIndex("Sport_id");
+
                     b.ToTable("Match", (string)null);
                 });
 
-            modelBuilder.Entity("TuPencaUy.Platform.DAO.Models.Permission", b =>
+            modelBuilder.Entity("TuPencaUy.Site.DAO.Models.Permission", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -180,7 +204,7 @@ namespace TuPencaUy.Platform.DAO.Migrations
                     b.ToTable("Permission", (string)null);
                 });
 
-            modelBuilder.Entity("TuPencaUy.Platform.DAO.Models.Role", b =>
+            modelBuilder.Entity("TuPencaUy.Site.DAO.Models.Role", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -211,63 +235,7 @@ namespace TuPencaUy.Platform.DAO.Migrations
                     b.ToTable("Role", (string)null);
                 });
 
-            modelBuilder.Entity("TuPencaUy.Platform.DAO.Models.Site", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id")
-                        .HasColumnOrder(0);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("AccessType")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Color")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ConnectionString")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar")
-                        .HasColumnName("ConnectionString")
-                        .HasColumnOrder(3);
-
-                    b.Property<DateTime?>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Domain")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar")
-                        .HasColumnName("Domain")
-                        .HasColumnOrder(2);
-
-                    b.Property<bool>("Inactive")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastModificationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar")
-                        .HasColumnName("Name")
-                        .HasColumnOrder(1);
-
-                    b.Property<string>("UserEmail")
-                        .HasColumnType("varchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserEmail");
-
-                    b.ToTable("Site", (string)null);
-                });
-
-            modelBuilder.Entity("TuPencaUy.Platform.DAO.Models.Sport", b =>
+            modelBuilder.Entity("TuPencaUy.Site.DAO.Models.Sport", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -318,7 +286,7 @@ namespace TuPencaUy.Platform.DAO.Migrations
                     b.ToTable("Sport", (string)null);
                 });
 
-            modelBuilder.Entity("TuPencaUy.Platform.DAO.Models.Team", b =>
+            modelBuilder.Entity("TuPencaUy.Site.DAO.Models.Team", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -350,12 +318,22 @@ namespace TuPencaUy.Platform.DAO.Migrations
                         .HasColumnName("Name")
                         .HasColumnOrder(1);
 
+                    b.Property<int?>("Sport_id")
+                        .HasColumnType("int")
+                        .HasColumnName("Sport")
+                        .HasColumnOrder(3);
+
+                    b.Property<int?>("TeamType")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("Sport_id");
 
                     b.ToTable("Team", (string)null);
                 });
 
-            modelBuilder.Entity("TuPencaUy.Platform.DAO.Models.User", b =>
+            modelBuilder.Entity("TuPencaUy.Site.DAO.Models.User", b =>
                 {
                     b.Property<string>("Email")
                         .HasMaxLength(50)
@@ -365,6 +343,9 @@ namespace TuPencaUy.Platform.DAO.Migrations
 
                     b.Property<DateTime?>("CreationDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int?>("EventId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -400,66 +381,117 @@ namespace TuPencaUy.Platform.DAO.Migrations
 
                     b.HasKey("Email");
 
+                    b.HasIndex("EventId");
+
                     b.HasIndex("roleId");
 
                     b.ToTable("User", (string)null);
                 });
 
+            modelBuilder.Entity("TuPencaUy.Site.DAO.Models.Event", b =>
+                {
+                    b.HasBaseType("TuPencaUy.Core.DAO.BaseEvent");
+
+                    b.ToTable("Event", (string)null);
+                });
+
             modelBuilder.Entity("PermissionRole", b =>
                 {
-                    b.HasOne("TuPencaUy.Platform.DAO.Models.Permission", null)
+                    b.HasOne("TuPencaUy.Site.DAO.Models.Permission", null)
                         .WithMany()
                         .HasForeignKey("PermissionsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TuPencaUy.Platform.DAO.Models.Role", null)
+                    b.HasOne("TuPencaUy.Site.DAO.Models.Role", null)
                         .WithMany()
                         .HasForeignKey("RolesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TuPencaUy.Platform.DAO.Models.Match", b =>
+            modelBuilder.Entity("TuPencaUy.Core.DAO.BaseEvent", b =>
                 {
-                    b.HasOne("TuPencaUy.Platform.DAO.Models.Event", null)
-                        .WithMany("Matches")
-                        .HasForeignKey("EventId");
-                });
-
-            modelBuilder.Entity("TuPencaUy.Platform.DAO.Models.Site", b =>
-                {
-                    b.HasOne("TuPencaUy.Platform.DAO.Models.User", null)
-                        .WithMany("Sites")
+                    b.HasOne("TuPencaUy.Site.DAO.Models.User", null)
+                        .WithMany("Events")
                         .HasForeignKey("UserEmail");
                 });
 
-            modelBuilder.Entity("TuPencaUy.Platform.DAO.Models.Sport", b =>
+            modelBuilder.Entity("TuPencaUy.Site.DAO.Models.Match", b =>
                 {
-                    b.HasOne("TuPencaUy.Platform.DAO.Models.Event", null)
+                    b.HasOne("TuPencaUy.Site.DAO.Models.Event", null)
+                        .WithMany("Matches")
+                        .HasForeignKey("EventId");
+
+                    b.HasOne("TuPencaUy.Site.DAO.Models.Team", "FirstTeam")
+                        .WithMany()
+                        .HasForeignKey("FirstTeam_id");
+
+                    b.HasOne("TuPencaUy.Site.DAO.Models.Team", "SecondTeam")
+                        .WithMany()
+                        .HasForeignKey("SecondTeam_id");
+
+                    b.HasOne("TuPencaUy.Site.DAO.Models.Sport", "Sport")
+                        .WithMany()
+                        .HasForeignKey("Sport_id");
+
+                    b.Navigation("FirstTeam");
+
+                    b.Navigation("SecondTeam");
+
+                    b.Navigation("Sport");
+                });
+
+            modelBuilder.Entity("TuPencaUy.Site.DAO.Models.Sport", b =>
+                {
+                    b.HasOne("TuPencaUy.Site.DAO.Models.Event", null)
                         .WithMany("Sports")
                         .HasForeignKey("EventId");
                 });
 
-            modelBuilder.Entity("TuPencaUy.Platform.DAO.Models.User", b =>
+            modelBuilder.Entity("TuPencaUy.Site.DAO.Models.Team", b =>
                 {
-                    b.HasOne("TuPencaUy.Platform.DAO.Models.Role", "Role")
+                    b.HasOne("TuPencaUy.Site.DAO.Models.Sport", "Sport")
+                        .WithMany()
+                        .HasForeignKey("Sport_id");
+
+                    b.Navigation("Sport");
+                });
+
+            modelBuilder.Entity("TuPencaUy.Site.DAO.Models.User", b =>
+                {
+                    b.HasOne("TuPencaUy.Site.DAO.Models.Event", null)
+                        .WithMany("Users")
+                        .HasForeignKey("EventId");
+
+                    b.HasOne("TuPencaUy.Site.DAO.Models.Role", "Role")
                         .WithMany()
                         .HasForeignKey("roleId");
 
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("TuPencaUy.Platform.DAO.Models.Event", b =>
+            modelBuilder.Entity("TuPencaUy.Site.DAO.Models.Event", b =>
+                {
+                    b.HasOne("TuPencaUy.Core.DAO.BaseEvent", null)
+                        .WithOne()
+                        .HasForeignKey("TuPencaUy.Site.DAO.Models.Event", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("TuPencaUy.Site.DAO.Models.User", b =>
+                {
+                    b.Navigation("Events");
+                });
+
+            modelBuilder.Entity("TuPencaUy.Site.DAO.Models.Event", b =>
                 {
                     b.Navigation("Matches");
 
                     b.Navigation("Sports");
-                });
 
-            modelBuilder.Entity("TuPencaUy.Platform.DAO.Models.User", b =>
-                {
-                    b.Navigation("Sites");
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

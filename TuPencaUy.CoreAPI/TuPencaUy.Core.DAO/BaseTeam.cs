@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using TuPencaUy.Core.Enums;
 
 namespace TuPencaUy.Core.DAO
 {
-  public class Sport : ControlDate
+  public abstract class BaseTeam : ControlDate
   {
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Key]
@@ -14,13 +15,13 @@ namespace TuPencaUy.Core.DAO
     [Column("Name", Order = 1, TypeName = "varchar")]
     public required string Name { get; set; }
 
-    [Column("Tie", Order = 2, TypeName = "bit")]
-    public required bool Tie{ get; set; }
+    [Column("Logo", Order = 2, TypeName = "image")]
+    public byte[]? Logo { get; set; }
 
-    [Column("ExactPoints", Order = 3, TypeName = "int")]
-    public int? ExactPoints { get; set; }
+    [ForeignKey("Sport")]
+    [Column("Sport_id", Order = 3)]
+    public int? Sport_id { get; set; }
 
-    [Column("PartialPoints", Order = 4, TypeName = "int")]
-    public int? PartialPoints { get; set; }
+    public TeamTypeEnum? TeamType { get; set; }
   }
 }

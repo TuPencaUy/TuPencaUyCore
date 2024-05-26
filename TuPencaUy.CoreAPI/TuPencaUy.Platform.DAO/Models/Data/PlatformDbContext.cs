@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Text.RegularExpressions;
 using TuPencaUy.Core.DAO;
 
 namespace TuPencaUy.Platform.DAO.Models.Data
@@ -15,7 +14,7 @@ namespace TuPencaUy.Platform.DAO.Models.Data
     public DbSet<Site> Sites { get; set; }
     public DbSet<Event> Events { get; set; }
     public DbSet<Sport> Sports { get; set; }
-    public DbSet<Core.DAO.Match> Matches { get; set; }
+    public DbSet<Match> Matches { get; set; }
     public DbSet<Team> Teams { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -27,7 +26,7 @@ namespace TuPencaUy.Platform.DAO.Models.Data
       modelBuilder.Entity<Site>().ToTable("Site");
       modelBuilder.Entity<Event>().ToTable("Event");
       modelBuilder.Entity<Sport>().ToTable("Sport");
-      modelBuilder.Entity<Core.DAO.Match>().ToTable("Match");
+      modelBuilder.Entity<Match>().ToTable("Match");
       modelBuilder.Entity<Team>().ToTable("Team");
     }
   }

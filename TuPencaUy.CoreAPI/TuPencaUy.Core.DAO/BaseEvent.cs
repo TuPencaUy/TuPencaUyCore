@@ -4,7 +4,7 @@ using TuPencaUy.Core.Enums;
 
 namespace TuPencaUy.Core.DAO
 {
-  public class Event : ControlDate
+  public abstract class BaseEvent : ControlDate
   {
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Key]
@@ -23,8 +23,9 @@ namespace TuPencaUy.Core.DAO
 
     [Column("Comission", Order = 4, TypeName = "float")]
     public required float? Comission { get; set; }
-    public virtual ICollection<Sport>? Sports { get; set; }
-    public virtual ICollection<Match>? Matches { get; set; }
+
+    [Column("Instantiable", Order = 5, TypeName = "bit")]
+    public required bool Instantiable { get; set; } = true;
     public TeamTypeEnum? TeamType { get; set; }
   }
 }
