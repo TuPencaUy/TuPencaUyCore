@@ -18,10 +18,12 @@ namespace TuPencaUy.Core.API.Controllers
   {
     private readonly IServiceFactory _serviceFactory;
     private readonly ISiteService _siteService;
+    private readonly IUserService _userService;
 
     public SiteController(IServiceFactory serviceFactory)
     {
       _siteService = serviceFactory.GetService<ISiteService>();
+      _userService = serviceFactory.GetService<IUserService>();
       _serviceFactory = serviceFactory;
     }
 
@@ -62,11 +64,13 @@ namespace TuPencaUy.Core.API.Controllers
 
       if (!created) return BadRequest(new ApiResponse { Error = true, Message = errorMessage });
 
+      userFromToken = _userService.GetUserByEmail(userFromToken.Email);
+
       _serviceFactory
         .CreateTenantServices(connectionString);
       _serviceFactory
         .GetService<IUserService>()
-        .CreateUser(userFromToken.Email, userFromToken.Name, UserRoleEnum.Admin);
+        .CreateUser(userFromToken.Email, userFromToken.Name, userFromToken.Password, UserRoleEnum.Admin);
 
       return StatusCode((int)HttpStatusCode.Created ,new ApiResponse { Message = "Successfully created site" });
     }
