@@ -4,7 +4,7 @@
 
   public class User : BaseUser
   {
-    public virtual ICollection<BaseEvent>? Events { get; set; }
+    public virtual ICollection<Event>? Events { get; set; }
     public virtual Role? Role { get; set; }
   }
 }

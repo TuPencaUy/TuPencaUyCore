@@ -19,4 +19,8 @@
     <ProjectReference Include="..\TuPencaUy.Core.DAO\TuPencaUy.Core.DAO.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>

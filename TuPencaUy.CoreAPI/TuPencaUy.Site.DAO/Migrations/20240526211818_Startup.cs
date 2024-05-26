@@ -6,19 +6,13 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TuPencaUy.Site.DAO.Migrations
 {
     /// <inheritdoc />
-    public partial class Addingeventssportsmatchesteams : Migration
+    public partial class Startup : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
-                name: "EventId",
-                table: "User",
-                type: "int",
-                nullable: true);
-
             migrationBuilder.CreateTable(
-                name: "BaseEvent",
+                name: "Event",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -28,37 +22,47 @@ namespace TuPencaUy.Site.DAO.Migrations
                     EndDate = table.Column<DateTime>(type: "DateTime", nullable: true),
                     Comission = table.Column<double>(type: "float", nullable: true),
                     Instantiable = table.Column<bool>(type: "bit", nullable: false),
-                    TeamType = table.Column<int>(type: "int", nullable: true),
-                    UserEmail = table.Column<string>(type: "varchar(50)", nullable: true),
+                    Inactive = table.Column<bool>(type: "bit", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    TeamType = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Event", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Permission",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
+                    Description = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
                     Inactive = table.Column<bool>(type: "bit", nullable: false),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LastModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BaseEvent", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_BaseEvent_User_UserEmail",
-                        column: x => x.UserEmail,
-                        principalTable: "User",
-                        principalColumn: "Email");
+                    table.PrimaryKey("PK_Permission", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Event",
+                name: "Role",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
+                    Inactive = table.Column<bool>(type: "bit", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Event", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Event_BaseEvent_Id",
-                        column: x => x.Id,
-                        principalTable: "BaseEvent",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                    table.PrimaryKey("PK_Role", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -87,14 +91,62 @@ namespace TuPencaUy.Site.DAO.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PermissionRole",
+                columns: table => new
+                {
+                    PermissionsId = table.Column<int>(type: "int", nullable: false),
+                    RolesId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PermissionRole", x => new { x.PermissionsId, x.RolesId });
+                    table.ForeignKey(
+                        name: "FK_PermissionRole_Permission_PermissionsId",
+                        column: x => x.PermissionsId,
+                        principalTable: "Permission",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PermissionRole_Role_RolesId",
+                        column: x => x.RolesId,
+                        principalTable: "Role",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "User",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
+                    Email = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
+                    Password = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true),
+                    RoleId = table.Column<int>(type: "int", nullable: true),
+                    Inactive = table.Column<bool>(type: "bit", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_User", x => x.Email);
+                    table.ForeignKey(
+                        name: "FK_User_Role_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "Role",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Team",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
-                    Logo = table.Column<byte[]>(type: "varbinary(50)", maxLength: 50, nullable: true),
-                    Sport = table.Column<int>(type: "int", nullable: true),
+                    Logo = table.Column<byte[]>(type: "image", nullable: true),
+                    Sport_id = table.Column<int>(type: "int", nullable: true),
                     Inactive = table.Column<bool>(type: "bit", nullable: false),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LastModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -104,10 +156,34 @@ namespace TuPencaUy.Site.DAO.Migrations
                 {
                     table.PrimaryKey("PK_Team", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Team_Sport_Sport",
-                        column: x => x.Sport,
+                        name: "FK_Team_Sport_Sport_id",
+                        column: x => x.Sport_id,
                         principalTable: "Sport",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EventUser",
+                columns: table => new
+                {
+                    EventsId = table.Column<int>(type: "int", nullable: false),
+                    UsersEmail = table.Column<string>(type: "varchar(50)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EventUser", x => new { x.EventsId, x.UsersEmail });
+                    table.ForeignKey(
+                        name: "FK_EventUser_Event_EventsId",
+                        column: x => x.EventsId,
+                        principalTable: "Event",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EventUser_User_UsersEmail",
+                        column: x => x.UsersEmail,
+                        principalTable: "User",
+                        principalColumn: "Email",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -121,7 +197,7 @@ namespace TuPencaUy.Site.DAO.Migrations
                     FirstTeamScore = table.Column<int>(type: "int", nullable: true),
                     SecondTeamScore = table.Column<int>(type: "int", nullable: true),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Sport = table.Column<int>(type: "int", nullable: true),
+                    Sport_id = table.Column<int>(type: "int", nullable: true),
                     EventId = table.Column<int>(type: "int", nullable: true),
                     Inactive = table.Column<bool>(type: "bit", nullable: false),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -136,8 +212,8 @@ namespace TuPencaUy.Site.DAO.Migrations
                         principalTable: "Event",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Match_Sport_Sport",
-                        column: x => x.Sport,
+                        name: "FK_Match_Sport_Sport_id",
+                        column: x => x.Sport_id,
                         principalTable: "Sport",
                         principalColumn: "Id");
                     table.ForeignKey(
@@ -153,14 +229,9 @@ namespace TuPencaUy.Site.DAO.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_User_EventId",
-                table: "User",
-                column: "EventId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_BaseEvent_UserEmail",
-                table: "BaseEvent",
-                column: "UserEmail");
+                name: "IX_EventUser_UsersEmail",
+                table: "EventUser",
+                column: "UsersEmail");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Match_EventId",
@@ -178,9 +249,14 @@ namespace TuPencaUy.Site.DAO.Migrations
                 column: "SecondTeam");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Match_Sport",
+                name: "IX_Match_Sport_id",
                 table: "Match",
-                column: "Sport");
+                column: "Sport_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PermissionRole_RolesId",
+                table: "PermissionRole",
+                column: "RolesId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Sport_EventId",
@@ -188,47 +264,45 @@ namespace TuPencaUy.Site.DAO.Migrations
                 column: "EventId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Team_Sport",
+                name: "IX_Team_Sport_id",
                 table: "Team",
-                column: "Sport");
+                column: "Sport_id");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_User_Event_EventId",
+            migrationBuilder.CreateIndex(
+                name: "IX_User_RoleId",
                 table: "User",
-                column: "EventId",
-                principalTable: "Event",
-                principalColumn: "Id");
+                column: "RoleId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_User_Event_EventId",
-                table: "User");
+            migrationBuilder.DropTable(
+                name: "EventUser");
 
             migrationBuilder.DropTable(
                 name: "Match");
 
             migrationBuilder.DropTable(
+                name: "PermissionRole");
+
+            migrationBuilder.DropTable(
+                name: "User");
+
+            migrationBuilder.DropTable(
                 name: "Team");
+
+            migrationBuilder.DropTable(
+                name: "Permission");
+
+            migrationBuilder.DropTable(
+                name: "Role");
 
             migrationBuilder.DropTable(
                 name: "Sport");
 
             migrationBuilder.DropTable(
                 name: "Event");
-
-            migrationBuilder.DropTable(
-                name: "BaseEvent");
-
-            migrationBuilder.DropIndex(
-                name: "IX_User_EventId",
-                table: "User");
-
-            migrationBuilder.DropColumn(
-                name: "EventId",
-                table: "User");
         }
     }
 }
