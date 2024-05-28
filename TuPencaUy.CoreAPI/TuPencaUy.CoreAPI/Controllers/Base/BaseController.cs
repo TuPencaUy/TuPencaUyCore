@@ -19,5 +19,16 @@ namespace TuPencaUy.CoreAPI.Controllers.Base
 
       return new UserDTO { Name = name, Email = email };
     }
+
+    protected string ObtainTenantFromToken()
+    {
+      string authHeader = Request.Headers["Authorization"];
+
+      var tokenHandler = new JwtSecurityTokenHandler();
+      var jwtToken = tokenHandler.ReadJwtToken(authHeader.Split(' ')[1].Trim());
+      var currentTenant = jwtToken.Claims.FirstOrDefault(x => x.Type == "currentTenant")?.Value;
+      
+      return currentTenant;
+    }
   }
 }
