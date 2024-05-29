@@ -116,19 +116,29 @@
 
       _userDAL.SaveChanges();
 
-      return new UserDTO
+      var userDTO = new UserDTO
       {
         Email = email,
-        Name = name,
-        Role = role != null ? new RoleDTO
+        Name = name
+      };
+
+      if (role != null)
+      {
+        userDTO.Role = new RoleDTO
         {
           Name = role.Name,
-          Id = role.Id,
-          Permissions = role.Permissions
+          Id = role.Id
+        };
+
+        if (role.Permissions != null)
+        {
+          userDTO.Role.Permissions = role.Permissions
             .Select(y => new PermissionDTO { Id = y.Id, Name = y.Name })
-            .ToList() ?? new List<PermissionDTO>()
-        } : null
-      };
+            .ToList() ?? new List<PermissionDTO>();
+        }
+      }
+
+      return userDTO;
     }
   }
 }
