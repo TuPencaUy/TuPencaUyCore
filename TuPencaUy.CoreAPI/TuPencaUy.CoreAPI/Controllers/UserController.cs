@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using TuPencaUy.Core.API.Model.Requests;
 using TuPencaUy.Core.API.Model.Responses;
 using TuPencaUy.Core.DataServices;
 using TuPencaUy.Core.DataServices.Services;
@@ -30,13 +31,35 @@ namespace TuPencaUy.Core.API.Controllers
         var response = new ApiResponse
         {
           Data = user,
-          Message = $"Users with id {userId} was found"
+          Message = $"User with id {userId} was found"
         };
 
         return StatusCode((int)HttpStatusCode.OK, response);
 
       }
       catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
+    }
+
+    [HttpPost("Modify/{userId}")]
+    [Authorize]
+    public IActionResult ModifyUser(int userId, [FromBody] UserRequest userRequest)
+    {
+      try
+      {
+        var user = _userService.ModifyUser(userId, userRequest.Email, userRequest.Name, userRequest.Password);
+
+        var response = new ApiResponse
+        {
+          Data = user,
+          Message = $"User with id {userId} was modified"
+        };
+
+        return StatusCode((int)HttpStatusCode.OK, response);
+      }
+      catch(Exception ex)
       {
         return ManageException(ex);
       }
