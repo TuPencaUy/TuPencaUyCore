@@ -22,7 +22,28 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       _roleDAL = roleDAL;
       _eventDAL = eventDAL;
     }
-
+    public UserDTO GetUserById(int id)
+    {
+      return _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Id == id })
+        .Select(x => new UserDTO
+        {
+          Name = x.Name,
+          Email = x.Email,
+          Id = id,
+          Password = x.Password,
+          Role = x.Role == null ? null : new RoleDTO
+          {
+            Name = x.Role.Name,
+            Id = x.Role.Id,
+            Permissions = x.Role.Permissions == null ? null :
+              x.Role.Permissions
+              .ToList()
+              .Select(p => new PermissionDTO { Name = p.Name, Id = p.Id })
+              .ToList()
+          },
+        })
+        .FirstOrDefault() ?? throw new UserNotFoundException();
+    }
     public List<UserDTO> GetUsersByEvent(int eventId)
     {
       if(!_eventDAL.Get(new List<Expression<Func<Event, bool>>> { x => x.Id == eventId }).Any())

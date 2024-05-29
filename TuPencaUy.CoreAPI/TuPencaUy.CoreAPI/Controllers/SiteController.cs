@@ -44,35 +44,34 @@ namespace TuPencaUy.Core.API.Controllers
     [HttpPost("CreateSite")]
     public IActionResult CreateSite([FromBody] SiteRequest site)
     {
-      if(site.Name.Contains(' '))
+      try
       {
-        var response = new ApiResponse
-        {
-          Error = true,
-          Message = "The site name can't contain withespaces"
-        };
+        if (site.Name.Contains(' ')) throw new InvalidNameOfSiteException("The site name can't contain withespaces");
+        
 
-        return BadRequest(response);
+        var siteDTO = new SiteDTO { Name = site.Name, AccessType = site.AccessType, Color = site.Color, Domain = site.Domain };
+
+        UserDTO userFromToken = ObtainUserFromToken();
+
+        var created = _siteService
+          .CreateNewSite(userFromToken.Email, siteDTO, out string? errorMessage, out string? connectionString);
+
+        if (!created) return BadRequest(new ApiResponse { Error = true, Message = errorMessage });
+
+        userFromToken = _userService.GetUserByEmail(userFromToken.Email);
+
+        _serviceFactory
+          .CreateTenantServices(connectionString);
+        _serviceFactory
+          .GetService<IUserService>()
+          .CreateUser(userFromToken.Email, userFromToken.Name, userFromToken.Password, UserRoleEnum.Admin);
+
+        return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Message = "Successfully created site" });
       }
-
-      var siteDTO = new SiteDTO { Name = site.Name, AccessType = site.AccessType, Color = site.Color, Domain = site.Domain };
-
-      UserDTO userFromToken = ObtainUserFromToken();
-
-      var created = _siteService
-        .CreateNewSite(userFromToken.Email, siteDTO, out string? errorMessage, out string? connectionString);
-
-      if (!created) return BadRequest(new ApiResponse { Error = true, Message = errorMessage });
-
-      userFromToken = _userService.GetUserByEmail(userFromToken.Email);
-
-      _serviceFactory
-        .CreateTenantServices(connectionString);
-      _serviceFactory
-        .GetService<IUserService>()
-        .CreateUser(userFromToken.Email, userFromToken.Name, userFromToken.Password, UserRoleEnum.Admin);
-
-      return StatusCode((int)HttpStatusCode.Created ,new ApiResponse { Message = "Successfully created site" });
+      catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
     }
   }
 }
