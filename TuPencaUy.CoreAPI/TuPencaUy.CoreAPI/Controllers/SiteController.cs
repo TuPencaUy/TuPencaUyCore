@@ -70,5 +70,25 @@ namespace TuPencaUy.Core.API.Controllers
 
       return StatusCode((int)HttpStatusCode.Created ,new ApiResponse { Message = "Successfully created site" });
     }
+
+
+    [Authorize]
+    [HttpDelete("{siteID}")]
+    public IActionResult DeleteSite(int siteID)
+    {
+      try
+      {
+        _siteService.DeleteSite(siteID);
+
+        return Ok(new ApiResponse { Message = "Successfully deleted site" });
+      }
+      catch (SiteNotFoundException)
+      {
+        return NotFound(new ApiResponse { Error = true, Message = "Site not found" });
+      }catch (Exception ex)
+      {
+        return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse { Message = "Internal Error" });
+      }
+    }
   }
 }

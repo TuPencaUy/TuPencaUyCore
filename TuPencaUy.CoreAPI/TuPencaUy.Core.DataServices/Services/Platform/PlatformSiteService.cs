@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 using TuPencaUy.Core.DataAccessLogic;
 using TuPencaUy.Core.DTOs;
@@ -92,6 +91,18 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       _userDAL.SaveChanges();
 
       return true;
+    }
+
+    public void DeleteSite(int siteID)
+    {
+      var site = _siteDAL.Get(new List<Expression<Func<TuPencaUy.Platform.DAO.Models.Site, bool>>>
+      {
+        x => x.Id == siteID
+      }).FirstOrDefault() ?? throw new SiteNotFoundException();
+
+      site.Inactive = true;
+      _siteDAL.Update(site);
+      _siteDAL.SaveChanges();
     }
   }
 }
