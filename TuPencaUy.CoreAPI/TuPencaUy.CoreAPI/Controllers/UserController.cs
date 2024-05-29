@@ -19,7 +19,7 @@ namespace TuPencaUy.Core.API.Controllers
     }
 
     [HttpGet("{eventId}")]
-    //[Authorize]
+    [Authorize]
     public IActionResult GetByEvent(int eventId)
     {
       if (string.IsNullOrEmpty(ObtainTenantFromToken()))
