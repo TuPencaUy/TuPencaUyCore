@@ -61,12 +61,7 @@ namespace TuPencaUy.Core.API.Controllers
       }
       catch (Exception ex)
       {
-        var errorResponse = new ApiResponse
-        {
-          Message = ex.Message,
-          Error = true
-        };
-        return BadRequest(errorResponse);
+        return ManageException(ex);
       }      
     }
 
@@ -108,12 +103,7 @@ namespace TuPencaUy.Core.API.Controllers
       }
       catch (Exception ex)
       {
-        var errorResponse = new ApiResponse
-        {
-          Message = ex.Message,
-          Error = true
-        };
-        return BadRequest(errorResponse);
+        return ManageException(ex);
       }
     }
 
@@ -155,12 +145,7 @@ namespace TuPencaUy.Core.API.Controllers
       }
       catch (Exception ex)
       {
-        var errorResponse = new ApiResponse
-        {
-          Message = ex.Message,
-          Error = true
-        };
-        return BadRequest(errorResponse);
+        return ManageException(ex);
       }
     }
 

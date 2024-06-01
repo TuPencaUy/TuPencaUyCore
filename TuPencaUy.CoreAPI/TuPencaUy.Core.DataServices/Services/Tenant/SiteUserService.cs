@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using TuPencaUy.Core.DataAccessLogic;
+using TuPencaUy.Core.DataServices.Services.CommonLogic;
 using TuPencaUy.Core.Enums;
 using TuPencaUy.Core.Exceptions;
 using TuPencaUy.DTOs;
@@ -13,16 +14,40 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
     private readonly IGenericRepository<User> _userDAL;
     private readonly IGenericRepository<Role> _roleDAL;
     private readonly IGenericRepository<Event> _eventDAL;
+    private readonly IAuthLogic _authLogic;
     public SiteUserService(
       IGenericRepository<User> userDAL,
       IGenericRepository<Role> roleDAL,
-      IGenericRepository<Event> eventDAL)
+      IGenericRepository<Event> eventDAL,
+      IAuthLogic authLogic)
     {
       _userDAL = userDAL;
       _roleDAL = roleDAL;
       _eventDAL = eventDAL;
+      _authLogic = authLogic;
     }
-
+    public UserDTO GetUserById(int id)
+    {
+      return _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Id == id })
+        .Select(x => new UserDTO
+        {
+          Name = x.Name,
+          Email = x.Email,
+          Id = id,
+          Password = x.Password,
+          Role = x.Role == null ? null : new RoleDTO
+          {
+            Name = x.Role.Name,
+            Id = x.Role.Id,
+            Permissions = x.Role.Permissions == null ? null :
+              x.Role.Permissions
+              .ToList()
+              .Select(p => new PermissionDTO { Name = p.Name, Id = p.Id })
+              .ToList()
+          },
+        })
+        .FirstOrDefault() ?? throw new UserNotFoundException();
+    }
     public List<UserDTO> GetUsersByEvent(int eventId)
     {
       if(!_eventDAL.Get(new List<Expression<Func<Event, bool>>> { x => x.Id == eventId }).Any())
@@ -110,6 +135,54 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       _userDAL.SaveChanges();
 
       return true;
+    }
+
+    public UserDTO ModifyUser(int userId, string? email, string? name, string? password)
+    {
+      var dbUser = _userDAL.Get(new List<Expression<Func<User, bool>>> { user => user.Id == userId })
+        .FirstOrDefault() ?? throw new UserNotFoundException();
+
+      if (email is not null && email != dbUser.Email)
+      {
+        var userWithEmail = _userDAL.Get(new List<Expression<Func<User, bool>>>
+        {
+          user => user.Email == user.Email
+        }).Any();
+        if (userWithEmail)
+        {
+          throw new EmailAlreadyInUseException($"The email {email} is already in use");
+        }
+      }
+
+      if (email is not null) dbUser.Email = email;
+      if (name is not null) dbUser.Name = name;
+      if (password is not null) dbUser.Password = _authLogic.HashPassword(password);
+
+      if ((email is not null && email != dbUser.Email)
+        || (name is not null && name != dbUser.Name)
+        || (password is not null))
+      {
+        _userDAL.Update(dbUser);
+        _userDAL.SaveChanges();
+      }
+
+      return new UserDTO
+      {
+        Name = dbUser.Name,
+        Email = dbUser.Email,
+        Id = dbUser.Id,
+        Password = dbUser.Password,
+        Role = dbUser.Role == null ? null : new RoleDTO
+        {
+          Name = dbUser.Role.Name,
+          Id = dbUser.Role.Id,
+          Permissions = dbUser.Role.Permissions == null ? null :
+              dbUser.Role.Permissions
+              .ToList()
+              .Select(p => new PermissionDTO { Name = p.Name, Id = p.Id })
+              .ToList()
+        }
+      };
     }
   }
 }

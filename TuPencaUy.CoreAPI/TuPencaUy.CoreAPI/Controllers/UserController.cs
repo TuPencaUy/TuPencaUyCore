@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using TuPencaUy.Core.API.Model.Requests;
 using TuPencaUy.Core.API.Model.Responses;
 using TuPencaUy.Core.DataServices;
 using TuPencaUy.Core.DataServices.Services;
 using TuPencaUy.Core.Exceptions;
 using TuPencaUy.CoreAPI.Controllers.Base;
+using TuPencaUy.Exceptions;
 
 namespace TuPencaUy.Core.API.Controllers
 {
@@ -18,7 +20,52 @@ namespace TuPencaUy.Core.API.Controllers
       _userService = serviceFactory.GetService<IUserService>();
     }
 
-    [HttpGet("{eventId}")]
+    [HttpGet("{userId}")]
+    [Authorize]
+    public IActionResult Get(int userId)
+    {
+      try
+      {
+        var user = _userService.GetUserById(userId);
+
+        var response = new ApiResponse
+        {
+          Data = user,
+          Message = $"User with id {userId} was found"
+        };
+
+        return StatusCode((int)HttpStatusCode.OK, response);
+
+      }
+      catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
+    }
+
+    [HttpPost("Modify/{userId}")]
+    [Authorize]
+    public IActionResult ModifyUser(int userId, [FromBody] UserRequest userRequest)
+    {
+      try
+      {
+        var user = _userService.ModifyUser(userId, userRequest.Email, userRequest.Name, userRequest.Password);
+
+        var response = new ApiResponse
+        {
+          Data = user,
+          Message = $"User with id {userId} was modified"
+        };
+
+        return StatusCode((int)HttpStatusCode.OK, response);
+      }
+      catch(Exception ex)
+      {
+        return ManageException(ex);
+      }
+    }
+
+    [HttpGet]
     [Authorize]
     public IActionResult GetByEvent(int eventId)
     {
@@ -39,25 +86,9 @@ namespace TuPencaUy.Core.API.Controllers
 
         return StatusCode((int)HttpStatusCode.OK, response);
       }
-      catch(EventNotFoundException ex)
+      catch (Exception ex)
       {
-        var errorResponse = new ApiResponse
-        {
-          Error = true,
-          Message = ex.Message,
-        };
-
-        return StatusCode((int)HttpStatusCode.NotFound, errorResponse);
-      }
-      catch (Exception)
-      {
-        var errorResponse = new ApiResponse
-        {
-          Error = true,
-          Message = "An internal error has occurred",
-        };
-
-        return StatusCode((int)HttpStatusCode.InternalServerError, errorResponse);
+        return ManageException(ex);
       }
     }
   }

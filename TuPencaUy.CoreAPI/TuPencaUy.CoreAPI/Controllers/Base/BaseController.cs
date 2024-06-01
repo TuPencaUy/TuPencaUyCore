@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
+using TuPencaUy.Core.API.Model.Responses;
+using TuPencaUy.Core.Exceptions;
 using TuPencaUy.DTOs;
 
 namespace TuPencaUy.CoreAPI.Controllers.Base
@@ -27,8 +29,31 @@ namespace TuPencaUy.CoreAPI.Controllers.Base
       var tokenHandler = new JwtSecurityTokenHandler();
       var jwtToken = tokenHandler.ReadJwtToken(authHeader.Split(' ')[1].Trim());
       var currentTenant = jwtToken.Claims.FirstOrDefault(x => x.Type == "currentTenant")?.Value;
-      
+
       return currentTenant;
+    }
+
+    protected IActionResult ManageException(Exception ex)
+    {
+      var errorResponse = new ApiResponse();
+
+      if (ex is NotFoundException)
+      {
+        errorResponse.Error = true;
+        errorResponse.Message = ex.Message;
+        return StatusCode((int)HttpStatusCode.NotFound, errorResponse);
+      }
+
+      if(ex is BadRequestException)
+      {
+        errorResponse.Error = true;
+        errorResponse.Message = ex.Message;
+        return StatusCode((int)HttpStatusCode.BadRequest, errorResponse);
+      }
+
+      errorResponse.Error = true;
+      errorResponse.Message = "An internal error has occurred";
+      return StatusCode((int)HttpStatusCode.InternalServerError, errorResponse);
     }
   }
 }
