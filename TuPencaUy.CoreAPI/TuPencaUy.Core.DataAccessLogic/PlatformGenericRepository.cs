@@ -54,12 +54,16 @@ namespace TuPencaUy.Core.DataAccessLogic
     }
     public void Delete(TEntity entity)
     {
+      /*
       if (_context.Entry(entity).State == EntityState.Detached)
       {
         _dbSet.Attach(entity);
       }
 
       _dbSet.Remove(entity);
+      */
+      entity.Inactive = true;
+      Update(entity);
     }
     public void Update(TEntity entity)
     {
