@@ -8,6 +8,6 @@ namespace TuPencaUy.Core.DTOs
     public required string Name { get; set; }
     public byte[]? Logo { get; set; }
     public TeamTypeEnum? TeamType { get; set; }
-    public int? Sport { get; set; }
+    public SportDTO? Sport { get; set; }
   }
 }
