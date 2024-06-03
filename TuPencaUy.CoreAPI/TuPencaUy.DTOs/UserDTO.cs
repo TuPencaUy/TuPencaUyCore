@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using TuPencaUy.Core.DTOs;
 
 namespace TuPencaUy.DTOs
 {
@@ -15,5 +16,7 @@ namespace TuPencaUy.DTOs
     public string? Password { get; set; }
     public string? Email { get; set; }
     public RoleDTO? Role { get; set; }
+
+    public SiteDTO? Site { get; set; }
   }
 }
