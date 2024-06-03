@@ -43,7 +43,7 @@ namespace TuPencaUy.Core.API.Controllers
       }
     }
 
-    [HttpPost("Modify/{userId}")]
+    [HttpPatch("Modify/{userId}")]
     [Authorize]
     public IActionResult ModifyUser(int userId, [FromBody] UserRequest userRequest)
     {
