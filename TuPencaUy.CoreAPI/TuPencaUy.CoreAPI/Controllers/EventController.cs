@@ -29,7 +29,8 @@ namespace TuPencaUy.Core.API.Controllers
         Name = requestEvent.Name,
         StartDate = requestEvent.StartDate,
         EndDate = requestEvent.EndDate,
-        Comission = requestEvent.Comission
+        Comission = requestEvent.Comission,
+        TeamType = requestEvent.TeamType
       };
 
       var created = _eventService.CreateEvent(eventDTO, out string? errorMessage);
