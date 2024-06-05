@@ -53,25 +53,9 @@ namespace TuPencaUy.CoreAPI.Controllers
         return StatusCode((int)HttpStatusCode.NotFound, errorResponse);
 
       }
-      catch (InvalidCredentialsException ex)
+      catch(Exception ex)
       {
-        var errorResponse = new ApiResponse
-        {
-          Error = true,
-          Message = ex.Message,
-        };
-
-        return StatusCode((int)HttpStatusCode.BadRequest, errorResponse);
-      }
-      catch(Exception)
-      {
-        var errorResponse = new ApiResponse
-        {
-          Error = true,
-          Message = "An internal error has occurred",
-        };
-
-        return StatusCode((int)HttpStatusCode.InternalServerError, errorResponse);
+        return ManageException(ex);
       }
     }
 

@@ -14,6 +14,7 @@
   using TuPencaUy.Core.Enums;
   using TuPencaUy.Exceptions;
   using TuPencaUy.Core.DataServices.Services.CommonLogic;
+  using TuPencaUy.Core.DTOs;
 
   public class SiteAuthService : IAuthService
   {
@@ -33,24 +34,26 @@
     {
       var user = _userDAL
         .Get(new List<Expression<Func<User, bool>>> { x => x.Email == email })
-          .FirstOrDefault();
+        .Select( user => new UserDTO
+        {
+          Password = user.Password,
+          Email = user.Email,
+          Id = user.Id,
+          Name = user.Name,
+          Role = user.Role != null ? new RoleDTO
+          {
+            Name = user.Role.Name,
+            Id = user.Role.Id,
+            Permissions = user.Role.Permissions
+             .Select(y => new PermissionDTO { Id = y.Id, Name = y.Name })
+             .ToList() ?? new List<PermissionDTO>()
+          } : null,
+        })
+        .FirstOrDefault();
 
       if (user == null) throw new InvalidCredentialsException();
 
-      return user.Password.Equals(_authLogic.HashPassword(password, user.Password.Split('$')[0])) ? new UserDTO
-      {
-        Email = email,
-        Id = user.Id,
-        Name = user.Name,
-        Role = user.Role != null ? new RoleDTO
-        {
-          Name = user.Role.Name,
-          Id = user.Role.Id,
-          Permissions = user.Role.Permissions
-             .Select(y => new PermissionDTO { Id = y.Id, Name = y.Name })
-             .ToList() ?? new List<PermissionDTO>()
-        } : null,
-      } : null;
+      return user.Password.Equals(_authLogic.HashPassword(password, user.Password.Split('$')[0])) ? user : null;
 
     }
     public UserDTO? Authenticate(string token)
@@ -62,19 +65,20 @@
         var jwtToken = tokenHandler.ReadJwtToken(token);
         var userEmail = jwtToken.Claims.FirstOrDefault(x => x.Type == "email")?.Value;
 
-        var user = _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Email == userEmail })
-        .Select(x => new UserDTO
+        var user = _userDAL
+        .Get(new List<Expression<Func<User, bool>>> { x => x.Email == userEmail })
+        .Select(user => new UserDTO
         {
-          Email = userEmail,
-          Id = x.Id,
-          Name = x.Name,
-          Role = x.Role != null ? new RoleDTO
+          Email = user.Email,
+          Id = user.Id,
+          Name = user.Name,
+          Role = user.Role != null ? new RoleDTO
           {
-            Name = x.Role.Name,
-            Id = x.Role.Id,
-            Permissions = x.Role.Permissions
-            .Select(y => new PermissionDTO { Id = y.Id, Name = y.Name })
-            .ToList() ?? new List<PermissionDTO>()
+            Name = user.Role.Name,
+            Id = user.Role.Id,
+            Permissions = user.Role.Permissions
+             .Select(y => new PermissionDTO { Id = y.Id, Name = y.Name })
+             .ToList() ?? new List<PermissionDTO>()
           } : null,
         })
         .FirstOrDefault();
@@ -116,19 +120,29 @@
 
       _userDAL.SaveChanges();
 
-      return new UserDTO
+      var userDTO = new UserDTO
       {
         Email = email,
-        Name = name,
-        Role = role != null ? new RoleDTO
+        Name = name
+      };
+
+      if (role != null)
+      {
+        userDTO.Role = new RoleDTO
         {
           Name = role.Name,
-          Id = role.Id,
-          Permissions = role.Permissions
+          Id = role.Id
+        };
+
+        if (role.Permissions != null)
+        {
+          userDTO.Role.Permissions = role.Permissions
             .Select(y => new PermissionDTO { Id = y.Id, Name = y.Name })
-            .ToList() ?? new List<PermissionDTO>()
-        } : null
-      };
+            .ToList() ?? new List<PermissionDTO>();
+        }
+      }
+
+      return userDTO;
     }
   }
 }
