@@ -42,7 +42,7 @@ namespace TuPencaUy.Core.API.Controllers
     [HttpPost("CreateSite")]
     public IActionResult CreateSite([FromBody] SiteRequest site)
     {
-      if(site.Name.Contains(' '))
+      if (site.Name.Contains(' '))
       {
         var response = new ApiResponse
         {
@@ -68,7 +68,7 @@ namespace TuPencaUy.Core.API.Controllers
         .GetService<IUserService>()
         .CreateUser(userFromToken.Email, userFromToken.Name, UserRoleEnum.Admin);
 
-      return StatusCode((int)HttpStatusCode.Created ,new ApiResponse { Message = "Successfully created site" });
+      return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Message = "Successfully created site" });
     }
 
 
@@ -85,7 +85,38 @@ namespace TuPencaUy.Core.API.Controllers
       catch (SiteNotFoundException)
       {
         return NotFound(new ApiResponse { Error = true, Message = "Site not found" });
-      }catch (Exception ex)
+      }
+      catch (Exception ex)
+      {
+        return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse { Message = "Internal Error" });
+      }
+    }
+
+
+    [Authorize]
+    [HttpPut("{siteID}")]
+    public IActionResult UpdateSite(int siteID, [FromBody] SiteRequest site)
+    {
+      try
+      {
+        SiteDTO siteDTO = new SiteDTO()
+        {
+          AccessType = site.AccessType,
+          Color = site.Color,
+          Domain = site.Domain,
+          Name = site.Name,
+          Id = siteID
+        };
+
+        _siteService.UpdateSite(siteDTO);
+
+        return Ok(new ApiResponse { Message = "Successfully updated site" });
+      }
+      catch (SiteNotFoundException)
+      {
+        return NotFound(new ApiResponse { Error = true, Message = "Site not found" });
+      }
+      catch (Exception ex)
       {
         return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse { Message = "Internal Error" });
       }

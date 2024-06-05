@@ -9,5 +9,7 @@ namespace TuPencaUy.Core.DataServices.Services
     bool CreateNewSite(string ownerEmail, SiteDTO site, out string? errorMessage, out string? connectionString);
 
     void DeleteSite(int siteID);
+
+    void UpdateSite(SiteDTO site);
   }
 }

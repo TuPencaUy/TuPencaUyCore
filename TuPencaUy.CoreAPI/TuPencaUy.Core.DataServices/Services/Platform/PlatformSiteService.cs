@@ -104,5 +104,20 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       _siteDAL.Update(site);
       _siteDAL.SaveChanges();
     }
+
+    public void UpdateSite(SiteDTO siteDTO)
+    {
+      var site = _siteDAL.Get(new List<Expression<Func<TuPencaUy.Platform.DAO.Models.Site, bool>>>
+      {
+        x => x.Id == siteDTO.Id
+      }).FirstOrDefault() ?? throw new SiteNotFoundException();
+
+      site.Domain = siteDTO.Domain;
+      site.Color = siteDTO.Color;
+      site.AccessType = siteDTO.AccessType;
+
+      _siteDAL.Update(site);
+      _siteDAL.SaveChanges();
+    }
   }
 }
