@@ -21,9 +21,5 @@ namespace TuPencaUy.Core.DAO
     [MaxLength(100)]
     [Column("Password", Order = 3, TypeName = "varchar")]
     public string? Password { get; set; }
-
-    [ForeignKey("Role")]
-    [Column("RoleId", Order = 4)]
-    public int? roleId { get; set; }
   }
 }

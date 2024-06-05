@@ -14,6 +14,7 @@
   using TuPencaUy.Core.Enums;
   using TuPencaUy.Exceptions;
   using TuPencaUy.Core.DataServices.Services.CommonLogic;
+  using TuPencaUy.Core.DTOs;
 
   public class PlatformAuthService : IAuthService
   {
@@ -33,25 +34,37 @@
     {
       var user = _userDAL
         .Get(new List<Expression<Func<User, bool>>> { x => x.Email == email })
-          .FirstOrDefault();
+        .Select(user => new UserDTO
+        {
+          Site = user.Sites != null ? user.Sites
+            .Select(site => new SiteDTO
+            {
+              AccessType = site.AccessType,
+              Domain = site.Domain,
+              ConnectionString = site.ConnectionString,
+              Color = site.Color,
+              Id = site.Id,
+              Name = site.Name,
+            })
+            .FirstOrDefault() : null,
+          Password = user.Password,
+          Email = user.Email,
+          Id = user.Id,
+          Name = user.Name,
+          Role = user.Role != null ? new RoleDTO
+          {
+            Name = user.Role.Name,
+            Id = user.Role.Id,
+            Permissions = user.Role.Permissions
+             .Select(y => new PermissionDTO { Id = y.Id, Name = y.Name })
+             .ToList() ?? new List<PermissionDTO>()
+          } : null,
+        })
+        .FirstOrDefault();
 
       if (user == null) throw new InvalidCredentialsException();
 
-      return user.Password.Equals(_authLogic.HashPassword(password, user.Password.Split('$')[0])) ? new UserDTO
-      {
-        Email = email,
-        Id = user.Id,
-        Name = user.Name,
-        Role = user.Role != null ? new RoleDTO
-        {
-          Name = user.Role.Name,
-          Id = user.Role.Id,
-          Permissions = user.Role.Permissions
-             .Select(y => new PermissionDTO { Id = y.Id, Name = y.Name })
-             .ToList() ?? new List<PermissionDTO>()
-        } : null,
-      } : null;
-
+      return user.Password.Equals(_authLogic.HashPassword(password, user.Password.Split('$')[0])) ? user : null;
     }
 
     public UserDTO? Authenticate(string token)
@@ -64,18 +77,30 @@
         var userEmail = jwtToken.Claims.FirstOrDefault(x => x.Type == "email")?.Value;
 
         var user = _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Email == userEmail })
-        .Select(x => new UserDTO
+        .Select(user => new UserDTO
         {
-          Email = userEmail,
-          Id = x.Id,
-          Name = x.Name,
-          Role = x.Role != null ? new RoleDTO
+          Site = user.Sites != null ? user.Sites
+            .Select(site => new SiteDTO
+            {
+              AccessType = site.AccessType,
+              Domain = site.Domain,
+              ConnectionString = site.ConnectionString,
+              Color = site.Color,
+              Id = site.Id,
+              Name = site.Name,
+            })
+            .FirstOrDefault() : null,
+          Password = user.Password,
+          Email = user.Email,
+          Id = user.Id,
+          Name = user.Name,
+          Role = user.Role != null ? new RoleDTO
           {
-            Name = x.Role.Name,
-            Id = x.Role.Id,
-            Permissions = x.Role.Permissions
-            .Select(y => new PermissionDTO { Id = y.Id, Name = y.Name })
-            .ToList() ?? new List<PermissionDTO>()
+            Name = user.Role.Name,
+            Id = user.Role.Id,
+            Permissions = user.Role.Permissions
+             .Select(y => new PermissionDTO { Id = y.Id, Name = y.Name })
+             .ToList() ?? new List<PermissionDTO>()
           } : null,
         })
         .FirstOrDefault();
