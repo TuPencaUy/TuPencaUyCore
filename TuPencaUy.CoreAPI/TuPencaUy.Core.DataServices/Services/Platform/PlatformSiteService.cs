@@ -100,7 +100,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         x => x.Id == siteID
       }).FirstOrDefault() ?? throw new SiteNotFoundException();
 
-      site.Inactive = true;
+      _siteDAL.Delete(site);
       _siteDAL.Update(site);
       _siteDAL.SaveChanges();
     }
