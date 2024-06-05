@@ -101,7 +101,6 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       }).FirstOrDefault() ?? throw new SiteNotFoundException();
 
       _siteDAL.Delete(site);
-      _siteDAL.Update(site);
       _siteDAL.SaveChanges();
     }
 
