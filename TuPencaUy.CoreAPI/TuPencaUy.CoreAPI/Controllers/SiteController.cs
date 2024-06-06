@@ -44,7 +44,7 @@ namespace TuPencaUy.Core.API.Controllers
     [HttpPost("CreateSite")]
     public IActionResult CreateSite([FromBody] SiteRequest site)
     {
-      try
+      if (site.Name.Contains(' '))
       {
         if (site.Name.Contains(' ')) throw new InvalidNameOfSiteException("The site name can't contain withespaces");
         
@@ -66,11 +66,58 @@ namespace TuPencaUy.Core.API.Controllers
           .GetService<IUserService>()
           .CreateUser(userFromToken.Email, userFromToken.Name, userFromToken.Password, UserRoleEnum.Admin);
 
-        return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Message = "Successfully created site" });
+      return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Message = "Successfully created site" });
+    }
+
+
+    [Authorize]
+    [HttpDelete("{siteID}")]
+    public IActionResult DeleteSite(int siteID)
+    {
+      try
+      {
+        _siteService.DeleteSite(siteID);
+
+        return Ok(new ApiResponse { Message = "Successfully deleted site" });
+      }
+      catch (SiteNotFoundException)
+      {
+        return NotFound(new ApiResponse { Error = true, Message = "Site not found" });
       }
       catch (Exception ex)
       {
-        return ManageException(ex);
+        return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse { Message = "Internal Error" });
+      }
+    }
+
+
+    [Authorize]
+    [HttpPut("{siteID}")]
+    public IActionResult UpdateSite(int siteID, [FromBody] SiteRequest site)
+    {
+      try
+      {
+        SiteDTO siteDTO = new SiteDTO()
+        {
+          AccessType = site.AccessType,
+          Color = site.Color,
+          Domain = site.Domain,
+          Name = site.Name,
+          Id = siteID
+        };
+
+        _siteService.UpdateSite(siteDTO);
+
+        return Ok(new ApiResponse { Message = "Successfully updated site" });
+      }
+      catch (SiteNotFoundException)
+      {
+        return NotFound(new ApiResponse { Error = true, Message = "Site not found" });
+      }
+      catch (Exception ex)
+      {
+        return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse { Message = "Internal Error" });
+
       }
     }
   }
