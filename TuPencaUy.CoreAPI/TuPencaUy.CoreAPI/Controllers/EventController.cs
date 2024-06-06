@@ -38,7 +38,7 @@ namespace TuPencaUy.Core.API.Controllers
 
       if (!created) return BadRequest(new ApiResponse { Error = true, Message = errorMessage });
 
-      return StatusCode((int)HttpStatusCode.Created ,new ApiResponse { Message = "Successfully created event" });
+      return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Message = "Successfully created event" });
     }
 
     [HttpGet]
@@ -62,7 +62,7 @@ namespace TuPencaUy.Core.API.Controllers
       catch (Exception ex)
       {
         return ManageException(ex);
-      }      
+      }
     }
 
     [HttpPost("Sport")]
@@ -71,8 +71,8 @@ namespace TuPencaUy.Core.API.Controllers
       var sportDTO = new SportDTO
       {
         Name = sport.Name,
-        Tie= sport.Tie,
-        ExactPoints= sport.ExactPoints,
+        Tie = sport.Tie,
+        ExactPoints = sport.ExactPoints,
         PartialPoints = sport.PartialPoints
       };
 
@@ -114,7 +114,8 @@ namespace TuPencaUy.Core.API.Controllers
       {
         Name = team.Name,
         Logo = team.Logo,
-        Sport = team.Sport,
+        // TODO review this or the CreateTeam method to receive sport ID
+        Sport = new SportDTO { Id = team.Sport, Name = string.Empty, Tie = false },
         TeamType = team.TeamType,
       };
 
@@ -154,8 +155,9 @@ namespace TuPencaUy.Core.API.Controllers
     {
       var matchDTO = new MatchDTO
       {
-        FirstTeam = match.FirstTeam,
-        SecondTeam = match.SecondTeam,
+        // TODO review this or the CreateMatch method to receive team IDs
+        FirstTeam =  new TeamDTO { Id = match.FirstTeam, Name = string.Empty },
+        SecondTeam = new TeamDTO { Id = match.FirstTeam, Name = string.Empty },
         FirstTeamScore = match.FirstTeamScore,
         SecondTeamScore = match.SecondTeamScore,
         Date = match.Date
@@ -194,6 +196,86 @@ namespace TuPencaUy.Core.API.Controllers
           Error = true
         };
         return BadRequest(errorResponse);
+      }
+    }
+
+    [HttpGet("Match/{idMatch}")]
+    public IActionResult GetMatch(int idMatch)
+    {
+      try
+      {
+        var match = _eventService.GetMatch(idMatch);
+
+        var successResponse = new ApiResponse
+        {
+          Data = match,
+        };
+
+        return Ok(successResponse);
+      }
+      catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
+    }
+
+    [HttpGet("Team/{idTeam}")]
+    public IActionResult GetTeam(int idTeam)
+    {
+      try
+      {
+        var team = _eventService.GetTeam(idTeam);
+
+        var successResponse = new ApiResponse
+        {
+          Data = team,
+        };
+
+        return Ok(successResponse);
+      }
+      catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
+    }
+
+    [HttpGet("Sport/{idSport}")]
+    public IActionResult GetSport(int idSport)
+    {
+      try
+      {
+        var sport = _eventService.GetSport(idSport);
+
+        var successResponse = new ApiResponse
+        {
+          Data = sport,
+        };
+
+        return Ok(successResponse);
+      }
+      catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
+    }
+
+    [HttpGet("Event/{idEvent}")]
+    public IActionResult GetEvent(int idEvent)
+    {
+      try
+      {
+        var ev = _eventService.GetEvent(idEvent);
+
+        var successResponse = new ApiResponse
+        {
+          Data = ev,
+        };
+
+        return Ok(successResponse);
+      }
+      catch (Exception ex)
+      {
+        return ManageException(ex);
       }
     }
   }

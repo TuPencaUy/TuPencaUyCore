@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
-using TuPencaUy.Core.DAO;
 using TuPencaUy.Core.DataAccessLogic;
 using TuPencaUy.Core.DTOs;
+using TuPencaUy.Core.Exceptions;
 using TuPencaUy.Platform.DAO.Models;
 
 namespace TuPencaUy.Core.DataServices.Services.Platform
@@ -22,6 +22,103 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       _sportDAL = sportDAL;
       _teamDAL = teamDAL;
       _matchDAL = matchDAL;
+    }
+    public MatchDTO GetMatch(int idMatch)
+    {
+      return _matchDAL
+        .Get(new List<Expression<Func<Match, bool>>> { match => match.Id == idMatch })?
+        .Select(match => new MatchDTO
+        {
+          Id = match.Id,
+          FirstTeam = match.FirstTeam != null ? new TeamDTO
+          {
+            Id = match.FirstTeam.Id,
+            Name = match.FirstTeam.Name,
+            TeamType = match.FirstTeam.TeamType,
+            Sport = match.FirstTeam.Sport != null ? new SportDTO
+            {
+              Id = match.FirstTeam.Sport.Id,
+              Name = match.FirstTeam.Sport.Name,
+              ExactPoints = match.FirstTeam.Sport.ExactPoints,
+              Tie = match.FirstTeam.Sport.Tie,
+              PartialPoints = match.FirstTeam.Sport.PartialPoints,
+            } : null,
+            Logo = match.FirstTeam.Logo,
+          } : null,
+          SecondTeam = match.SecondTeam != null ? new TeamDTO
+          {
+            Id = match.SecondTeam.Id,
+            Name = match.SecondTeam.Name,
+            TeamType = match.SecondTeam.TeamType,
+            Sport = match.SecondTeam.Sport != null ? new SportDTO
+            {
+              Id = match.SecondTeam.Sport.Id,
+              Name = match.SecondTeam.Sport.Name,
+              ExactPoints = match.SecondTeam.Sport.ExactPoints,
+              Tie = match.SecondTeam.Sport.Tie,
+              PartialPoints = match.SecondTeam.Sport.PartialPoints,
+            } : null,
+            Logo = match.SecondTeam.Logo,
+          } : null,
+          FirstTeamScore = match.FirstTeamScore,
+          SecondTeamScore = match.SecondTeamScore,
+          Date = match.Date,
+          Sport = match.Sport != null ? new SportDTO
+          {
+            Id = match.Sport.Id,
+            Name = match.Sport.Name,
+            ExactPoints = match.Sport.ExactPoints,
+            Tie = match.Sport.Tie,
+            PartialPoints = match.Sport.PartialPoints,
+          } : null,
+        }).FirstOrDefault() ?? throw new MatchNotFoundException($"Match with id {idMatch} not found");
+    }
+    public TeamDTO GetTeam(int idTeam)
+    {
+      return _teamDAL
+        .Get(new List<Expression<Func<Team, bool>>> { team => team.Id == idTeam })?
+        .Select(team => new TeamDTO
+        {
+          Id = team.Id,
+          Name = team.Name,
+          TeamType = team.TeamType,
+          Sport = team.Sport != null ? new SportDTO
+          {
+            Id = team.Sport.Id,
+            Name = team.Sport.Name,
+            ExactPoints = team.Sport.ExactPoints,
+            Tie = team.Sport.Tie,
+            PartialPoints = team.Sport.PartialPoints,
+          } : null,
+          Logo = team.Logo,
+        }).FirstOrDefault() ?? throw new TeamNotFoundException($"Team with id {idTeam} not found");
+    }
+    public SportDTO GetSport(int idSport)
+    {
+      return _sportDAL
+        .Get(new List<Expression<Func<Sport, bool>>> { sport => sport.Id == idSport })?
+        .Select(s => new SportDTO
+        {
+          Id = s.Id,
+          Name = s.Name,
+          ExactPoints = s.ExactPoints,
+          Tie = s.Tie,
+          PartialPoints = s.PartialPoints,
+        }).FirstOrDefault() ?? throw new SportNotFoundException($"Sport with id {idSport} not found");
+    }
+    public EventDTO GetEvent(int idEvent)
+    {
+      return _eventDAL
+        .Get(new List<Expression<Func<Event, bool>>> { ev => ev.Id == idEvent })?
+        .Select(ev => new EventDTO
+        {
+          Id = ev.Id,
+          Name = ev.Name,
+          EndDate = ev.EndDate,
+          Comission = ev.Comission,
+          StartDate = ev.StartDate,
+          TeamType = ev.TeamType,
+        }).FirstOrDefault() ?? throw new EventNotFoundException($"Event with id {idEvent} not found");
     }
 
     public bool CreateEvent(EventDTO eventDTO, out string? errorMessage)
@@ -123,7 +220,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       errorMessage = null;
       var existingTeam = _teamDAL.Get(new List<Expression<Func<Team, bool>>>
       {
-        x => x.Name == teamDTO.Name && x.Sport_id == teamDTO.Sport
+        x => x.Name == teamDTO.Name && x.Sport_id == teamDTO.Sport.Id
       }).ToList();
 
       if (existingTeam.Count != 0)
@@ -132,14 +229,14 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         return false;
       }
 
-      var sport = _sportDAL.Get(new List<Expression<Func<Sport, bool>>> { x => x.Id == teamDTO.Sport }).FirstOrDefault();
-
+      var sport = _sportDAL.Get(new List<Expression<Func<Sport, bool>>> { x => x.Id == teamDTO.Sport.Id }).FirstOrDefault();
+      
       var newTeam = new Team
       {
         Name = teamDTO.Name,
         Logo = teamDTO.Logo,
         TeamType = teamDTO.TeamType,
-        Sport_id = teamDTO.Sport,
+        Sport_id = teamDTO.Sport.Id,
         Sport = sport
       };
 
@@ -163,7 +260,14 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
           Name = x.Name,
           Logo = x.Logo,
           TeamType = x.TeamType,
-          Sport = x.Sport.Id
+          Sport = x.Sport != null ? new SportDTO
+          {
+            Id = x.Sport.Id,
+            Name = x.Sport.Name,
+            ExactPoints = x.Sport.ExactPoints,
+            Tie = x.Sport.Tie,
+            PartialPoints = x.Sport.PartialPoints,
+          } : null,
         }).Skip((page - 1) * pageSize).Take(pageSize).ToList();
     }
 
@@ -182,13 +286,13 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         return false;
       }
 
-      var teams = _teamDAL.Get(new List<Expression<Func<Team, bool>>> { x => x.Id == matchDTO.FirstTeam || x.Id == matchDTO.SecondTeam })
+      var teams = _teamDAL.Get(new List<Expression<Func<Team, bool>>> { x => x.Id == matchDTO.FirstTeam.Id || x.Id == matchDTO.SecondTeam.Id })
         .ToList();
 
-      var firstTeam = teams.First(x => x.Id == matchDTO.FirstTeam);
-      var secondTeam = teams.First(x => x.Id == matchDTO.SecondTeam);
+      var firstTeam = teams.First(x => x.Id == matchDTO.FirstTeam.Id);
+      var secondTeam = teams.First(x => x.Id == matchDTO.SecondTeam.Id);
 
-      var sport = _sportDAL.Get(new List<Expression<Func<Sport, bool>>> { x => x.Id == matchDTO.Sport }).FirstOrDefault();
+      var sport = _sportDAL.Get(new List<Expression<Func<Sport, bool>>> { x => x.Id == matchDTO.Sport.Id }).FirstOrDefault();
 
       var newMatch = new Match
       {
@@ -222,14 +326,50 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       count = _matchDAL.Get().Count();
 
       return _matchDAL.Get()
-        .Select(x => new MatchDTO
+        .Select(match => new MatchDTO
         {
-          Id = x.Id,
-          Date = x.Date,
-          FirstTeam = x.FirstTeam.Id,
-          FirstTeamScore= x.FirstTeamScore,
-          SecondTeam = x.SecondTeam.Id,
-          SecondTeamScore = x.SecondTeamScore
+          Id = match.Id,
+          FirstTeam = match.FirstTeam != null ? new TeamDTO
+          {
+            Id = match.FirstTeam.Id,
+            Name = match.FirstTeam.Name,
+            TeamType = match.FirstTeam.TeamType,
+            Sport = match.FirstTeam.Sport != null ? new SportDTO
+            {
+              Id = match.FirstTeam.Sport.Id,
+              Name = match.FirstTeam.Sport.Name,
+              ExactPoints = match.FirstTeam.Sport.ExactPoints,
+              Tie = match.FirstTeam.Sport.Tie,
+              PartialPoints = match.FirstTeam.Sport.PartialPoints,
+            } : null,
+            Logo = match.FirstTeam.Logo,
+          } : null,
+          SecondTeam = match.SecondTeam != null ? new TeamDTO
+          {
+            Id = match.SecondTeam.Id,
+            Name = match.SecondTeam.Name,
+            TeamType = match.SecondTeam.TeamType,
+            Sport = match.SecondTeam.Sport != null ? new SportDTO
+            {
+              Id = match.SecondTeam.Sport.Id,
+              Name = match.SecondTeam.Sport.Name,
+              ExactPoints = match.SecondTeam.Sport.ExactPoints,
+              Tie = match.SecondTeam.Sport.Tie,
+              PartialPoints = match.SecondTeam.Sport.PartialPoints,
+            } : null,
+            Logo = match.SecondTeam.Logo,
+          } : null,
+          FirstTeamScore = match.FirstTeamScore,
+          SecondTeamScore = match.SecondTeamScore,
+          Date = match.Date,
+          Sport = match.Sport != null ? new SportDTO
+          {
+            Id = match.Sport.Id,
+            Name = match.Sport.Name,
+            ExactPoints = match.Sport.ExactPoints,
+            Tie = match.Sport.Tie,
+            PartialPoints = match.Sport.PartialPoints,
+          } : null,
         }).Skip((page - 1) * pageSize).Take(pageSize).ToList();
     }
   }
