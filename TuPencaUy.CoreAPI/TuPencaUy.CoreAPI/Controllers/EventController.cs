@@ -15,13 +15,11 @@ namespace TuPencaUy.Core.API.Controllers
   [Route("[controller]")]
   public class EventController : BaseController
   {
-    private readonly IServiceFactory _serviceFactory;
     private readonly IEventService _eventService;
 
     public EventController(IServiceFactory serviceFactory)
     {
       _eventService = serviceFactory.GetService<IEventService>();
-      _serviceFactory = serviceFactory;
     }
 
     [HttpPost]
@@ -31,7 +29,8 @@ namespace TuPencaUy.Core.API.Controllers
         Name = requestEvent.Name,
         StartDate = requestEvent.StartDate,
         EndDate = requestEvent.EndDate,
-        Comission = requestEvent.Comission
+        Comission = requestEvent.Comission,
+        TeamType = requestEvent.TeamType
       };
 
       var created = _eventService.CreateEvent(eventDTO, out string? errorMessage);
@@ -158,9 +157,10 @@ namespace TuPencaUy.Core.API.Controllers
         // TODO review this or the CreateMatch method to receive team IDs
         FirstTeam =  new TeamDTO { Id = match.FirstTeam, Name = string.Empty },
         SecondTeam = new TeamDTO { Id = match.FirstTeam, Name = string.Empty },
+        Sport = new SportDTO { Id = match.Sport, Tie = false, Name = string.Empty },
         FirstTeamScore = match.FirstTeamScore,
         SecondTeamScore = match.SecondTeamScore,
-        Date = match.Date
+        Date = match.Date,
       };
 
       var created = _eventService.CreateMatch(match.EventId, matchDTO, out string? errorMessage);
@@ -259,7 +259,7 @@ namespace TuPencaUy.Core.API.Controllers
       }
     }
 
-    [HttpGet("Event/{idEvent}")]
+    [HttpGet("{idEvent}")]
     public IActionResult GetEvent(int idEvent)
     {
       try
@@ -269,6 +269,170 @@ namespace TuPencaUy.Core.API.Controllers
         var successResponse = new ApiResponse
         {
           Data = ev,
+        };
+
+        return Ok(successResponse);
+      }
+      catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
+    }
+
+    [HttpDelete("Match/{idMatch}")]
+    public IActionResult DeleteMatch(int idMatch)
+    {
+      try
+      {
+        _eventService.DeleteMatch(idMatch);
+
+        var successResponse = new ApiResponse
+        {
+          Message = $"The match with id {idMatch} was deleted",
+        };
+
+        return Ok(successResponse);
+      }
+      catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
+    }
+
+    [HttpDelete("Team/{idTeam}")]
+    public IActionResult DeleteTeam(int idTeam)
+    {
+      try
+      {
+        _eventService.DeleteTeam(idTeam);
+
+        var successResponse = new ApiResponse
+        {
+          Message = $"The team with id {idTeam} was deleted",
+        };
+
+        return Ok(successResponse);
+      }
+      catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
+    }
+
+    [HttpDelete("Sport/{idSport}")]
+    public IActionResult DeleteSport(int idSport)
+    {
+      try
+      {
+        _eventService.DeleteSport(idSport);
+
+        var successResponse = new ApiResponse
+        {
+          Message = $"The sport with id {idSport} was deleted",
+        };
+
+        return Ok(successResponse);
+      }
+      catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
+    }
+
+    [HttpDelete("{idEvent}")]
+    public IActionResult DeleteEvent(int idEvent)
+    {
+      try
+      {
+        _eventService.DeleteEvent(idEvent);
+
+        var successResponse = new ApiResponse
+        {
+          Message = $"The event with id {idEvent} was deleted",
+        };
+
+        return Ok(successResponse);
+      }
+      catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
+    }
+
+    [HttpPatch("Match/{idMatch}")]
+    public IActionResult ModifyMatch(int idMatch, [FromBody] ModifyMatchRequest match)
+    {
+      try
+      {
+        var m =_eventService.ModifyMatch(idMatch, match.FirstTeam, match.SecondTeam, match.Date, match.FirstTeamScore, match.SecondTeamScore, match.Sport);
+
+        var successResponse = new ApiResponse
+        {
+          Data = m,
+          Message = $"The match with id {idMatch} was modified",
+        };
+
+        return Ok(successResponse);
+      }
+      catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
+    }
+
+    [HttpPatch("Team/{idTeam}")]
+    public IActionResult ModifyTeam(int idTeam, [FromBody] ModifyTeamRequest team)
+    {
+      try
+      {
+        var t =_eventService.ModifyTeam(idTeam, team.Name, team.Logo, team.TeamType, team.Sport);
+
+        var successResponse = new ApiResponse
+        {
+          Data = t,
+          Message = $"The team with id {idTeam} was modified",
+        };
+
+        return Ok(successResponse);
+      }
+      catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
+    }
+
+    [HttpPatch("Sport/{idSport}")]
+    public IActionResult ModifySport(int idSport, [FromBody] ModifySportRequest sport)
+    {
+      try
+      {
+        var s = _eventService.ModifySport(idSport, sport.Name, sport.Tie, sport.ExactPoints, sport.PartialPoints);
+
+        var successResponse = new ApiResponse
+        {
+          Data = s,
+          Message = $"The sport with id {idSport} was modified",
+        };
+
+        return Ok(successResponse);
+      }
+      catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
+    }
+
+    [HttpPatch("{idEvent}")]
+    public IActionResult ModifyEvent(int idEvent, [FromBody] ModifyEventRequest ev)
+    {
+      try
+      {
+        var e = _eventService.ModifyEvent(idEvent, ev.Name, ev.StartDate, ev.EndDate, ev.Comission, ev.TeamType);
+
+        var successResponse = new ApiResponse
+        {
+          Data= e,
+          Message = $"The event with id {idEvent} was modified",
         };
 
         return Ok(successResponse);
