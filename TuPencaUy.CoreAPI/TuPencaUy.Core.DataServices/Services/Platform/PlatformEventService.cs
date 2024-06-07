@@ -333,7 +333,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       {
         foreach (var match in matches)
         {
-          _eventDAL.Delete(match.Id);
+          _matchDAL.Delete(match.Id);
         }
       }
 
