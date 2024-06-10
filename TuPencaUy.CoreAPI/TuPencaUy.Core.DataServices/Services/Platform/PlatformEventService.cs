@@ -605,41 +605,36 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         }).Skip((page - 1) * pageSize).Take(pageSize).ToList();
     }
 
-    public bool CreateMatch(int eventID, MatchDTO matchDTO, out string? errorMessage)
+    public MatchDTO CreateMatch(int eventID, int? firstTeamId, int? secondTeamId, int? firstTeamScore, int? secondTeamScore, int sportId, DateTime date)
     {
-      errorMessage = null;
-
       Event? eventSearch = _eventDAL.Get(new List<Expression<Func<Event, bool>>>
       {
         x => x.Id == eventID
-      }).ToList().FirstOrDefault();
+      }).FirstOrDefault() ?? throw new EventNotFoundException($"Event {eventID} not founded");
 
-      if (eventSearch == null)
-      {
-        errorMessage = $"Event {eventID} nof founded";
-        return false;
-      }
-
-      var teams = _teamDAL.Get(new List<Expression<Func<Team, bool>>> { x => x.Id == matchDTO.FirstTeam.Id || x.Id == matchDTO.SecondTeam.Id })
+      List<Team>? teams = _teamDAL.Get(new List<Expression<Func<Team, bool>>> { x => x.Id == firstTeamId || x.Id == secondTeamId })
         .ToList();
 
-      var firstTeam = teams.First(x => x.Id == matchDTO.FirstTeam.Id);
-      var secondTeam = teams.First(x => x.Id == matchDTO.SecondTeam.Id);
+      if (!teams.Any()) throw new TeamNotFoundException($"Teams with id {firstTeamId} and {secondTeamId} not founded");
+      if (!teams.Where(x => x.Id == firstTeamId).Any()) throw new TeamNotFoundException($"Team with id {firstTeamId} not founded");
+      if (!teams.Where(x => x.Id == secondTeamId).Any()) throw new TeamNotFoundException($"Team with id {secondTeamId} not founded");
 
-      var sport = _sportDAL.Get(new List<Expression<Func<Sport, bool>>> { x => x.Id == matchDTO.Sport.Id }).FirstOrDefault();
+      var firstTeam = teams.First(x => x.Id == firstTeamId);
+      var secondTeam = teams.First(x => x.Id == secondTeamId);
+
+      var sport = _sportDAL.Get(new List<Expression<Func<Sport, bool>>> { x => x.Id == sportId })
+        .FirstOrDefault() ?? throw new SportNotFoundException($"Sport with id {sportId}");
 
       var newMatch = new Match
       {
-       Sport = sport,
-       FirstTeam = firstTeam,
-       SecondTeam = secondTeam,
-       FirstTeamScore = matchDTO.FirstTeamScore,
-       SecondTeamScore = matchDTO.SecondTeamScore,
-       Date = matchDTO.Date,
+        Sport = sport,
+        FirstTeam = firstTeam,
+        SecondTeam = secondTeam,
+        FirstTeamScore = firstTeamScore,
+        SecondTeamScore = secondTeamScore,
+        Date = date,
       };
 
-      _matchDAL.Insert(newMatch);
-      _matchDAL.SaveChanges();
       if(eventSearch.Matches == null)
       {
         eventSearch.Matches = new List<Match>();
@@ -649,7 +644,51 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       _eventDAL.Update(eventSearch);
       _eventDAL.SaveChanges();
 
-      return true;
+      return new MatchDTO
+      {
+        Id = newMatch.Id,
+        FirstTeam = firstTeam != null ? new TeamDTO
+        {
+          Id = firstTeamId,
+          Name = firstTeam.Name,
+          TeamType = firstTeam.TeamType,
+          Sport = firstTeam.Sport != null ? new SportDTO
+          {
+            Id = firstTeam.Sport.Id,
+            Name = firstTeam.Sport.Name,
+            ExactPoints = firstTeam.Sport.ExactPoints,
+            Tie = firstTeam.Sport.Tie,
+            PartialPoints = firstTeam.Sport.PartialPoints,
+          } : null,
+          Logo = firstTeam.Logo,
+        } : null,
+        SecondTeam = secondTeam != null ? new TeamDTO
+        {
+          Id = secondTeam.Id,
+          Name = secondTeam.Name,
+          TeamType = secondTeam.TeamType,
+          Sport = secondTeam.Sport != null ? new SportDTO
+          {
+            Id = secondTeamId,
+            Name = secondTeam.Sport.Name,
+            ExactPoints = secondTeam.Sport.ExactPoints,
+            Tie = secondTeam.Sport.Tie,
+            PartialPoints = secondTeam.Sport.PartialPoints,
+          } : null,
+          Logo = secondTeam.Logo,
+        } : null,
+        FirstTeamScore = firstTeamScore,
+        SecondTeamScore = firstTeamScore,
+        Date = date,
+        Sport = sport != null ? new SportDTO
+        {
+          Id = sport.Id,
+          Name = sport.Name,
+          ExactPoints = sport.ExactPoints,
+          Tie = sport.Tie,
+          PartialPoints = sport.PartialPoints,
+        } : null,
+      };
     }
 
     public List<MatchDTO> GetMatches(int page, int pageSize, out int count)

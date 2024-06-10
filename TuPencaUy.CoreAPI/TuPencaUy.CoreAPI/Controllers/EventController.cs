@@ -145,22 +145,10 @@ namespace TuPencaUy.Core.API.Controllers
     {
       try
       {
-        var matchDTO = new MatchDTO
-        {
-          // TODO review this or the CreateMatch method to receive team IDs
-          FirstTeam = new TeamDTO { Id = match.FirstTeam, Name = string.Empty },
-          SecondTeam = new TeamDTO { Id = match.FirstTeam, Name = string.Empty },
-          Sport = new SportDTO { Id = match.Sport, Tie = false, Name = string.Empty },
-          FirstTeamScore = match.FirstTeamScore,
-          SecondTeamScore = match.SecondTeamScore,
-          Date = match.Date,
-        };
+        var createdMatch = _eventService
+          .CreateMatch(match.EventId, match.FirstTeam, match.SecondTeam, match.FirstTeamScore, match.SecondTeamScore, match.Sport, match.Date);
 
-        var created = _eventService.CreateMatch(match.EventId, matchDTO, out string? errorMessage);
-
-        if (!created) return BadRequest(new ApiResponse { Error = true, Message = errorMessage });
-
-        return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Message = "Successfully created match" });
+        return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Data = createdMatch, Message = "Successfully created match" });
       }
       catch(Exception ex)
       {
