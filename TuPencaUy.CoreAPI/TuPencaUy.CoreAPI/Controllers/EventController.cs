@@ -124,11 +124,11 @@ namespace TuPencaUy.Core.API.Controllers
     }
 
     [HttpGet("Team")]
-    public IActionResult GetTeams(int page, int pageSize)
+    public IActionResult GetTeams(int? page, int? pageSize, string? name, int? sportId, TeamTypeEnum? teamType)
     {
       try
       {
-        var list = _eventService.GetTeams(page, pageSize, out int count);
+        var list = _eventService.GetTeams(out int count, name, sportId, teamType, page, pageSize);
 
         var successResponse = new ApiResponse
         {
