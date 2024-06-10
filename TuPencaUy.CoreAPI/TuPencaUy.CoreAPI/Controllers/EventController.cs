@@ -39,11 +39,18 @@ namespace TuPencaUy.Core.API.Controllers
     }
 
     [HttpGet]
-    public IActionResult GetEvents(int page, int pageSize)
+    public IActionResult GetEvents(int? page, int? pageSize, string? name, DateTime? fromDate, DateTime? untilDate, TeamTypeEnum? teamType, bool? instantiable)
     {
       try
       {
-        var list = _eventService.GetEvents(page, pageSize, out int count);
+        var list = _eventService.GetEvents(
+          out int count,
+          name,
+          fromDate,
+          untilDate,
+          teamType,
+          instantiable,
+          page, pageSize);
 
         var successResponse = new ApiResponse
         {

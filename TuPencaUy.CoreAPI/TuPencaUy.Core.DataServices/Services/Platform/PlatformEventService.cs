@@ -13,6 +13,9 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
     private readonly IGenericRepository<Sport> _sportDAL;
     private readonly IGenericRepository<Team> _teamDAL;
     private readonly IGenericRepository<Match> _matchDAL;
+
+    private int _page = 1;
+    private int _pageSize = 10;
     public PlatformEventService(
       IGenericRepository<Event> eventDAL,
       IGenericRepository<Sport> sportDAL,
@@ -472,14 +475,29 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       };
     }
 
-    public List<EventDTO> GetEvents(int page, int pageSize, out int count)
+    public List<EventDTO> GetEvents(
+      out int count,
+      string? name,
+      DateTime? fromDate,
+      DateTime? untilDate,
+      TeamTypeEnum? teamType,
+      bool? instantiable,
+      int? page, int? pageSize)
     {
-      page = page > 0 ? page : 1;
-      pageSize = pageSize > 0 ? pageSize : 10;
+      SetPagination(page, pageSize);
 
-      count = _eventDAL.Get().Count();
+      if (fromDate != null && untilDate != null && fromDate >= untilDate) throw new InvalidDateFilterException();
 
-      return _eventDAL.Get()
+      var conditions = new List<Expression<Func<Event, bool>>>();
+
+      if (name != null) conditions.Add(x => x.Name == name);
+      if (fromDate != null) conditions.Add(x => x.StartDate >= fromDate);
+      if (untilDate != null) conditions.Add(x => x.EndDate <= fromDate);
+      if (teamType != null) conditions.Add(x => x.TeamType == teamType);
+      if (instantiable != null) conditions.Add(x => x.Instantiable == instantiable);
+
+
+      IQueryable<EventDTO> events = _eventDAL.Get(conditions)
         .Select(x => new EventDTO
         {
           Id = x.Id,
@@ -487,8 +505,13 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
           StartDate = x.StartDate,
           EndDate = x.EndDate,
           Comission = x.Comission,
-          TeamType = x.TeamType
-        }).Skip((page - 1) * pageSize).Take(pageSize).ToList();
+          TeamType = x.TeamType,
+          Instantiable = x.Instantiable,
+        });
+
+      count = _eventDAL.Get(conditions).Count();
+
+      return events.Skip((_page - 1) * _pageSize).Take(_pageSize).ToList();
     }
 
     public SportDTO CreateSport(string name, bool tie, int? exactPoints, int? partialPoints) {
@@ -744,6 +767,12 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
             PartialPoints = match.Sport.PartialPoints,
           } : null,
         }).Skip((page - 1) * pageSize).Take(pageSize).ToList();
+    }
+
+    private void SetPagination(int? page, int? pageSize)
+    {
+      _page = page != null && page.Value > 0 ? page.Value : _page;
+      _pageSize = pageSize != null && pageSize.Value > 0 ? pageSize.Value : _pageSize;
     }
   }
 }

@@ -11,7 +11,14 @@ namespace TuPencaUy.Core.DataServices.Services
       DateTime? endDate,
       float? comission,
       TeamTypeEnum? teamType);
-    List<EventDTO> GetEvents(int page, int pageSize, out int count);
+    List<EventDTO> GetEvents(
+      out int count,
+      string? name,
+      DateTime? fromDate,
+      DateTime? untilDate,
+      TeamTypeEnum? teamType,
+      bool? instantiable,
+      int? page, int? pageSize);
     SportDTO CreateSport(string name, bool tie, int? exactPoints, int? partialPoints);
     List<SportDTO> GetSports(int page, int pageSize, out int count);
     TeamDTO CreateTeam(string name, byte[]? logo, int sportId, TeamTypeEnum? teamType);
