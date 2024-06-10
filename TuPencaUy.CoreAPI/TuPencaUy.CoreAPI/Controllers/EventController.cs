@@ -67,19 +67,9 @@ namespace TuPencaUy.Core.API.Controllers
     {
       try
       {
-        var sportDTO = new SportDTO
-        {
-          Name = sport.Name,
-          Tie = sport.Tie,
-          ExactPoints = sport.ExactPoints,
-          PartialPoints = sport.PartialPoints
-        };
+        var createdSport = _eventService.CreateSport(sport.Name, sport.Tie, sport.ExactPoints, sport.PartialPoints);
 
-        var created = _eventService.CreateSport(sportDTO, out string? errorMessage);
-
-        if (!created) return BadRequest(new ApiResponse { Error = true, Message = errorMessage });
-
-        return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Message = "Successfully created sport" });
+        return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Data = createdSport, Message = "Successfully created sport" });
       }
       catch (Exception ex)
       {

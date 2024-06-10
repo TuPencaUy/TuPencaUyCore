@@ -491,31 +491,34 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         }).Skip((page - 1) * pageSize).Take(pageSize).ToList();
     }
 
-    public bool CreateSport(SportDTO sportDTO, out string? errorMessage) {
-      errorMessage = null;
+    SportDTO CreateSport(string name, bool tie, int? exactPoints, int? partialPoints) {
       var existingSport = _sportDAL.Get(new List<Expression<Func<Sport, bool>>>
       {
-        x => x.Name == sportDTO.Name
-      }).ToList();
+        x => x.Name == name
+      }).Any();
 
-      if (existingSport.Count != 0)
-      {
-        errorMessage = $"A sport with the name {sportDTO.Name} already exists";
-        return false;
-      }
+      if (existingSport) throw new NameAlreadyInUseException($"A sport with the name {name} already exists");
+      
 
       var newSport = new Sport
       {
-        Name = sportDTO.Name,
-        Tie = sportDTO.Tie,
-        ExactPoints = sportDTO.ExactPoints,
-        PartialPoints = sportDTO.PartialPoints,
+        Name = name,
+        Tie = tie,
+        ExactPoints = exactPoints,
+        PartialPoints = partialPoints,
       };
 
       _sportDAL.Insert(newSport);
       _sportDAL.SaveChanges();
 
-      return true;
+      return new SportDTO
+      {
+        Id = newSport.Id,
+        Name = newSport.Name,
+        Tie = newSport.Tie,
+        ExactPoints = exactPoints,
+        PartialPoints = partialPoints,
+      };
     }
 
     public List<SportDTO> GetSports(int page, int pageSize, out int count)
