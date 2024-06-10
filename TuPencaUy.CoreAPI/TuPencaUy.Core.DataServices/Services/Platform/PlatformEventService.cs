@@ -491,7 +491,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         }).Skip((page - 1) * pageSize).Take(pageSize).ToList();
     }
 
-    SportDTO CreateSport(string name, bool tie, int? exactPoints, int? partialPoints) {
+    public SportDTO CreateSport(string name, bool tie, int? exactPoints, int? partialPoints) {
       var existingSport = _sportDAL.Get(new List<Expression<Func<Sport, bool>>>
       {
         x => x.Name == name
@@ -539,35 +539,45 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         }).Skip((page - 1) * pageSize).Take(pageSize).ToList();
     }
 
-    public bool CreateTeam(TeamDTO teamDTO, out string? errorMessage)
+    public TeamDTO CreateTeam(string name, byte[]? logo, int sportId, TeamTypeEnum? teamType)
     {
-      errorMessage = null;
       var existingTeam = _teamDAL.Get(new List<Expression<Func<Team, bool>>>
       {
-        x => x.Name == teamDTO.Name && x.Sport_id == teamDTO.Sport.Id
-      }).ToList();
+        x => x.Name == name && x.Sport_id == sportId
+      }).Any();
 
-      if (existingTeam.Count != 0)
-      {
-        errorMessage = $"A team with the name {teamDTO.Name} already exists";
-        return false;
-      }
+      if (existingTeam) throw new NameAlreadyInUseException($"A team with the name {name} already exists");
 
-      var sport = _sportDAL.Get(new List<Expression<Func<Sport, bool>>> { x => x.Id == teamDTO.Sport.Id }).FirstOrDefault();
+      var sport = _sportDAL.Get(new List<Expression<Func<Sport, bool>>> { x => x.Id == sportId }).FirstOrDefault();
       
       var newTeam = new Team
       {
-        Name = teamDTO.Name,
-        Logo = teamDTO.Logo,
-        TeamType = teamDTO.TeamType,
-        Sport_id = teamDTO.Sport.Id,
-        Sport = sport
+        Name = name,
+        Logo = logo,
+        TeamType = teamType,
+        Sport = sport,
       };
 
       _teamDAL.Insert(newTeam);
       _teamDAL.SaveChanges();
 
-      return true;
+      return new TeamDTO
+      {
+        Id = newTeam.Id,
+        Name = name,
+        Logo = logo,
+        TeamType = teamType,
+        Sport = sport != null
+        ? new SportDTO
+          {
+            Id = sport.Id,
+            Name = sport.Name,
+            Tie = sport.Tie,
+            ExactPoints = sport.ExactPoints,
+            PartialPoints = sport.PartialPoints,
+          }
+        : null,
+      };
     }
 
     public List<TeamDTO> GetTeams(int page, int pageSize, out int count)

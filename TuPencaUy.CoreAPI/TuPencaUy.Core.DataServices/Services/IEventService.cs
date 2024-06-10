@@ -9,7 +9,7 @@ namespace TuPencaUy.Core.DataServices.Services
     List<EventDTO> GetEvents(int page, int pageSize, out int count);
     SportDTO CreateSport(string name, bool tie, int? exactPoints, int? partialPoints);
     List<SportDTO> GetSports(int page, int pageSize, out int count);
-    bool CreateTeam(TeamDTO teamDTO, out string? errorMessage);
+    TeamDTO CreateTeam(string name, byte[]? logo, int sportId, TeamTypeEnum? teamType);
     List<TeamDTO> GetTeams(int page, int pageSize, out int count);
     bool CreateMatch(int eventId, MatchDTO matchDTO, out string? errorMessage);
     List<MatchDTO> GetMatches(int page, int pageSize, out int count);

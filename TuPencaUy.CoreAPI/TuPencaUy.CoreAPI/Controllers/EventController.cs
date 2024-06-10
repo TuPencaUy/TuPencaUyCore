@@ -106,20 +106,9 @@ namespace TuPencaUy.Core.API.Controllers
     {
       try
       {
-        var teamDTO = new TeamDTO
-        {
-          Name = team.Name,
-          Logo = team.Logo,
-          // TODO review this or the CreateTeam method to receive sport ID
-          Sport = new SportDTO { Id = team.Sport, Name = string.Empty, Tie = false },
-          TeamType = team.TeamType,
-        };
+        var createdTeam = _eventService.CreateTeam(team.Name, team.Logo, team.Sport, team.TeamType);
 
-        var created = _eventService.CreateTeam(teamDTO, out string? errorMessage);
-
-        if (!created) return BadRequest(new ApiResponse { Error = true, Message = errorMessage });
-
-        return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Message = "Successfully created team" });
+        return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Data = createdTeam, Message = "Successfully created team" });
       }
       catch (Exception ex)
       {
