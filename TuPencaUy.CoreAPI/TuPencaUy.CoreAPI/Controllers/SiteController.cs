@@ -44,27 +44,25 @@ namespace TuPencaUy.Core.API.Controllers
     [HttpPost("CreateSite")]
     public IActionResult CreateSite([FromBody] SiteRequest site)
     {
-      if (site.Name.Contains(' '))
-      {
-        if (site.Name.Contains(' ')) throw new InvalidNameOfSiteException("The site name can't contain withespaces");
-        
+      if (site.Name.Contains(' ')) throw new InvalidNameOfSiteException("The site name can't contain withespaces");
 
-        var siteDTO = new SiteDTO { Name = site.Name, AccessType = site.AccessType, Color = site.Color, Domain = site.Domain };
 
-        UserDTO userFromToken = ObtainUserFromToken();
+      var siteDTO = new SiteDTO { Name = site.Name, AccessType = site.AccessType, Color = site.Color, Domain = site.Domain };
 
-        var created = _siteService
-          .CreateNewSite(userFromToken.Email, siteDTO, out string? errorMessage, out string? connectionString);
+      UserDTO userFromToken = ObtainUserFromToken();
 
-        if (!created) return BadRequest(new ApiResponse { Error = true, Message = errorMessage });
+      var created = _siteService
+        .CreateNewSite(userFromToken.Email, siteDTO, out string? errorMessage, out string? connectionString);
 
-        userFromToken = _userService.GetUserByEmail(userFromToken.Email);
+      if (!created) return BadRequest(new ApiResponse { Error = true, Message = errorMessage });
 
-        _serviceFactory
-          .CreateTenantServices(connectionString);
-        _serviceFactory
-          .GetService<IUserService>()
-          .CreateUser(userFromToken.Email, userFromToken.Name, userFromToken.Password, UserRoleEnum.Admin);
+      userFromToken = _userService.GetUserByEmail(userFromToken.Email);
+
+      _serviceFactory
+        .CreateTenantServices(connectionString);
+      _serviceFactory
+        .GetService<IUserService>()
+        .CreateUser(userFromToken.Email, userFromToken.Name, userFromToken.Password, UserRoleEnum.Admin);
 
       return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Message = "Successfully created site" });
     }
