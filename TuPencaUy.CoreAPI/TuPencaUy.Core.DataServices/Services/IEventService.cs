@@ -5,7 +5,7 @@ namespace TuPencaUy.Core.DataServices.Services
 {
   public interface IEventService
   {
-    bool CreateEvent(EventDTO eventDTO, out string? errorMessage);
+    EventDTO CreateEvent(string name, DateTime? startDate, DateTime? endDate, float? comission, TeamTypeEnum? teamType);
     List<EventDTO> GetEvents(int page, int pageSize, out int count);
     bool CreateSport(SportDTO sportDTO, out string? errorMessage);
     List<SportDTO> GetSports(int page, int pageSize, out int count);

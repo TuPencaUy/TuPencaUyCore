@@ -438,34 +438,38 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         }).FirstOrDefault() ?? throw new EventNotFoundException($"Event with id {idEvent} not found");
     }
 
-    public bool CreateEvent(EventDTO eventDTO, out string? errorMessage)
+    public EventDTO CreateEvent(string name, DateTime? startDate, DateTime? endDate, float? comission, TeamTypeEnum? teamType)
     {
-      errorMessage = null;
       var existingEvent = _eventDAL.Get(new List<Expression<Func<Event, bool>>>
       {
-        x => x.Name == eventDTO.Name
-      }).ToList();
+        x => x.Name == name
+      }).Any() ;
 
-      if (existingEvent.Count != 0)
-      {
-        errorMessage = $"An event with the name {eventDTO.Name} already exists";
-        return false;
-      }
+      if (existingEvent) throw new NameAlreadyInUseException($"An event with the name {name} already exists");
 
       var newEvent = new Event
       {
-        Name = eventDTO.Name,
-        StartDate = eventDTO.StartDate,
-        EndDate = eventDTO.EndDate,
-        Comission = eventDTO.Comission,
-        TeamType = eventDTO.TeamType,
+        Name = name,
+        StartDate = startDate,
+        EndDate = endDate,
+        Comission = comission,
+        TeamType = teamType,
         Instantiable = true
       };
 
       _eventDAL.Insert(newEvent);
       _eventDAL.SaveChanges();
 
-      return true;
+      return new EventDTO
+      {
+        Id = newEvent.Id,
+        Name = name,
+        StartDate = startDate,
+        EndDate = endDate,
+        Comission = comission,
+        TeamType = teamType,
+        Instantiable = true
+      };
     }
 
     public List<EventDTO> GetEvents(int page, int pageSize, out int count)

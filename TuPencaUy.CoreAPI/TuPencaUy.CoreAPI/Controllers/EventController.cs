@@ -27,20 +27,10 @@ namespace TuPencaUy.Core.API.Controllers
     {
       try
       {
-        var eventDTO = new EventDTO
-        {
-          Name = requestEvent.Name,
-          StartDate = requestEvent.StartDate,
-          EndDate = requestEvent.EndDate,
-          Comission = requestEvent.Comission,
-          TeamType = requestEvent.TeamType
-        };
+        var createdEvent = _eventService
+          .CreateEvent(requestEvent.Name, requestEvent.StartDate, requestEvent.EndDate, requestEvent.Comission, requestEvent.TeamType);
 
-        var created = _eventService.CreateEvent(eventDTO, out string? errorMessage);
-
-        if (!created) return BadRequest(new ApiResponse { Error = true, Message = errorMessage });
-
-        return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Message = "Successfully created event" });
+        return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Data = createdEvent, Message = "Successfully created event" });
       }
       catch (Exception ex)
       {
