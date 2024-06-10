@@ -731,14 +731,44 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       };
     }
 
-    public List<MatchDTO> GetMatches(int page, int pageSize, out int count)
+    public List<MatchDTO> GetMatches(
+      out int count,
+      int? idTeam,
+      int? otherIdTeam,
+      int? eventId,
+      int? sportId,
+      DateTime? fromDate,
+      DateTime? untilDate,
+      int? page, int? pageSize)
     {
-      page = page > 0 ? page : 1;
-      pageSize = pageSize > 0 ? pageSize : 10;
+      SetPagination(page, pageSize);
 
-      count = _matchDAL.Get().Count();
+      var conditions = new List<Expression<Func<Match, bool>>>();
 
-      return _matchDAL.Get()
+      if (fromDate != null && untilDate != null && fromDate >= untilDate) throw new InvalidDateFilterException();
+
+      if (fromDate != null) conditions.Add(x => x.Date >= fromDate);
+      if (untilDate != null) conditions.Add(x => x.Date <= fromDate);
+
+      if (idTeam != null && otherIdTeam != null && idTeam != otherIdTeam)
+      {
+        conditions.Add(
+          x => (x.FirstTeam_id == idTeam && x.SecondTeam_id == otherIdTeam)
+          || (x.FirstTeam_id == idTeam && x.SecondTeam_id == otherIdTeam));
+      }
+      else if (idTeam != null)
+      {
+        conditions.Add(x => x.FirstTeam_id == idTeam || x.SecondTeam_id == idTeam);
+      }
+      else if (otherIdTeam != null)
+      {
+        conditions.Add(x => x.FirstTeam_id == otherIdTeam || x.SecondTeam_id == otherIdTeam);
+      }
+
+      if (eventId != null) conditions.Add(x => x.Event_id == eventId);
+      if (sportId != null) conditions.Add(x => x.Sport_id == sportId);
+
+      IQueryable<MatchDTO> matches = _matchDAL.Get(conditions)
         .Select(match => new MatchDTO
         {
           Id = match.Id,
@@ -783,7 +813,11 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
             Tie = match.Sport.Tie,
             PartialPoints = match.Sport.PartialPoints,
           } : null,
-        }).Skip((page - 1) * pageSize).Take(pageSize).ToList();
+        });
+
+      count = matches.Count();
+
+      return matches.Skip((_page - 1) * _pageSize).Take(_pageSize).ToList();
     }
 
     private void SetPagination(int? page, int? pageSize)

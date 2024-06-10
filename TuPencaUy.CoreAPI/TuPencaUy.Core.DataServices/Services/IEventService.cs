@@ -36,7 +36,15 @@ namespace TuPencaUy.Core.DataServices.Services
       int? secondTeamScore,
       int sportId,
       DateTime date);
-    List<MatchDTO> GetMatches(int page, int pageSize, out int count);
+    List<MatchDTO> GetMatches(
+      out int count,
+      int? idTeam,
+      int? otherIdTeam,
+      int? eventId,
+      int? sportId,
+      DateTime? fromDate,
+      DateTime? untilDate,
+      int? page, int? pageSize);
     MatchDTO GetMatch(int idMatch);
     TeamDTO GetTeam(int idTeam);
     SportDTO GetSport(int idSport);

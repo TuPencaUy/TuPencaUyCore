@@ -164,11 +164,19 @@ namespace TuPencaUy.Core.API.Controllers
     }
 
     [HttpGet("Match")]
-    public IActionResult GetMatches(int page, int pageSize)
+    public IActionResult GetMatches(int? page, int? pageSize, int? idTeam, int? otherIdTeam, int? eventId, int? sportId, DateTime? fromDate, DateTime? untilDate)
     {
       try
       {
-        var list = _eventService.GetMatches(page, pageSize, out int count);
+        var list = _eventService.GetMatches(
+          out int count,
+          idTeam,
+          otherIdTeam,
+          eventId,
+          sportId,
+          fromDate,
+          untilDate,
+          page, pageSize);
 
         var successResponse = new ApiResponse
         {

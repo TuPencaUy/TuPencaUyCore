@@ -30,5 +30,9 @@ namespace TuPencaUy.Core.DAO
     [ForeignKey("Sport")]
     [Column("Sport_id", Order = 6)]
     public int? Sport_id { get; set; }
+
+    [ForeignKey("Event")]
+    [Column("Event_id", Order = 7)]
+    public int Event_id { get; set; }
   }
 }
