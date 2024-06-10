@@ -544,14 +544,15 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       };
     }
 
-    public List<SportDTO> GetSports(int page, int pageSize, out int count)
+    public List<SportDTO> GetSports(out int count, string? name, int? page, int? pageSize)
     {
-      page = page > 0 ? page : 1;
-      pageSize = pageSize > 0 ? pageSize : 10;
+      SetPagination(page, pageSize);
 
-      count = _sportDAL.Get().Count();
+      var conditions = new List<Expression<Func<Sport, bool>>>();
 
-      return _sportDAL.Get()
+      if (name != null) conditions.Add(x => x.Name == name);
+
+      IQueryable<SportDTO> sports = _sportDAL.Get(conditions)
         .Select(x => new SportDTO
         {
           Id = x.Id,
@@ -559,7 +560,11 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
           Tie = x.Tie,
           ExactPoints = x.ExactPoints,
           PartialPoints = x.PartialPoints,
-        }).Skip((page - 1) * pageSize).Take(pageSize).ToList();
+        });
+
+      count = sports.Count();
+
+      return sports.Skip((_page - 1) * _pageSize).Take(_pageSize).ToList();
     }
 
     public TeamDTO CreateTeam(string name, byte[]? logo, int sportId, TeamTypeEnum? teamType)

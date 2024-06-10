@@ -20,7 +20,7 @@ namespace TuPencaUy.Core.DataServices.Services
       bool? instantiable,
       int? page, int? pageSize);
     SportDTO CreateSport(string name, bool tie, int? exactPoints, int? partialPoints);
-    List<SportDTO> GetSports(int page, int pageSize, out int count);
+    List<SportDTO> GetSports(out int count, string? name, int? page, int? pageSize);
     TeamDTO CreateTeam(string name, byte[]? logo, int sportId, TeamTypeEnum? teamType);
     List<TeamDTO> GetTeams(int page, int pageSize, out int count);
     MatchDTO CreateMatch(

@@ -85,11 +85,11 @@ namespace TuPencaUy.Core.API.Controllers
     }
 
     [HttpGet("Sport")]
-    public IActionResult GetSport(int page, int pageSize)
+    public IActionResult GetSport(int? page, int? pageSize, string? name)
     {
       try
       {
-        var list = _eventService.GetSports(page, pageSize, out int count);
+        var list = _eventService.GetSports(out int count, name, page, pageSize);
 
         var successResponse = new ApiResponse
         {
