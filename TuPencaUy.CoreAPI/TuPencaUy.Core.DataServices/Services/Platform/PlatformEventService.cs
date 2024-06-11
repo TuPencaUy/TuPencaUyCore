@@ -438,34 +438,38 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         }).FirstOrDefault() ?? throw new EventNotFoundException($"Event with id {idEvent} not found");
     }
 
-    public bool CreateEvent(EventDTO eventDTO, out string? errorMessage)
+    public EventDTO CreateEvent(string name, DateTime? startDate, DateTime? endDate, float? comission, TeamTypeEnum? teamType)
     {
-      errorMessage = null;
       var existingEvent = _eventDAL.Get(new List<Expression<Func<Event, bool>>>
       {
-        x => x.Name == eventDTO.Name
-      }).ToList();
+        x => x.Name == name
+      }).Any() ;
 
-      if (existingEvent.Count != 0)
-      {
-        errorMessage = $"An event with the name {eventDTO.Name} already exists";
-        return false;
-      }
+      if (existingEvent) throw new NameAlreadyInUseException($"An event with the name {name} already exists");
 
       var newEvent = new Event
       {
-        Name = eventDTO.Name,
-        StartDate = eventDTO.StartDate,
-        EndDate = eventDTO.EndDate,
-        Comission = eventDTO.Comission,
-        TeamType = eventDTO.TeamType,
+        Name = name,
+        StartDate = startDate,
+        EndDate = endDate,
+        Comission = comission,
+        TeamType = teamType,
         Instantiable = true
       };
 
       _eventDAL.Insert(newEvent);
       _eventDAL.SaveChanges();
 
-      return true;
+      return new EventDTO
+      {
+        Id = newEvent.Id,
+        Name = name,
+        StartDate = startDate,
+        EndDate = endDate,
+        Comission = comission,
+        TeamType = teamType,
+        Instantiable = true
+      };
     }
 
     public List<EventDTO> GetEvents(int page, int pageSize, out int count)
@@ -487,31 +491,34 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         }).Skip((page - 1) * pageSize).Take(pageSize).ToList();
     }
 
-    public bool CreateSport(SportDTO sportDTO, out string? errorMessage) {
-      errorMessage = null;
+    public SportDTO CreateSport(string name, bool tie, int? exactPoints, int? partialPoints) {
       var existingSport = _sportDAL.Get(new List<Expression<Func<Sport, bool>>>
       {
-        x => x.Name == sportDTO.Name
-      }).ToList();
+        x => x.Name == name
+      }).Any();
 
-      if (existingSport.Count != 0)
-      {
-        errorMessage = $"A sport with the name {sportDTO.Name} already exists";
-        return false;
-      }
+      if (existingSport) throw new NameAlreadyInUseException($"A sport with the name {name} already exists");
+      
 
       var newSport = new Sport
       {
-        Name = sportDTO.Name,
-        Tie = sportDTO.Tie,
-        ExactPoints = sportDTO.ExactPoints,
-        PartialPoints = sportDTO.PartialPoints,
+        Name = name,
+        Tie = tie,
+        ExactPoints = exactPoints,
+        PartialPoints = partialPoints,
       };
 
       _sportDAL.Insert(newSport);
       _sportDAL.SaveChanges();
 
-      return true;
+      return new SportDTO
+      {
+        Id = newSport.Id,
+        Name = newSport.Name,
+        Tie = newSport.Tie,
+        ExactPoints = exactPoints,
+        PartialPoints = partialPoints,
+      };
     }
 
     public List<SportDTO> GetSports(int page, int pageSize, out int count)
@@ -532,35 +539,45 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         }).Skip((page - 1) * pageSize).Take(pageSize).ToList();
     }
 
-    public bool CreateTeam(TeamDTO teamDTO, out string? errorMessage)
+    public TeamDTO CreateTeam(string name, byte[]? logo, int sportId, TeamTypeEnum? teamType)
     {
-      errorMessage = null;
       var existingTeam = _teamDAL.Get(new List<Expression<Func<Team, bool>>>
       {
-        x => x.Name == teamDTO.Name && x.Sport_id == teamDTO.Sport.Id
-      }).ToList();
+        x => x.Name == name && x.Sport_id == sportId
+      }).Any();
 
-      if (existingTeam.Count != 0)
-      {
-        errorMessage = $"A team with the name {teamDTO.Name} already exists";
-        return false;
-      }
+      if (existingTeam) throw new NameAlreadyInUseException($"A team with the name {name} already exists");
 
-      var sport = _sportDAL.Get(new List<Expression<Func<Sport, bool>>> { x => x.Id == teamDTO.Sport.Id }).FirstOrDefault();
+      var sport = _sportDAL.Get(new List<Expression<Func<Sport, bool>>> { x => x.Id == sportId }).FirstOrDefault();
       
       var newTeam = new Team
       {
-        Name = teamDTO.Name,
-        Logo = teamDTO.Logo,
-        TeamType = teamDTO.TeamType,
-        Sport_id = teamDTO.Sport.Id,
-        Sport = sport
+        Name = name,
+        Logo = logo,
+        TeamType = teamType,
+        Sport = sport,
       };
 
       _teamDAL.Insert(newTeam);
       _teamDAL.SaveChanges();
 
-      return true;
+      return new TeamDTO
+      {
+        Id = newTeam.Id,
+        Name = name,
+        Logo = logo,
+        TeamType = teamType,
+        Sport = sport != null
+        ? new SportDTO
+          {
+            Id = sport.Id,
+            Name = sport.Name,
+            Tie = sport.Tie,
+            ExactPoints = sport.ExactPoints,
+            PartialPoints = sport.PartialPoints,
+          }
+        : null,
+      };
     }
 
     public List<TeamDTO> GetTeams(int page, int pageSize, out int count)
@@ -588,41 +605,36 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         }).Skip((page - 1) * pageSize).Take(pageSize).ToList();
     }
 
-    public bool CreateMatch(int eventID, MatchDTO matchDTO, out string? errorMessage)
+    public MatchDTO CreateMatch(int eventID, int? firstTeamId, int? secondTeamId, int? firstTeamScore, int? secondTeamScore, int sportId, DateTime date)
     {
-      errorMessage = null;
-
       Event? eventSearch = _eventDAL.Get(new List<Expression<Func<Event, bool>>>
       {
         x => x.Id == eventID
-      }).ToList().FirstOrDefault();
+      }).FirstOrDefault() ?? throw new EventNotFoundException($"Event {eventID} not founded");
 
-      if (eventSearch == null)
-      {
-        errorMessage = $"Event {eventID} nof founded";
-        return false;
-      }
-
-      var teams = _teamDAL.Get(new List<Expression<Func<Team, bool>>> { x => x.Id == matchDTO.FirstTeam.Id || x.Id == matchDTO.SecondTeam.Id })
+      List<Team>? teams = _teamDAL.Get(new List<Expression<Func<Team, bool>>> { x => x.Id == firstTeamId || x.Id == secondTeamId })
         .ToList();
 
-      var firstTeam = teams.First(x => x.Id == matchDTO.FirstTeam.Id);
-      var secondTeam = teams.First(x => x.Id == matchDTO.SecondTeam.Id);
+      if (!teams.Any()) throw new TeamNotFoundException($"Teams with id {firstTeamId} and {secondTeamId} not founded");
+      if (!teams.Where(x => x.Id == firstTeamId).Any()) throw new TeamNotFoundException($"Team with id {firstTeamId} not founded");
+      if (!teams.Where(x => x.Id == secondTeamId).Any()) throw new TeamNotFoundException($"Team with id {secondTeamId} not founded");
 
-      var sport = _sportDAL.Get(new List<Expression<Func<Sport, bool>>> { x => x.Id == matchDTO.Sport.Id }).FirstOrDefault();
+      var firstTeam = teams.First(x => x.Id == firstTeamId);
+      var secondTeam = teams.First(x => x.Id == secondTeamId);
+
+      var sport = _sportDAL.Get(new List<Expression<Func<Sport, bool>>> { x => x.Id == sportId })
+        .FirstOrDefault() ?? throw new SportNotFoundException($"Sport with id {sportId}");
 
       var newMatch = new Match
       {
-       Sport = sport,
-       FirstTeam = firstTeam,
-       SecondTeam = secondTeam,
-       FirstTeamScore = matchDTO.FirstTeamScore,
-       SecondTeamScore = matchDTO.SecondTeamScore,
-       Date = matchDTO.Date,
+        Sport = sport,
+        FirstTeam = firstTeam,
+        SecondTeam = secondTeam,
+        FirstTeamScore = firstTeamScore,
+        SecondTeamScore = secondTeamScore,
+        Date = date,
       };
 
-      _matchDAL.Insert(newMatch);
-      _matchDAL.SaveChanges();
       if(eventSearch.Matches == null)
       {
         eventSearch.Matches = new List<Match>();
@@ -632,7 +644,51 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       _eventDAL.Update(eventSearch);
       _eventDAL.SaveChanges();
 
-      return true;
+      return new MatchDTO
+      {
+        Id = newMatch.Id,
+        FirstTeam = firstTeam != null ? new TeamDTO
+        {
+          Id = firstTeamId,
+          Name = firstTeam.Name,
+          TeamType = firstTeam.TeamType,
+          Sport = firstTeam.Sport != null ? new SportDTO
+          {
+            Id = firstTeam.Sport.Id,
+            Name = firstTeam.Sport.Name,
+            ExactPoints = firstTeam.Sport.ExactPoints,
+            Tie = firstTeam.Sport.Tie,
+            PartialPoints = firstTeam.Sport.PartialPoints,
+          } : null,
+          Logo = firstTeam.Logo,
+        } : null,
+        SecondTeam = secondTeam != null ? new TeamDTO
+        {
+          Id = secondTeam.Id,
+          Name = secondTeam.Name,
+          TeamType = secondTeam.TeamType,
+          Sport = secondTeam.Sport != null ? new SportDTO
+          {
+            Id = secondTeamId,
+            Name = secondTeam.Sport.Name,
+            ExactPoints = secondTeam.Sport.ExactPoints,
+            Tie = secondTeam.Sport.Tie,
+            PartialPoints = secondTeam.Sport.PartialPoints,
+          } : null,
+          Logo = secondTeam.Logo,
+        } : null,
+        FirstTeamScore = firstTeamScore,
+        SecondTeamScore = firstTeamScore,
+        Date = date,
+        Sport = sport != null ? new SportDTO
+        {
+          Id = sport.Id,
+          Name = sport.Name,
+          ExactPoints = sport.ExactPoints,
+          Tie = sport.Tie,
+          PartialPoints = sport.PartialPoints,
+        } : null,
+      };
     }
 
     public List<MatchDTO> GetMatches(int page, int pageSize, out int count)

@@ -25,19 +25,17 @@ namespace TuPencaUy.Core.API.Controllers
     [HttpPost]
     public IActionResult CreateEvent([FromBody] CreateEventRequest requestEvent)
     {
-      var eventDTO = new EventDTO {
-        Name = requestEvent.Name,
-        StartDate = requestEvent.StartDate,
-        EndDate = requestEvent.EndDate,
-        Comission = requestEvent.Comission,
-        TeamType = requestEvent.TeamType
-      };
+      try
+      {
+        var createdEvent = _eventService
+          .CreateEvent(requestEvent.Name, requestEvent.StartDate, requestEvent.EndDate, requestEvent.Comission, requestEvent.TeamType);
 
-      var created = _eventService.CreateEvent(eventDTO, out string? errorMessage);
-
-      if (!created) return BadRequest(new ApiResponse { Error = true, Message = errorMessage });
-
-      return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Message = "Successfully created event" });
+        return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Data = createdEvent, Message = "Successfully created event" });
+      }
+      catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
     }
 
     [HttpGet]
@@ -67,19 +65,16 @@ namespace TuPencaUy.Core.API.Controllers
     [HttpPost("Sport")]
     public IActionResult CreateSport([FromBody] CreateSportRequest sport)
     {
-      var sportDTO = new SportDTO
+      try
       {
-        Name = sport.Name,
-        Tie = sport.Tie,
-        ExactPoints = sport.ExactPoints,
-        PartialPoints = sport.PartialPoints
-      };
+        var createdSport = _eventService.CreateSport(sport.Name, sport.Tie, sport.ExactPoints, sport.PartialPoints);
 
-      var created = _eventService.CreateSport(sportDTO, out string? errorMessage);
-
-      if (!created) return BadRequest(new ApiResponse { Error = true, Message = errorMessage });
-
-      return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Message = "Successfully created sport" });
+        return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Data = createdSport, Message = "Successfully created sport" });
+      }
+      catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
     }
 
     [HttpGet("Sport")]
@@ -109,20 +104,16 @@ namespace TuPencaUy.Core.API.Controllers
     [HttpPost("Team")]
     public IActionResult CreateTeam([FromBody] CreateTeamRequest team)
     {
-      var teamDTO = new TeamDTO
+      try
       {
-        Name = team.Name,
-        Logo = team.Logo,
-        // TODO review this or the CreateTeam method to receive sport ID
-        Sport = new SportDTO { Id = team.Sport, Name = string.Empty, Tie = false },
-        TeamType = team.TeamType,
-      };
+        var createdTeam = _eventService.CreateTeam(team.Name, team.Logo, team.Sport, team.TeamType);
 
-      var created = _eventService.CreateTeam(teamDTO, out string? errorMessage);
-
-      if (!created) return BadRequest(new ApiResponse { Error = true, Message = errorMessage });
-
-      return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Message = "Successfully created team" });
+        return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Data = createdTeam, Message = "Successfully created team" });
+      }
+      catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
     }
 
     [HttpGet("Team")]
@@ -152,22 +143,17 @@ namespace TuPencaUy.Core.API.Controllers
     [HttpPost("Match")]
     public IActionResult CreateMatch([FromBody] CreateMatchRequest match)
     {
-      var matchDTO = new MatchDTO
+      try
       {
-        // TODO review this or the CreateMatch method to receive team IDs
-        FirstTeam =  new TeamDTO { Id = match.FirstTeam, Name = string.Empty },
-        SecondTeam = new TeamDTO { Id = match.FirstTeam, Name = string.Empty },
-        Sport = new SportDTO { Id = match.Sport, Tie = false, Name = string.Empty },
-        FirstTeamScore = match.FirstTeamScore,
-        SecondTeamScore = match.SecondTeamScore,
-        Date = match.Date,
-      };
+        var createdMatch = _eventService
+          .CreateMatch(match.EventId, match.FirstTeam, match.SecondTeam, match.FirstTeamScore, match.SecondTeamScore, match.Sport, match.Date);
 
-      var created = _eventService.CreateMatch(match.EventId, matchDTO, out string? errorMessage);
-
-      if (!created) return BadRequest(new ApiResponse { Error = true, Message = errorMessage });
-
-      return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Message = "Successfully created match" });
+        return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Data = createdMatch, Message = "Successfully created match" });
+      }
+      catch(Exception ex)
+      {
+        return ManageException(ex);
+      }
     }
 
     [HttpGet("Match")]
@@ -364,7 +350,7 @@ namespace TuPencaUy.Core.API.Controllers
     {
       try
       {
-        var m =_eventService.ModifyMatch(idMatch, match.FirstTeam, match.SecondTeam, match.Date, match.FirstTeamScore, match.SecondTeamScore, match.Sport);
+        var m = _eventService.ModifyMatch(idMatch, match.FirstTeam, match.SecondTeam, match.Date, match.FirstTeamScore, match.SecondTeamScore, match.Sport);
 
         var successResponse = new ApiResponse
         {
@@ -385,7 +371,7 @@ namespace TuPencaUy.Core.API.Controllers
     {
       try
       {
-        var t =_eventService.ModifyTeam(idTeam, team.Name, team.Logo, team.TeamType, team.Sport);
+        var t = _eventService.ModifyTeam(idTeam, team.Name, team.Logo, team.TeamType, team.Sport);
 
         var successResponse = new ApiResponse
         {
@@ -431,7 +417,7 @@ namespace TuPencaUy.Core.API.Controllers
 
         var successResponse = new ApiResponse
         {
-          Data= e,
+          Data = e,
           Message = $"The event with id {idEvent} was modified",
         };
 

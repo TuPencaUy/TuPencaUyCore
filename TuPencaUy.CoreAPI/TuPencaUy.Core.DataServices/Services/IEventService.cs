@@ -5,13 +5,25 @@ namespace TuPencaUy.Core.DataServices.Services
 {
   public interface IEventService
   {
-    bool CreateEvent(EventDTO eventDTO, out string? errorMessage);
+    EventDTO CreateEvent(
+      string name,
+      DateTime? startDate,
+      DateTime? endDate,
+      float? comission,
+      TeamTypeEnum? teamType);
     List<EventDTO> GetEvents(int page, int pageSize, out int count);
-    bool CreateSport(SportDTO sportDTO, out string? errorMessage);
+    SportDTO CreateSport(string name, bool tie, int? exactPoints, int? partialPoints);
     List<SportDTO> GetSports(int page, int pageSize, out int count);
-    bool CreateTeam(TeamDTO teamDTO, out string? errorMessage);
+    TeamDTO CreateTeam(string name, byte[]? logo, int sportId, TeamTypeEnum? teamType);
     List<TeamDTO> GetTeams(int page, int pageSize, out int count);
-    bool CreateMatch(int eventId, MatchDTO matchDTO, out string? errorMessage);
+    MatchDTO CreateMatch(
+      int eventID,
+      int? firstTeamId,
+      int? secondTeamId,
+      int? firstTeamScore,
+      int? secondTeamScore,
+      int sportId,
+      DateTime date);
     List<MatchDTO> GetMatches(int page, int pageSize, out int count);
     MatchDTO GetMatch(int idMatch);
     TeamDTO GetTeam(int idTeam);
