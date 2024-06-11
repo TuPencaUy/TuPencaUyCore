@@ -10,5 +10,6 @@ namespace TuPencaUy.Site.DAO.Models
   public class Team : BaseTeam
   {
     public required virtual Sport Sport { get; set; }
+    public int RefTeam { get; set; }
   }
 }

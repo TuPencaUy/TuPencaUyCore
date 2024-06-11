@@ -13,6 +13,9 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
     private readonly IGenericRepository<Sport> _sportDAL;
     private readonly IGenericRepository<Team> _teamDAL;
     private readonly IGenericRepository<Match> _matchDAL;
+
+    private int _page = 1;
+    private int _pageSize = 10;
     public PlatformEventService(
       IGenericRepository<Event> eventDAL,
       IGenericRepository<Sport> sportDAL,
@@ -472,14 +475,29 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       };
     }
 
-    public List<EventDTO> GetEvents(int page, int pageSize, out int count)
+    public List<EventDTO> GetEvents(
+      out int count,
+      string? name,
+      DateTime? fromDate,
+      DateTime? untilDate,
+      TeamTypeEnum? teamType,
+      bool? instantiable,
+      int? page, int? pageSize)
     {
-      page = page > 0 ? page : 1;
-      pageSize = pageSize > 0 ? pageSize : 10;
+      SetPagination(page, pageSize);
 
-      count = _eventDAL.Get().Count();
+      if (fromDate != null && untilDate != null && fromDate >= untilDate) throw new InvalidDateFilterException();
 
-      return _eventDAL.Get()
+      var conditions = new List<Expression<Func<Event, bool>>>();
+
+      if (name != null) conditions.Add(x => x.Name == name);
+      if (fromDate != null) conditions.Add(x => x.StartDate >= fromDate);
+      if (untilDate != null) conditions.Add(x => x.EndDate <= fromDate);
+      if (teamType != null) conditions.Add(x => x.TeamType == teamType);
+      if (instantiable != null) conditions.Add(x => x.Instantiable == instantiable);
+
+
+      IQueryable<EventDTO> events = _eventDAL.Get(conditions)
         .Select(x => new EventDTO
         {
           Id = x.Id,
@@ -487,8 +505,13 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
           StartDate = x.StartDate,
           EndDate = x.EndDate,
           Comission = x.Comission,
-          TeamType = x.TeamType
-        }).Skip((page - 1) * pageSize).Take(pageSize).ToList();
+          TeamType = x.TeamType,
+          Instantiable = x.Instantiable,
+        });
+
+      count = _eventDAL.Get(conditions).Count();
+
+      return events.Skip((_page - 1) * _pageSize).Take(_pageSize).ToList();
     }
 
     public SportDTO CreateSport(string name, bool tie, int? exactPoints, int? partialPoints) {
@@ -521,14 +544,15 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       };
     }
 
-    public List<SportDTO> GetSports(int page, int pageSize, out int count)
+    public List<SportDTO> GetSports(out int count, string? name, int? page, int? pageSize)
     {
-      page = page > 0 ? page : 1;
-      pageSize = pageSize > 0 ? pageSize : 10;
+      SetPagination(page, pageSize);
 
-      count = _sportDAL.Get().Count();
+      var conditions = new List<Expression<Func<Sport, bool>>>();
 
-      return _sportDAL.Get()
+      if (name != null) conditions.Add(x => x.Name == name);
+
+      IQueryable<SportDTO> sports = _sportDAL.Get(conditions)
         .Select(x => new SportDTO
         {
           Id = x.Id,
@@ -536,7 +560,11 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
           Tie = x.Tie,
           ExactPoints = x.ExactPoints,
           PartialPoints = x.PartialPoints,
-        }).Skip((page - 1) * pageSize).Take(pageSize).ToList();
+        });
+
+      count = sports.Count();
+
+      return sports.Skip((_page - 1) * _pageSize).Take(_pageSize).ToList();
     }
 
     public TeamDTO CreateTeam(string name, byte[]? logo, int sportId, TeamTypeEnum? teamType)
@@ -580,14 +608,22 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       };
     }
 
-    public List<TeamDTO> GetTeams(int page, int pageSize, out int count)
+    public List<TeamDTO> GetTeams(
+      out int count,
+      string? name,
+      int? sportId,
+      TeamTypeEnum? teamType,
+      int? page, int? pageSize)
     {
-      page = page > 0 ? page : 1;
-      pageSize = pageSize > 0 ? pageSize : 10;
+      SetPagination(page, pageSize);
 
-      count = _teamDAL.Get().Count();
+      var conditions = new List<Expression<Func<Team, bool>>>();
 
-      return _teamDAL.Get()
+      if (name != null) conditions.Add(x => x.Name == name);
+      if (sportId != null) conditions.Add(x => x.Sport_id == sportId);
+      if (teamType != null) conditions.Add(x => x.TeamType == teamType);
+
+      IQueryable<TeamDTO> teams = _teamDAL.Get(conditions)
         .Select(x => new TeamDTO
         {
           Id = x.Id,
@@ -602,7 +638,11 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
             Tie = x.Sport.Tie,
             PartialPoints = x.Sport.PartialPoints,
           } : null,
-        }).Skip((page - 1) * pageSize).Take(pageSize).ToList();
+        });
+
+      count = teams.Count();
+
+      return teams.Skip((_page - 1) * _pageSize).Take(_pageSize).ToList();
     }
 
     public MatchDTO CreateMatch(int eventID, int? firstTeamId, int? secondTeamId, int? firstTeamScore, int? secondTeamScore, int sportId, DateTime date)
@@ -691,14 +731,44 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       };
     }
 
-    public List<MatchDTO> GetMatches(int page, int pageSize, out int count)
+    public List<MatchDTO> GetMatches(
+      out int count,
+      int? idTeam,
+      int? otherIdTeam,
+      int? eventId,
+      int? sportId,
+      DateTime? fromDate,
+      DateTime? untilDate,
+      int? page, int? pageSize)
     {
-      page = page > 0 ? page : 1;
-      pageSize = pageSize > 0 ? pageSize : 10;
+      SetPagination(page, pageSize);
 
-      count = _matchDAL.Get().Count();
+      var conditions = new List<Expression<Func<Match, bool>>>();
 
-      return _matchDAL.Get()
+      if (fromDate != null && untilDate != null && fromDate >= untilDate) throw new InvalidDateFilterException();
+
+      if (fromDate != null) conditions.Add(x => x.Date >= fromDate);
+      if (untilDate != null) conditions.Add(x => x.Date <= fromDate);
+
+      if (idTeam != null && otherIdTeam != null && idTeam != otherIdTeam)
+      {
+        conditions.Add(
+          x => (x.FirstTeam_id == idTeam && x.SecondTeam_id == otherIdTeam)
+          || (x.FirstTeam_id == idTeam && x.SecondTeam_id == otherIdTeam));
+      }
+      else if (idTeam != null)
+      {
+        conditions.Add(x => x.FirstTeam_id == idTeam || x.SecondTeam_id == idTeam);
+      }
+      else if (otherIdTeam != null)
+      {
+        conditions.Add(x => x.FirstTeam_id == otherIdTeam || x.SecondTeam_id == otherIdTeam);
+      }
+
+      if (eventId != null) conditions.Add(x => x.Event_id == eventId);
+      if (sportId != null) conditions.Add(x => x.Sport_id == sportId);
+
+      IQueryable<MatchDTO> matches = _matchDAL.Get(conditions)
         .Select(match => new MatchDTO
         {
           Id = match.Id,
@@ -743,7 +813,17 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
             Tie = match.Sport.Tie,
             PartialPoints = match.Sport.PartialPoints,
           } : null,
-        }).Skip((page - 1) * pageSize).Take(pageSize).ToList();
+        });
+
+      count = matches.Count();
+
+      return matches.Skip((_page - 1) * _pageSize).Take(_pageSize).ToList();
+    }
+
+    private void SetPagination(int? page, int? pageSize)
+    {
+      _page = page != null && page.Value > 0 ? page.Value : _page;
+      _pageSize = pageSize != null && pageSize.Value > 0 ? pageSize.Value : _pageSize;
     }
   }
 }

@@ -7,5 +7,7 @@ namespace TuPencaUy.Site.DAO.Models
     public virtual required Sport Sport { get; set; }
     public virtual required Team FirstTeam { get; set; }
     public virtual required Team SecondTeam { get; set; }
+    public virtual Event Event { get; set; }
+    public int RefMatch { get; set; }
   }
 }

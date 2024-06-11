@@ -39,11 +39,18 @@ namespace TuPencaUy.Core.API.Controllers
     }
 
     [HttpGet]
-    public IActionResult GetEvents(int page, int pageSize)
+    public IActionResult GetEvents(int? page, int? pageSize, string? name, DateTime? fromDate, DateTime? untilDate, TeamTypeEnum? teamType, bool? instantiable)
     {
       try
       {
-        var list = _eventService.GetEvents(page, pageSize, out int count);
+        var list = _eventService.GetEvents(
+          out int count,
+          name,
+          fromDate,
+          untilDate,
+          teamType,
+          instantiable,
+          page, pageSize);
 
         var successResponse = new ApiResponse
         {
@@ -78,11 +85,11 @@ namespace TuPencaUy.Core.API.Controllers
     }
 
     [HttpGet("Sport")]
-    public IActionResult GetSport(int page, int pageSize)
+    public IActionResult GetSport(int? page, int? pageSize, string? name)
     {
       try
       {
-        var list = _eventService.GetSports(page, pageSize, out int count);
+        var list = _eventService.GetSports(out int count, name, page, pageSize);
 
         var successResponse = new ApiResponse
         {
@@ -117,11 +124,11 @@ namespace TuPencaUy.Core.API.Controllers
     }
 
     [HttpGet("Team")]
-    public IActionResult GetTeams(int page, int pageSize)
+    public IActionResult GetTeams(int? page, int? pageSize, string? name, int? sportId, TeamTypeEnum? teamType)
     {
       try
       {
-        var list = _eventService.GetTeams(page, pageSize, out int count);
+        var list = _eventService.GetTeams(out int count, name, sportId, teamType, page, pageSize);
 
         var successResponse = new ApiResponse
         {
@@ -157,11 +164,19 @@ namespace TuPencaUy.Core.API.Controllers
     }
 
     [HttpGet("Match")]
-    public IActionResult GetMatches(int page, int pageSize)
+    public IActionResult GetMatches(int? page, int? pageSize, int? idTeam, int? otherIdTeam, int? eventId, int? sportId, DateTime? fromDate, DateTime? untilDate)
     {
       try
       {
-        var list = _eventService.GetMatches(page, pageSize, out int count);
+        var list = _eventService.GetMatches(
+          out int count,
+          idTeam,
+          otherIdTeam,
+          eventId,
+          sportId,
+          fromDate,
+          untilDate,
+          page, pageSize);
 
         var successResponse = new ApiResponse
         {

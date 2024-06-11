@@ -124,8 +124,10 @@ namespace TuPencaUy.Platform.DAO.Migrations
                         .HasColumnName("Date")
                         .HasColumnOrder(5);
 
-                    b.Property<int?>("EventId")
-                        .HasColumnType("int");
+                    b.Property<int>("Event_id")
+                        .HasColumnType("int")
+                        .HasColumnName("Event_id")
+                        .HasColumnOrder(7);
 
                     b.Property<int?>("FirstTeamScore")
                         .HasColumnType("int")
@@ -160,7 +162,7 @@ namespace TuPencaUy.Platform.DAO.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EventId");
+                    b.HasIndex("Event_id");
 
                     b.HasIndex("FirstTeam_id");
 
@@ -470,9 +472,11 @@ namespace TuPencaUy.Platform.DAO.Migrations
 
             modelBuilder.Entity("TuPencaUy.Platform.DAO.Models.Match", b =>
                 {
-                    b.HasOne("TuPencaUy.Platform.DAO.Models.Event", null)
+                    b.HasOne("TuPencaUy.Platform.DAO.Models.Event", "Event")
                         .WithMany("Matches")
-                        .HasForeignKey("EventId");
+                        .HasForeignKey("Event_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("TuPencaUy.Platform.DAO.Models.Team", "FirstTeam")
                         .WithMany()
@@ -485,6 +489,8 @@ namespace TuPencaUy.Platform.DAO.Migrations
                     b.HasOne("TuPencaUy.Platform.DAO.Models.Sport", "Sport")
                         .WithMany("Matches")
                         .HasForeignKey("Sport_id");
+
+                    b.Navigation("Event");
 
                     b.Navigation("FirstTeam");
 

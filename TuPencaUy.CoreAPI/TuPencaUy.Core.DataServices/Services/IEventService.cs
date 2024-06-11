@@ -11,11 +11,23 @@ namespace TuPencaUy.Core.DataServices.Services
       DateTime? endDate,
       float? comission,
       TeamTypeEnum? teamType);
-    List<EventDTO> GetEvents(int page, int pageSize, out int count);
+    List<EventDTO> GetEvents(
+      out int count,
+      string? name,
+      DateTime? fromDate,
+      DateTime? untilDate,
+      TeamTypeEnum? teamType,
+      bool? instantiable,
+      int? page, int? pageSize);
     SportDTO CreateSport(string name, bool tie, int? exactPoints, int? partialPoints);
-    List<SportDTO> GetSports(int page, int pageSize, out int count);
+    List<SportDTO> GetSports(out int count, string? name, int? page, int? pageSize);
     TeamDTO CreateTeam(string name, byte[]? logo, int sportId, TeamTypeEnum? teamType);
-    List<TeamDTO> GetTeams(int page, int pageSize, out int count);
+    List<TeamDTO> GetTeams(
+      out int count,
+      string? name,
+      int? sportId,
+      TeamTypeEnum? teamType,
+      int? page, int? pageSize);
     MatchDTO CreateMatch(
       int eventID,
       int? firstTeamId,
@@ -24,7 +36,15 @@ namespace TuPencaUy.Core.DataServices.Services
       int? secondTeamScore,
       int sportId,
       DateTime date);
-    List<MatchDTO> GetMatches(int page, int pageSize, out int count);
+    List<MatchDTO> GetMatches(
+      out int count,
+      int? idTeam,
+      int? otherIdTeam,
+      int? eventId,
+      int? sportId,
+      DateTime? fromDate,
+      DateTime? untilDate,
+      int? page, int? pageSize);
     MatchDTO GetMatch(int idMatch);
     TeamDTO GetTeam(int idTeam);
     SportDTO GetSport(int idSport);
