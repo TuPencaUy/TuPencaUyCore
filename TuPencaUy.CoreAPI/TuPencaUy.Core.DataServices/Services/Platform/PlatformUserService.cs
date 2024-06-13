@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using TuPencaUy.Core.DataAccessLogic;
 using TuPencaUy.Core.DataServices.Services.CommonLogic;
+using TuPencaUy.Core.DTOs;
 using TuPencaUy.Core.Enums;
 using TuPencaUy.Core.Exceptions;
 using TuPencaUy.DTOs;
@@ -154,6 +155,11 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
               .ToList()
         }
       };
+    }
+
+    public Tuple<UserDTO, EventDTO> SuscribeUser(int userId, int eventId)
+    {
+      throw new NotImplementedException();
     }
   }
 }
