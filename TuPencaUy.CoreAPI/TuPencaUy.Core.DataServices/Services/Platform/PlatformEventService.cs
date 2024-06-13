@@ -455,7 +455,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         }).FirstOrDefault() ?? throw new EventNotFoundException($"Event with id {idEvent} not found");
     }
 
-    public EventDTO CreateEvent(string name, DateTime? startDate, DateTime? endDate, float? comission, TeamTypeEnum? teamType)
+    public EventDTO CreateEvent(string name, DateTime? startDate, DateTime? endDate, float? comission, TeamTypeEnum? teamType, int sportId)
     {
       var existingEvent = _eventDAL.Get(new List<Expression<Func<Event, bool>>>
       {
@@ -464,6 +464,9 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
 
       if (existingEvent) throw new NameAlreadyInUseException($"An event with the name {name} already exists");
 
+      var sport = _sportDAL.Get(new List<Expression<Func<Sport, bool>>> { x => x.Id == sportId })
+        .FirstOrDefault() ?? throw new SportNotFoundException($"Sport with id {sportId} not found");
+
       var newEvent = new Event
       {
         Name = name,
@@ -471,7 +474,8 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         EndDate = endDate,
         Comission = comission,
         TeamType = teamType,
-        Instantiable = true
+        Instantiable = true,
+        Sports = new List<Sport>() { sport }
       };
 
       _eventDAL.Insert(newEvent);

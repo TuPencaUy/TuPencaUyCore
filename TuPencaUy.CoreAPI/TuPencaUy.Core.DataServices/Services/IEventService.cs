@@ -11,7 +11,8 @@ namespace TuPencaUy.Core.DataServices.Services
       DateTime? startDate,
       DateTime? endDate,
       float? comission,
-      TeamTypeEnum? teamType);
+      TeamTypeEnum? teamType,
+      int sportId);
     List<EventDTO> GetEvents(
       out int count,
       string? name,

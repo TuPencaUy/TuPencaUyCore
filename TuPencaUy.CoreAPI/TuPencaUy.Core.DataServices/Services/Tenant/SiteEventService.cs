@@ -506,7 +506,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
     }
 
     #region Don't need implementation
-    public EventDTO CreateEvent(string name, DateTime? startDate, DateTime? endDate, float? comission, TeamTypeEnum? teamType)
+    public EventDTO CreateEvent(string name, DateTime? startDate, DateTime? endDate, float? comission, TeamTypeEnum? teamType, int sportId)
     {
       throw new NotImplementedException();
     }

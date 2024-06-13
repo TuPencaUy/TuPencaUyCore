@@ -78,7 +78,7 @@ namespace TuPencaUy.Core.API.Controllers
         }
 
         var createdEvent = _eventService
-          .CreateEvent(requestEvent.Name, requestEvent.StartDate, requestEvent.EndDate, requestEvent.Comission, requestEvent.TeamType);
+          .CreateEvent(requestEvent.Name, requestEvent.StartDate, requestEvent.EndDate, requestEvent.Comission, requestEvent.TeamType, requestEvent.Sport_id);
 
         return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Data = createdEvent, Message = "Successfully created event" });
       }
