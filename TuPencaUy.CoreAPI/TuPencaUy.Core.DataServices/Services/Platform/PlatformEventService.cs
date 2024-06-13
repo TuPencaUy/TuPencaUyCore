@@ -489,7 +489,15 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         EndDate = endDate,
         Comission = comission,
         TeamType = teamType,
-        Instantiable = true
+        Instantiable = true,
+        Sport = newEvent.Sports.Select(x => new SportDTO
+        {
+          Name = x.Name,
+          Tie = x.Tie,
+          Id = x.Id,
+          ExactPoints = x.ExactPoints,
+          PartialPoints = x.PartialPoints,
+        }).FirstOrDefault(),
       };
     }
 
