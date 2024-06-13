@@ -9,5 +9,7 @@ namespace TuPencaUy.Core.DTOs
     public byte[]? Logo { get; set; }
     public TeamTypeEnum? TeamType { get; set; }
     public SportDTO? Sport { get; set; }
+
+    public int? ReferenceTeam { get; set; }
   }
 }
