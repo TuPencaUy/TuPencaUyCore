@@ -32,7 +32,9 @@ namespace TuPencaUy.Core.API.Controllers
           return BadRequest(new ApiResponse { Error = true, Message = "You must be logged to a tenant" });
         }
 
+        var eventUser = _userService.SuscribeUser(userId, eventId);
 
+        return Ok(new ApiResponse { Data = eventUser, Message = $"User {eventUser.Item2.Name} suscribed to {eventUser.Item1.Name}"})
       }
       catch (Exception ex)
       {
