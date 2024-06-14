@@ -46,7 +46,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
         _sportDAL.Insert(sport);
         _sportDAL.SaveChanges();
       }
-        
+
 
       var matchesToInsert = new List<Match>();
       foreach (var match in matches)
@@ -77,18 +77,19 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
             Sport = sport,
             TeamType = match.SecondTeam.TeamType,
           };
-          _teamDAL.Insert(firstTeam);
+          _teamDAL.Insert(secondTeam);
           _teamDAL.SaveChanges();
         }
 
         matchesToInsert.Add(new Match
         {
-          RefMatch = match.ReferenceMatch.Value,
+          RefMatch = match.Id.Value,
           FirstTeam = firstTeam,
           SecondTeam = secondTeam,
           Sport = sport,
           SecondTeamScore = match.SecondTeamScore,
           FirstTeamScore = match.FirstTeamScore,
+          Date = match.Date,
         });
       }
 
@@ -150,6 +151,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
               ExactPoints = ev.Sports.FirstOrDefault().ExactPoints,
             },
             TeamType = x.FirstTeam?.TeamType,
+            ReferenceTeam = x.FirstTeam.RefTeam
           },
           SecondTeam = new TeamDTO
           {
@@ -166,6 +168,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
               ExactPoints = ev.Sports.FirstOrDefault().ExactPoints,
             },
             TeamType = x.SecondTeam?.TeamType,
+            ReferenceTeam = x.SecondTeam.RefTeam
           },
           SecondTeamScore = x.SecondTeamScore,
           FirstTeamScore = x.FirstTeamScore,

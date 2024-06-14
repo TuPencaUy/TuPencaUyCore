@@ -27,7 +27,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       _eventDAL = eventDAL;
       _authLogic = authLogic;
     }
-    public Tuple<UserDTO, EventDTO> SuscribeUser(int userId, int eventId)
+    public Tuple<UserDTO, EventDTO> SubscribeUser(int userId, int eventId)
     {
       Event @event = _eventDAL.Get(new List<Expression<Func<Event, bool>>> { x => x.Id == eventId })
         .FirstOrDefault() ?? throw new EventNotFoundException($"Event not found with id: {eventId}");
@@ -67,8 +67,8 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
           Comission = @event.Comission,
           Instantiable = @event.Instantiable,
           TeamType = @event.TeamType,
-          MatchesCount = @event.Matches.Count(),
-          Sport = @event.Sports.Select(x => new SportDTO
+          MatchesCount = @event.Matches?.Count() ?? 0,
+          Sport = @event.Sports == null ? null : @event.Sports.Select(x => new SportDTO
           {
             ReferenceSport = x.RefSport,
             Name = x.Name,

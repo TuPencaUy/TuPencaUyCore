@@ -71,7 +71,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
               .Select(p => new PermissionDTO { Name = p.Name, Id = p.Id })
               .ToList()
           },
-        }) 
+        })
         .FirstOrDefault() ?? throw new UserNotFoundException();
     }
     public RoleDTO GetRolesByUser(string email)
@@ -157,7 +157,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       };
     }
 
-    public Tuple<UserDTO, EventDTO> SuscribeUser(int userId, int eventId)
+    public Tuple<UserDTO, EventDTO> SubscribeUser(int userId, int eventId)
     {
       throw new NotImplementedException();
     }

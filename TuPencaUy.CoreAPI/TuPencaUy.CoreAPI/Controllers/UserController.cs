@@ -21,8 +21,8 @@ namespace TuPencaUy.Core.API.Controllers
       _userService = serviceFactory.GetService<IUserService>();
     }
 
-    [HttpPost("SuscribeToEvent")]
-    public IActionResult SuscribeToEvent([Required] int userId, [Required] int eventId)
+    [HttpPost("SubscribeToEvent")]
+    public IActionResult SubscribeToEvent([Required] int userId, [Required] int eventId)
     {
       try
       {
@@ -32,7 +32,7 @@ namespace TuPencaUy.Core.API.Controllers
           return BadRequest(new ApiResponse { Error = true, Message = "You must be logged to a tenant" });
         }
 
-        var eventUser = _userService.SuscribeUser(userId, eventId);
+        var eventUser = _userService.SubscribeUser(userId, eventId);
 
         return Ok(new ApiResponse { Data = eventUser, Message = $"User {eventUser.Item2.Name} suscribed to {eventUser.Item1.Name}" });
       }
