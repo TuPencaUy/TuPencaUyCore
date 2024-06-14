@@ -53,7 +53,9 @@ namespace TuPencaUy.Core.DataServices
       _serviceCollection = new ServiceCollection();
       _serviceCollection.AddDbContext<PlatformDbContext>(options =>
       {
-        options.UseSqlServer(_configuration.GetConnectionString("Platform"))
+        options
+        .UseLazyLoadingProxies()
+        .UseSqlServer(_configuration.GetConnectionString("Platform"))
         .LogTo(s => System.Diagnostics.Debug.WriteLine(s)); // To log queries
       });
 
@@ -72,7 +74,9 @@ namespace TuPencaUy.Core.DataServices
       _serviceCollection = new ServiceCollection();
       _serviceCollection.AddDbContext<SiteDbContext>(options =>
       {
-        options.UseSqlServer(connectionString)
+        options
+        .UseLazyLoadingProxies()
+        .UseSqlServer(connectionString)
         .LogTo(s => System.Diagnostics.Debug.WriteLine(s)); // To log queries
       });
 
