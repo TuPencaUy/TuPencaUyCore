@@ -113,7 +113,8 @@ namespace TuPencaUy.Core.API.Controllers
     {
       try
       {
-        var createdTeam = _eventService.CreateTeam(team.Name, team.Logo, team.Sport, team.TeamType);
+        byte[]? logo = team.Logo == null ? null : Convert.FromBase64String(team.Logo);
+        var createdTeam = _eventService.CreateTeam(team.Name, logo, team.Sport, team.TeamType);
 
         return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Data = createdTeam, Message = "Successfully created team" });
       }
