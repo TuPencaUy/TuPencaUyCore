@@ -105,6 +105,28 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
               .Select(p => new PermissionDTO { Name = p.Name, Id = p.Id })
               .ToList()
           },
+          Events = x.Events != null ? x.Events.Select(ev =>
+          new EventDTO
+          {
+            Id = ev.Id,
+            ReferenceEvent = ev.RefEvent,
+            Name = ev.Name,
+            Comission = ev.Comission,
+            EndDate = ev.EndDate,
+            StartDate = ev.StartDate,
+            Instantiable = ev.Instantiable,
+            MatchesCount = ev.Matches.Count(),
+            TeamType = ev.TeamType,
+            Sport = new SportDTO
+            {
+              Id = ev.Id,
+              ReferenceSport = ev.Sports.FirstOrDefault().Id,
+              Name = ev.Sports.FirstOrDefault().Name,
+              Tie = ev.Sports.FirstOrDefault().Tie,
+              PartialPoints = ev.Sports.FirstOrDefault().PartialPoints,
+              ExactPoints = ev.Sports.FirstOrDefault().ExactPoints,
+            }
+          }).ToList() : new List<EventDTO>()
         })
         .FirstOrDefault() ?? throw new UserNotFoundException();
     }
