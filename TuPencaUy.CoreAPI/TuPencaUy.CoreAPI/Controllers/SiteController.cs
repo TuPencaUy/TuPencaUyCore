@@ -44,27 +44,34 @@ namespace TuPencaUy.Core.API.Controllers
     [HttpPost("CreateSite")]
     public IActionResult CreateSite([FromBody] SiteRequest site)
     {
-      if (site.Name.Contains(' ')) throw new InvalidNameOfSiteException("The site name can't contain withespaces");
+      try
+      {
+        if (site.Name.Contains(' ')) throw new InvalidNameOfSiteException("The site name can't contain withespaces");
 
 
-      var siteDTO = new SiteDTO { Name = site.Name, AccessType = site.AccessType, Color = site.Color, Domain = site.Domain };
+        var siteDTO = new SiteDTO { Name = site.Name, AccessType = site.AccessType, Color = site.Color, Domain = site.Domain };
 
-      UserDTO userFromToken = ObtainUserFromToken();
+        UserDTO userFromToken = ObtainUserFromToken();
 
-      var created = _siteService
-        .CreateNewSite(userFromToken.Email, siteDTO, out string? errorMessage, out string? connectionString);
+        var created = _siteService
+          .CreateNewSite(userFromToken.Email, siteDTO, out string? errorMessage, out string? connectionString);
 
-      if (!created) return BadRequest(new ApiResponse { Error = true, Message = errorMessage });
+        if (!created) return BadRequest(new ApiResponse { Error = true, Message = errorMessage });
 
-      userFromToken = _userService.GetUserByEmail(userFromToken.Email);
+        userFromToken = _userService.GetUserByEmail(userFromToken.Email);
 
-      _serviceFactory
-        .CreateTenantServices(connectionString);
-      _serviceFactory
-        .GetService<IUserService>()
-        .CreateUser(userFromToken.Email, userFromToken.Name, userFromToken.Password, UserRoleEnum.Admin);
+        _serviceFactory
+          .CreateTenantServices(connectionString);
+        _serviceFactory
+          .GetService<IUserService>()
+          .CreateUser(userFromToken.Email, userFromToken.Name, userFromToken.Password, UserRoleEnum.Admin);
 
-      return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Message = "Successfully created site" });
+        return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Message = "Successfully created site" });
+      }
+      catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
     }
 
 
@@ -84,7 +91,7 @@ namespace TuPencaUy.Core.API.Controllers
       }
       catch (Exception ex)
       {
-        return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse { Message = "Internal Error" });
+        return ManageException(ex);
       }
     }
 
@@ -108,14 +115,9 @@ namespace TuPencaUy.Core.API.Controllers
 
         return Ok(new ApiResponse { Message = "Successfully updated site" });
       }
-      catch (SiteNotFoundException)
-      {
-        return NotFound(new ApiResponse { Error = true, Message = "Site not found" });
-      }
       catch (Exception ex)
       {
-        return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse { Message = "Internal Error" });
-
+        return ManageException(ex);
       }
     }
   }

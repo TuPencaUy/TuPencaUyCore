@@ -5,6 +5,7 @@ using TuPencaUy.Core.DataAccessLogic;
 using TuPencaUy.Core.DataServices.Services;
 using TuPencaUy.Core.DataServices.Services.CommonLogic;
 using TuPencaUy.Core.DataServices.Services.Platform;
+using TuPencaUy.Core.DataServices.Services.Tenant;
 using TuPencaUy.Platform.DAO.Models.Data;
 using TuPencaUy.Site.DAO.Models.Data;
 
@@ -52,7 +53,9 @@ namespace TuPencaUy.Core.DataServices
       _serviceCollection = new ServiceCollection();
       _serviceCollection.AddDbContext<PlatformDbContext>(options =>
       {
-        options.UseSqlServer(_configuration.GetConnectionString("Platform"))
+        options
+        .UseLazyLoadingProxies()
+        .UseSqlServer(_configuration.GetConnectionString("Platform"))
         .LogTo(s => System.Diagnostics.Debug.WriteLine(s)); // To log queries
       });
 
@@ -71,7 +74,9 @@ namespace TuPencaUy.Core.DataServices
       _serviceCollection = new ServiceCollection();
       _serviceCollection.AddDbContext<SiteDbContext>(options =>
       {
-        options.UseSqlServer(connectionString)
+        options
+        .UseLazyLoadingProxies()
+        .UseSqlServer(connectionString)
         .LogTo(s => System.Diagnostics.Debug.WriteLine(s)); // To log queries
       });
 
@@ -81,6 +86,7 @@ namespace TuPencaUy.Core.DataServices
       _serviceCollection.AddScoped(typeof(IGenericRepository<>), typeof(SiteGenericRepository<>));
       _serviceCollection.AddScoped<IAuthService, SiteAuthService>();
       _serviceCollection.AddScoped<IUserService, SiteUserService>();
+      _serviceCollection.AddScoped<IEventService, SiteEventService>();
     }
   }
 }

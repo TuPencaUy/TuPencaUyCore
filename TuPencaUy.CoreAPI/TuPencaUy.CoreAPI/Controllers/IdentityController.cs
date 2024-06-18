@@ -97,7 +97,7 @@ namespace TuPencaUy.CoreAPI.Controllers
       if (user != null)
       {
         Request.Headers.TryGetValue("currentTenant", out var currentTenant);
-        var tokenTuple = _authLogic.GenerateToken(user);
+        var tokenTuple = _authLogic.GenerateToken(user, currentTenant);
         var token = tokenTuple.Item1;
         var expiration = tokenTuple.Item2;
 

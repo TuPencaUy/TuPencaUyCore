@@ -9,5 +9,6 @@
     public int? SecondTeamScore { get; set; }
     public SportDTO Sport { get; set; }
     public DateTime? Date { get; set; }
+    public int? ReferenceMatch { get; set; }
   }
 }

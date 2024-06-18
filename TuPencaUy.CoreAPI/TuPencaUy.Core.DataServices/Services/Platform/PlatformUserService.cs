@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using TuPencaUy.Core.DataAccessLogic;
 using TuPencaUy.Core.DataServices.Services.CommonLogic;
+using TuPencaUy.Core.DTOs;
 using TuPencaUy.Core.Enums;
 using TuPencaUy.Core.Exceptions;
 using TuPencaUy.DTOs;
@@ -70,7 +71,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
               .Select(p => new PermissionDTO { Name = p.Name, Id = p.Id })
               .ToList()
           },
-        }) 
+        })
         .FirstOrDefault() ?? throw new UserNotFoundException();
     }
     public RoleDTO GetRolesByUser(string email)
@@ -154,6 +155,11 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
               .ToList()
         }
       };
+    }
+
+    public Tuple<UserDTO, EventDTO> SubscribeUser(int userId, int eventId)
+    {
+      throw new NotImplementedException();
     }
   }
 }

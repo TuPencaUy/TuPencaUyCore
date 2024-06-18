@@ -27,6 +27,11 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       _teamDAL = teamDAL;
       _matchDAL = matchDAL;
     }
+    public Tuple<EventDTO, List<MatchDTO>> InstantiateEvent(EventDTO eventDTO, List<MatchDTO> matches)
+    {
+      throw new NotImplementedException();
+    }
+
     public MatchDTO ModifyMatch(
       int idMatch,
       int? idFirstTeam,
@@ -438,10 +443,19 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
           Comission = ev.Comission,
           StartDate = ev.StartDate,
           TeamType = ev.TeamType,
+          Sport =  ev.Sports.Select(x => new SportDTO
+          {
+            Name = x.Name,
+            Tie = x.Tie,
+            Id = x.Id,
+            ExactPoints = x.ExactPoints,
+            PartialPoints = x.PartialPoints,
+          }).FirstOrDefault(),
+          MatchesCount = ev.Matches != null ? ev.Matches.Count() : 0,
         }).FirstOrDefault() ?? throw new EventNotFoundException($"Event with id {idEvent} not found");
     }
 
-    public EventDTO CreateEvent(string name, DateTime? startDate, DateTime? endDate, float? comission, TeamTypeEnum? teamType)
+    public EventDTO CreateEvent(string name, DateTime? startDate, DateTime? endDate, float? comission, TeamTypeEnum? teamType, int sportId)
     {
       var existingEvent = _eventDAL.Get(new List<Expression<Func<Event, bool>>>
       {
@@ -450,6 +464,9 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
 
       if (existingEvent) throw new NameAlreadyInUseException($"An event with the name {name} already exists");
 
+      var sport = _sportDAL.Get(new List<Expression<Func<Sport, bool>>> { x => x.Id == sportId })
+        .FirstOrDefault() ?? throw new SportNotFoundException($"Sport with id {sportId} not found");
+
       var newEvent = new Event
       {
         Name = name,
@@ -457,7 +474,8 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         EndDate = endDate,
         Comission = comission,
         TeamType = teamType,
-        Instantiable = true
+        Instantiable = true,
+        Sports = new List<Sport>() { sport }
       };
 
       _eventDAL.Insert(newEvent);
@@ -471,7 +489,15 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         EndDate = endDate,
         Comission = comission,
         TeamType = teamType,
-        Instantiable = true
+        Instantiable = true,
+        Sport = newEvent.Sports.Select(x => new SportDTO
+        {
+          Name = x.Name,
+          Tie = x.Tie,
+          Id = x.Id,
+          ExactPoints = x.ExactPoints,
+          PartialPoints = x.PartialPoints,
+        }).FirstOrDefault(),
       };
     }
 
@@ -507,6 +533,15 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
           Comission = x.Comission,
           TeamType = x.TeamType,
           Instantiable = x.Instantiable,
+          Sport = x.Sports.Select(x => new SportDTO
+          {
+            Name = x.Name,
+            Tie = x.Tie,
+            Id = x.Id,
+            ExactPoints = x.ExactPoints,
+            PartialPoints = x.PartialPoints,
+          }).FirstOrDefault(),
+          MatchesCount = x.Matches != null ? x.Matches.Count() : 0,
         });
 
       count = _eventDAL.Get(conditions).Count();

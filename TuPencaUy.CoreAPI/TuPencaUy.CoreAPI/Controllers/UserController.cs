@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using TuPencaUy.Core.API.Model.Requests;
 using TuPencaUy.Core.API.Model.Responses;
@@ -18,6 +19,27 @@ namespace TuPencaUy.Core.API.Controllers
     public UserController(IServiceFactory serviceFactory)
     {
       _userService = serviceFactory.GetService<IUserService>();
+    }
+
+    [HttpPost("SubscribeToEvent")]
+    public IActionResult SubscribeToEvent([Required] int userId, [Required] int eventId)
+    {
+      try
+      {
+        string domain = ObtainTenantFromToken();
+        if (string.IsNullOrEmpty(domain))
+        {
+          return BadRequest(new ApiResponse { Error = true, Message = "You must be logged to a tenant" });
+        }
+
+        var eventUser = _userService.SubscribeUser(userId, eventId);
+
+        return Ok(new ApiResponse { Data = new { User = eventUser.Item1, Event = eventUser.Item2 }, Message = $"User {eventUser.Item2.Name} suscribed to {eventUser.Item1.Name}" });
+      }
+      catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
     }
 
     [HttpGet("{userId}")]

@@ -11,5 +11,7 @@ namespace TuPencaUy.Core.API.Model.Requests
     public DateTime? EndDate { get; set; }
     public float? Comission { get; set; }
     public TeamTypeEnum TeamType { get; set; }
+
+    public int Sport_id { get; set; }
   }
 }

@@ -11,5 +11,8 @@ namespace TuPencaUy.Core.DTOs
     public float? Comission { get; set; }
     public TeamTypeEnum? TeamType { get; set; }
     public bool Instantiable { get; set; }
+    public int MatchesCount { get; set; }
+    public int? ReferenceEvent { get; set; }
+    public SportDTO? Sport { get; set; }
   }
 }

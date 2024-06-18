@@ -1,6 +1,8 @@
-﻿using System.Linq.Expressions;
+﻿using System.Linq;
+using System.Linq.Expressions;
 using TuPencaUy.Core.DataAccessLogic;
 using TuPencaUy.Core.DataServices.Services.CommonLogic;
+using TuPencaUy.Core.DTOs;
 using TuPencaUy.Core.Enums;
 using TuPencaUy.Core.Exceptions;
 using TuPencaUy.DTOs;
@@ -25,6 +27,64 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       _roleDAL = roleDAL;
       _eventDAL = eventDAL;
       _authLogic = authLogic;
+    }
+    public Tuple<UserDTO, EventDTO> SubscribeUser(int userId, int eventId)
+    {
+      Event @event = _eventDAL.Get(new List<Expression<Func<Event, bool>>> { x => x.Id == eventId })
+        .FirstOrDefault() ?? throw new EventNotFoundException($"Event not found with id: {eventId}");
+
+      User user = _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Id == userId})
+        .FirstOrDefault() ?? throw new UserNotFoundException($"User not found with id: {userId}");
+
+      var subscribedUser = _userDAL.Get(new List<Expression<Func<User, bool>>>
+      {
+        x => x.Id == userId && x.Events.FirstOrDefault(x => x.Id == eventId) == null
+      }).Any();
+
+      if (subscribedUser) throw new UserAlreadySubscribedException($"User {userId} is already subscribed to the event {eventId}");
+      if (@event.Users == null) @event.Users = new List<User>();
+
+      @event.Users.Add(user);
+      _eventDAL.Update(@event);
+      _eventDAL.SaveChanges();
+
+      return new Tuple<UserDTO, EventDTO>(
+        new UserDTO
+        {
+          Id = userId,
+          Email = user.Email,
+          Role = user.Role == null ? null : new RoleDTO
+          {
+            Name = user.Role.Name,
+            Id = user.Role.Id,
+            Permissions = user.Role.Permissions == null ? null :
+              user.Role.Permissions
+              .ToList()
+              .Select(p => new PermissionDTO { Name = p.Name, Id = p.Id })
+              .ToList()
+          },
+        },
+        new EventDTO
+        {
+          Name = @event.Name,
+          Id= @event.Id,
+          ReferenceEvent = @event.RefEvent,
+          StartDate = @event.StartDate,
+          EndDate = @event.EndDate,
+          Comission = @event.Comission,
+          Instantiable = @event.Instantiable,
+          TeamType = @event.TeamType,
+          MatchesCount = @event.Matches?.Count() ?? 0,
+          Sport = @event.Sports == null ? null : @event.Sports.Select(x => new SportDTO
+          {
+            ReferenceSport = x.RefSport,
+            Name = x.Name,
+            Tie = x.Tie,
+            Id = x.Id,
+            ExactPoints = x.ExactPoints,
+            PartialPoints = x.PartialPoints,
+          }).FirstOrDefault(),
+        });
     }
     public UserDTO GetUserById(int id)
     {

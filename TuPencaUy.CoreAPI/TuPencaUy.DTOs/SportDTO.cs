@@ -9,5 +9,7 @@ namespace TuPencaUy.Core.DTOs
     public required bool Tie { get; set; }
     public int? ExactPoints { get; set; }
     public int? PartialPoints { get; set; }
+
+    public int? ReferenceSport { get; set; }
   }
 }
