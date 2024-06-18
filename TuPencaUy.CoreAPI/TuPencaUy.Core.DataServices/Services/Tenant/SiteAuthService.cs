@@ -1,20 +1,13 @@
 ﻿namespace TuPencaUy.Core.DataServices.Services.Platform
 {
   using System.Linq.Expressions;
-  using System.Text;
-  using Microsoft.Extensions.Configuration;
-  using Microsoft.IdentityModel.Tokens;
   using System.IdentityModel.Tokens.Jwt;
-  using System.Security.Claims;
   using TuPencaUy.DTOs;
   using TuPencaUy.Site.DAO.Models;
-  using System.Security.Cryptography;
-  using Microsoft.AspNetCore.Cryptography.KeyDerivation;
   using TuPencaUy.Core.DataAccessLogic;
   using TuPencaUy.Core.Enums;
   using TuPencaUy.Exceptions;
   using TuPencaUy.Core.DataServices.Services.CommonLogic;
-  using TuPencaUy.Core.DTOs;
 
   public class SiteAuthService : IAuthService
   {

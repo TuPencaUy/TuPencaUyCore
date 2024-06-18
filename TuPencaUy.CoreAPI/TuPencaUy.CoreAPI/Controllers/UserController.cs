@@ -34,7 +34,7 @@ namespace TuPencaUy.Core.API.Controllers
 
         var eventUser = _userService.SubscribeUser(userId, eventId);
 
-        return Ok(new ApiResponse { Data = eventUser, Message = $"User {eventUser.Item2.Name} suscribed to {eventUser.Item1.Name}" });
+        return Ok(new ApiResponse { Data = new { User = eventUser.Item1, Event = eventUser.Item2 }, Message = $"User {eventUser.Item2.Name} suscribed to {eventUser.Item1.Name}" });
       }
       catch (Exception ex)
       {

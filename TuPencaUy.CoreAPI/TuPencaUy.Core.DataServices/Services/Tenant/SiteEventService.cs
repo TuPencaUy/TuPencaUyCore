@@ -31,7 +31,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
     public Tuple<EventDTO, List<MatchDTO>> InstantiateEvent(EventDTO eventDTO, List<MatchDTO> matches)
     {
       Sport sport = _sportDAL
-        .Get(new List<Expression<Func<Sport, bool>>> { sport => sport.Id == eventDTO.Sport.Id })?.FirstOrDefault();
+        .Get(new List<Expression<Func<Sport, bool>>> { sport => sport.RefSport == eventDTO.Sport.Id })?.FirstOrDefault();
 
       if(sport == null)
       {
@@ -51,7 +51,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       var matchesToInsert = new List<Match>();
       foreach (var match in matches)
       {
-        var firstTeam = _teamDAL.Get(new List<Expression<Func<Team, bool>>> { x => x.Id == match.FirstTeam.Id }).FirstOrDefault();
+        var firstTeam = _teamDAL.Get(new List<Expression<Func<Team, bool>>> { x => x.RefTeam == match.FirstTeam.Id }).FirstOrDefault();
         if(firstTeam == null)
         {
           firstTeam = new Team
@@ -66,7 +66,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
           _teamDAL.SaveChanges();
         }
 
-        var secondTeam = _teamDAL.Get(new List<Expression<Func<Team, bool>>> { x => x.Id == match.SecondTeam.Id }).FirstOrDefault();
+        var secondTeam = _teamDAL.Get(new List<Expression<Func<Team, bool>>> { x => x.RefTeam == match.SecondTeam.Id }).FirstOrDefault();
         if (secondTeam == null)
         {
           secondTeam = new Team

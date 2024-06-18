@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using System.Linq;
+using System.Linq.Expressions;
 using TuPencaUy.Core.DataAccessLogic;
 using TuPencaUy.Core.DataServices.Services.CommonLogic;
 using TuPencaUy.Core.DTOs;
@@ -35,7 +36,13 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       User user = _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Id == userId})
         .FirstOrDefault() ?? throw new UserNotFoundException($"User not found with id: {userId}");
 
-      if(@event.Users == null) @event.Users = new List<User>();
+      var subscribedUser = _userDAL.Get(new List<Expression<Func<User, bool>>>
+      {
+        x => x.Id == userId && x.Events.FirstOrDefault(x => x.Id == eventId) == null
+      }).Any();
+
+      if (subscribedUser) throw new UserAlreadySubscribedException($"User {userId} is already subscribed to the event {eventId}");
+      if (@event.Users == null) @event.Users = new List<User>();
 
       @event.Users.Add(user);
       _eventDAL.Update(@event);
