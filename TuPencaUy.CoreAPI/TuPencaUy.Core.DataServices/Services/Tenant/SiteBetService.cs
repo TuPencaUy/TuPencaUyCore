@@ -373,10 +373,56 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       };
     }
 
+    public void UpdatePoints(string userEmail, int matchId, int eventId)
+    {
+      var @event = _eventDAL.Get(new List<Expression<Func<Event, bool>>> { x => x.Id == eventId }).Any();
+      if (!@event) throw new EventNotFoundException($"Event not found with id {eventId}");
+
+      var user = _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Email == userEmail }).Any();
+      if(!user) throw new UserNotFoundException($"User not found with email {userEmail}");
+
+      var match = _matchDAL.Get(new List<Expression<Func<Match, bool>>> { x => x.Id == matchId && x.Event_id == eventId })
+        .Select(x => new
+        {
+          FirstTeamScore = x.FirstTeamScore,
+          SecondTeamScore = x.SecondTeamScore,
+          PartialPoints = x.Sport.PartialPoints,
+          ExactPoints = x.Sport.ExactPoints,
+        })
+        .FirstOrDefault() ?? throw new MatchNotFoundException($"Match not found with if {matchId} for event {eventId}");
+
+      var bet = _betDAL.Get(new List<Expression<Func<Bet, bool>>> { x => x.Event_id == eventId && x.Match_id == matchId && x.User_email == userEmail })
+        .FirstOrDefault() ?? throw new BetNotFoundException($"Bet not found with event_id: {eventId}, user_email: {userEmail}, match_id: {matchId}");
+
+      CalculatePoints(ref bet, match.FirstTeamScore.Value, match.SecondTeamScore.Value, match.PartialPoints.Value, match.ExactPoints.Value);
+
+      _betDAL.Update(bet);
+      _betDAL.SaveChanges();
+    }
+
     private void SetPagination(int? page, int? pageSize)
     {
       _page = page != null && page.Value > 0 ? page.Value : _page;
       _pageSize = pageSize != null && pageSize.Value > 0 ? pageSize.Value : _pageSize;
+    }
+
+    private void CalculatePoints(ref Bet bet, int firstTeamScore, int secondTeamScore, int partialPoints, int exactPoints)
+    {
+      int points = 0;
+
+      if (bet.ScoreFirstTeam == firstTeamScore && secondTeamScore == bet.ScoreSecondTeam)
+      {
+        points = exactPoints;
+      } 
+      else if(
+        (firstTeamScore > secondTeamScore && bet.ScoreFirstTeam > bet.ScoreSecondTeam) ||
+        (firstTeamScore < secondTeamScore && bet.ScoreFirstTeam < bet.ScoreSecondTeam) ||
+        (firstTeamScore == secondTeamScore && bet.ScoreFirstTeam == bet.ScoreSecondTeam))
+      {
+        points = partialPoints;
+      }
+
+      bet.Points = points;
     }
   }
 }

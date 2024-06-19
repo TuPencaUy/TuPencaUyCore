@@ -11,5 +11,7 @@ namespace TuPencaUy.Core.DataServices.Services
     BetDTO ModifyBet(string userEmail, int matchId, int eventId, int? firstTeamScore, int? secondTeamScore);
 
     void DeleteBet(string userEmail, int matchId, int eventId);
+
+    void UpdatePoints(string userEmail, int matchId, int eventId);
   }
 }

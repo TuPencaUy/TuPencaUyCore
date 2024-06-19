@@ -81,5 +81,19 @@ namespace TuPencaUy.Core.API.Controllers
       }
     }
 
+    [HttpPatch("UpdatePoints")]
+    public IActionResult UpdatePoints([Required] string userEmail, [Required] int matchId, [Required] int eventId)
+    {
+      try
+      {
+        _betService.UpdatePoints(userEmail, matchId, eventId);
+
+        return Ok(new ApiResponse { Message = "Points updated"});
+      }
+      catch(Exception ex)
+      {
+        return ManageException(ex);
+      }
+    }
   }
 }
