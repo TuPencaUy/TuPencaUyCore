@@ -1,6 +1,8 @@
-﻿using System.Linq.Expressions;
+﻿using Microsoft.Identity.Client;
+using System.Linq.Expressions;
 using TuPencaUy.Core.DataAccessLogic;
 using TuPencaUy.Core.DTOs;
+using TuPencaUy.Core.Exceptions;
 using TuPencaUy.DTOs;
 using TuPencaUy.Site.DAO.Models;
 
@@ -19,9 +21,13 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       throw new NotImplementedException();
     }
 
-    public BetDTO DeleteBet(string userEmail, int matchId, int eventId)
+    public void DeleteBet(string userEmail, int matchId, int eventId)
     {
-      throw new NotImplementedException();
+      var bet = _betDAL.Get(new List<Expression<Func<Bet, bool>>> { x => x.Event_id == eventId && x.Match_id == matchId && x.User_email == userEmail })
+        .FirstOrDefault() ?? throw new BetNotFoundException($"Bet not found with event_id: {eventId}, user_email: {userEmail}, match_id: {matchId}");
+
+      _betDAL.Delete(bet);
+      _betDAL.SaveChanges();
     }
 
     public List<BetDTO> GetBets(out int count, string? userEmail, int? matchId, int? eventId, int? page, int? pageSize)

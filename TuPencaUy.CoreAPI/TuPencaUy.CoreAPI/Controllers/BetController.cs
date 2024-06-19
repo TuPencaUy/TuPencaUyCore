@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using TuPencaUy.Core.API.Model.Responses;
 using TuPencaUy.Core.DataServices;
 using TuPencaUy.Core.DataServices.Services;
@@ -20,6 +21,20 @@ namespace TuPencaUy.Core.API.Controllers
         var bets = _betService.GetBets(out int count, userEmail, matchId, eventId, page, pageSize);
 
         return Ok(new ApiResponse { Message = "Returned bets" });
+      }
+      catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
+    }
+
+    [HttpDelete]
+    public IActionResult DeleteBet([Required] string userEmail, [Required] int matchId, [Required] int eventId)
+    {
+      try
+      {
+        _betService.DeleteBet(userEmail, matchId, eventId);
+        return Ok(new ApiResponse { Message = "Bet successfully deleted" });
       }
       catch(Exception ex)
       {
