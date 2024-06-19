@@ -65,5 +65,21 @@ namespace TuPencaUy.Core.API.Controllers
         return ManageException(ex);
       }
     }
+
+    [HttpPatch]
+    public IActionResult ModifyBet([Required] ModifyBetRequest request)
+    {
+      try
+      {
+        var bet = _betService.ModifyBet(request.UserEmail, request.MatchId, request.EventId, request.FirstTeamScore, request.SecondTeamScore);
+
+        return Ok(new ApiResponse { Data = bet, Message = "Modified bet" });
+      }
+      catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
+    }
+
   }
 }

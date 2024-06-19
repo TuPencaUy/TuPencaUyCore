@@ -253,9 +253,124 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       return betsQuery.ToList();
     }
 
-    public BetDTO ModifyBet(string? userEmail, int? matchId, int? eventId, int? firstTeamScore, int? secondTeamScore)
+    public BetDTO ModifyBet(string userEmail, int matchId, int eventId, int? firstTeamScore, int? secondTeamScore)
     {
-      throw new NotImplementedException();
+      var bet = _betDAL.Get(new List<Expression<Func<Bet, bool>>> { x => x.Event_id == eventId && x.Match_id == matchId && x.User_email == userEmail })
+        .FirstOrDefault() ?? throw new BetNotFoundException($"Bet not found with event_id: {eventId}, user_email: {userEmail}, match_id: {matchId}");
+
+      bool changes = false;
+
+      if (firstTeamScore != null && firstTeamScore != bet.ScoreFirstTeam)
+      {
+        bet.ScoreFirstTeam = firstTeamScore.Value;
+        changes = changes || true;
+      }
+
+      if (secondTeamScore != null && secondTeamScore != bet.ScoreSecondTeam)
+      {
+        bet.ScoreSecondTeam = secondTeamScore.Value;
+        changes = changes || true;
+      }
+
+      if(changes)
+      {
+        _betDAL.Update(bet);
+        _betDAL.SaveChanges();
+      }
+
+      var @event = _eventDAL.Get(new List<Expression<Func<Event, bool>>> { x => eventId == x.Id })
+        .Select(x => new EventDTO
+        {
+          Name = x.Name,
+          Comission = x.Comission,
+          MatchesCount = x.Matches.Count(),
+          EndDate = x.EndDate,
+          StartDate = x.StartDate,
+          Id = x.Id,
+          ReferenceEvent = x.RefEvent,
+          Instantiable = x.Instantiable,
+          TeamType = x.TeamType,
+          Sport = new SportDTO
+          {
+            Name = x.Sports.FirstOrDefault().Name,
+            Id = x.Sports.FirstOrDefault().Id,
+            ReferenceSport = x.Sports.FirstOrDefault().RefSport,
+            ExactPoints = x.Sports.FirstOrDefault().ExactPoints,
+            PartialPoints = x.Sports.FirstOrDefault().PartialPoints,
+            Tie = x.Sports.FirstOrDefault().Tie,
+          }
+        })
+        .FirstOrDefault();
+      var match = _matchDAL.Get(new List<Expression<Func<Match, bool>>> { x => matchId == x.Id })
+        .Select(x => new MatchDTO
+        {
+          Date = x.Date,
+          FirstTeamScore = x.FirstTeamScore,
+          SecondTeamScore = x.SecondTeamScore,
+          ReferenceMatch = x.RefMatch,
+          Id = x.Id,
+          Sport = new SportDTO
+          {
+            Name = x.Sport.Name,
+            Id = x.Sport.Id,
+            ReferenceSport = x.Sport.RefSport,
+            ExactPoints = x.Sport.ExactPoints,
+            PartialPoints = x.Sport.PartialPoints,
+            Tie = x.Sport.Tie,
+          },
+          FirstTeam = new TeamDTO
+          {
+            Id = x.FirstTeam.Id,
+            ReferenceTeam = x.FirstTeam.RefTeam,
+            Logo = x.FirstTeam.Logo,
+            Name = x.FirstTeam.Name,
+            TeamType = x.FirstTeam.TeamType,
+            Sport = new SportDTO
+            {
+              Name = x.FirstTeam.Sport.Name,
+              Id = x.FirstTeam.Sport.Id,
+              ReferenceSport = x.FirstTeam.Sport.RefSport,
+              ExactPoints = x.FirstTeam.Sport.ExactPoints,
+              PartialPoints = x.FirstTeam.Sport.PartialPoints,
+              Tie = x.FirstTeam.Sport.Tie,
+            }
+          },
+          SecondTeam = new TeamDTO
+          {
+            Id = x.SecondTeam.Id,
+            ReferenceTeam = x.SecondTeam.RefTeam,
+            Logo = x.SecondTeam.Logo,
+            Name = x.SecondTeam.Name,
+            TeamType = x.SecondTeam.TeamType,
+            Sport = new SportDTO
+            {
+              Name = x.SecondTeam.Sport.Name,
+              Id = x.SecondTeam.Sport.Id,
+              ReferenceSport = x.SecondTeam.Sport.RefSport,
+              ExactPoints = x.SecondTeam.Sport.ExactPoints,
+              PartialPoints = x.SecondTeam.Sport.PartialPoints,
+              Tie = x.SecondTeam.Sport.Tie,
+            }
+          }
+        })
+        .FirstOrDefault();
+      var user = _userDAL.Get(new List<Expression<Func<User, bool>>> { x => userEmail == x.Email })
+        .Select(x => new UserDTO
+        {
+          Email = userEmail,
+          Name = x.Name,
+        })
+        .FirstOrDefault();
+
+      return new BetDTO
+      {
+        ScoreFirstTeam = bet.ScoreFirstTeam,
+        ScoreSecondTeam = bet.ScoreSecondTeam,
+        Points = bet.Points,
+        Event = @event,
+        Match = match,
+        User = user
+      };
     }
 
     private void SetPagination(int? page, int? pageSize)
