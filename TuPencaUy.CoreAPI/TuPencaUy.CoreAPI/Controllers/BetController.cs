@@ -1,10 +1,14 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Net;
+using TuPencaUy.Core.API.Model.Requests;
 using TuPencaUy.Core.API.Model.Responses;
 using TuPencaUy.Core.DataServices;
 using TuPencaUy.Core.DataServices.Services;
 using TuPencaUy.CoreAPI.Controllers.Base;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TuPencaUy.Core.API.Controllers
 {
@@ -18,9 +22,9 @@ namespace TuPencaUy.Core.API.Controllers
     {
       try
       {
-        var bets = _betService.GetBets(out int count, userEmail, matchId, eventId, page, pageSize);
+        var list = _betService.GetBets(out int count, userEmail, matchId, eventId, page, pageSize);
 
-        return Ok(new ApiResponse { Message = "Returned bets" });
+        return Ok(new ApiResponse { Data = new { list, count }, Message = "Returned bets" });
       }
       catch (Exception ex)
       {
@@ -37,6 +41,26 @@ namespace TuPencaUy.Core.API.Controllers
         return Ok(new ApiResponse { Message = "Bet successfully deleted" });
       }
       catch(Exception ex)
+      {
+        return ManageException(ex);
+      }
+    }
+
+    [HttpPost]
+    public IActionResult CreateBet([FromBody] CreateBetRequest betRequest)
+    {
+      try
+      {
+        var bet = _betService.CreateBet(
+          betRequest.UserEmail,
+          betRequest.MatchId,
+          betRequest.EventId,
+          betRequest.FirstTeamScore,
+          betRequest.SecondTeamScore);
+
+        return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Data = bet, Message = "Bet created"});
+      }
+      catch (Exception ex)
       {
         return ManageException(ex);
       }

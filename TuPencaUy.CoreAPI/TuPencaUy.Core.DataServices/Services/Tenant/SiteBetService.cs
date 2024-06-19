@@ -1,9 +1,11 @@
-﻿using Microsoft.Identity.Client;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Identity.Client;
 using System.Linq.Expressions;
 using TuPencaUy.Core.DataAccessLogic;
 using TuPencaUy.Core.DTOs;
 using TuPencaUy.Core.Exceptions;
 using TuPencaUy.DTOs;
+using TuPencaUy.Exceptions;
 using TuPencaUy.Site.DAO.Models;
 
 namespace TuPencaUy.Core.DataServices.Services.Tenant
@@ -11,14 +13,135 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
   public class SiteBetService : IBetService
   {
     private readonly IGenericRepository<Bet> _betDAL;
+    private readonly IGenericRepository<Event> _eventDAL;
+    private readonly IGenericRepository<Match> _matchDAL;
+    private readonly IGenericRepository<User> _userDAL;
 
     private int _page = 1;
     private int _pageSize = 10;
 
-    public SiteBetService(IGenericRepository<Bet> betDAL) => _betDAL = betDAL;
+    public SiteBetService(
+      IGenericRepository<Bet> betDAL,
+      IGenericRepository<Event> eventDAL,
+      IGenericRepository<Match> matchDAL,
+      IGenericRepository<User> userDAL
+      )
+    {
+      _betDAL = betDAL;
+      _eventDAL = eventDAL;
+      _matchDAL = matchDAL;
+      _userDAL = userDAL;
+    }
     public BetDTO CreateBet(string userEmail, int matchId, int eventId, int firstTeamScore, int secondTeamScore)
     {
-      throw new NotImplementedException();
+      var existingBet = _betDAL.Get(new List<Expression<Func<Bet, bool>>> { x => x.Event_id == eventId && x.Match_id == matchId && x.User_email == userEmail }).Any();
+      if (existingBet) throw new BetAlreadyExists($"Bet already exists with event_id: {eventId}, user_email: {userEmail}, match_id: {matchId}");
+
+      var @event = _eventDAL.Get(new List<Expression<Func<Event, bool>>> { x => x.Id == eventId })
+        .FirstOrDefault() ?? throw new EventNotFoundException($"Event not found with id {eventId}");
+
+      var match = _matchDAL.Get(new List<Expression<Func<Match, bool>>> { x => x.Id == matchId && x.Event_id == eventId })
+        .FirstOrDefault() ?? throw new MatchNotFoundException($"Match not found with if {matchId} for event {eventId}");
+
+      var user = _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Email == userEmail })
+        .FirstOrDefault() ?? throw new UserNotFoundException($"User not found with email {userEmail}");
+
+      var bet = new Bet
+      {
+        Event = @event,
+        Match = match,
+        User = user,
+        ScoreFirstTeam = firstTeamScore,
+        ScoreSecondTeam = secondTeamScore,
+        Points = 0,
+      };
+
+      _betDAL.Insert(bet);
+      _betDAL.SaveChanges();
+
+      return new BetDTO
+      {
+        ScoreFirstTeam = bet.ScoreFirstTeam,
+        ScoreSecondTeam = bet.ScoreSecondTeam,
+        Points = bet.Points,
+        Event = new EventDTO
+        {
+          Name = bet.Event.Name,
+          Comission = bet.Event.Comission,
+          MatchesCount = bet.Event.Matches.Count(),
+          EndDate = bet.Event.EndDate,
+          StartDate = bet.Event.StartDate,
+          Id = bet.Event.Id,
+          ReferenceEvent = bet.Event.RefEvent,
+          Instantiable = bet.Event.Instantiable,
+          TeamType = bet.Event.TeamType,
+          Sport = new SportDTO
+          {
+            Name = bet.Event.Sports.FirstOrDefault().Name,
+            Id = bet.Event.Sports.FirstOrDefault().Id,
+            ReferenceSport = bet.Event.Sports.FirstOrDefault().RefSport,
+            ExactPoints = bet.Event.Sports.FirstOrDefault().ExactPoints,
+            PartialPoints = bet.Event.Sports.FirstOrDefault().PartialPoints,
+            Tie = bet.Event.Sports.FirstOrDefault().Tie,
+          }
+        },
+        Match = new MatchDTO
+        {
+          Date = bet.Match.Date,
+          FirstTeamScore = bet.Match.FirstTeamScore,
+          SecondTeamScore = bet.Match.SecondTeamScore,
+          ReferenceMatch = bet.Match.RefMatch,
+          Id = bet.Match.Id,
+          Sport = new SportDTO
+          {
+            Name = bet.Match.Sport.Name,
+            Id = bet.Match.Sport.Id,
+            ReferenceSport = bet.Match.Sport.RefSport,
+            ExactPoints = bet.Match.Sport.ExactPoints,
+            PartialPoints = bet.Match.Sport.PartialPoints,
+            Tie = bet.Match.Sport.Tie,
+          },
+          FirstTeam = new TeamDTO
+          {
+            Id = bet.Match.FirstTeam.Id,
+            ReferenceTeam = bet.Match.FirstTeam.RefTeam,
+            Logo = bet.Match.FirstTeam?.Logo,
+            Name = bet.Match.FirstTeam.Name,
+            TeamType = bet.Match.FirstTeam.TeamType,
+            Sport = new SportDTO
+            {
+              Name = bet.Match.FirstTeam.Sport.Name,
+              Id = bet.Match.FirstTeam.Sport.Id,
+              ReferenceSport = bet.Match.FirstTeam.Sport.RefSport,
+              ExactPoints = bet.Match.FirstTeam.Sport.ExactPoints,
+              PartialPoints = bet.Match.FirstTeam.Sport.PartialPoints,
+              Tie = bet.Match.FirstTeam.Sport.Tie,
+            }
+          },
+          SecondTeam = new TeamDTO
+          {
+            Id = bet.Match.SecondTeam.Id,
+            ReferenceTeam = bet.Match.SecondTeam.RefTeam,
+            Logo = bet.Match.SecondTeam?.Logo,
+            Name = bet.Match.SecondTeam.Name,
+            TeamType = bet.Match.SecondTeam.TeamType,
+            Sport = new SportDTO
+            {
+              Name = bet.Match.SecondTeam.Sport.Name,
+              Id = bet.Match.SecondTeam.Sport.Id,
+              ReferenceSport = bet.Match.SecondTeam.Sport.RefSport,
+              ExactPoints = bet.Match.SecondTeam.Sport.ExactPoints,
+              PartialPoints = bet.Match.SecondTeam.Sport.PartialPoints,
+              Tie = bet.Match.SecondTeam.Sport.Tie,
+            }
+          }
+        },
+        User = new UserDTO
+        {
+          Email = userEmail,
+          Name = bet.User.Name,
+        }
+      };
     }
 
     public void DeleteBet(string userEmail, int matchId, int eventId)
@@ -87,7 +210,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
             {
               Id = x.Match.FirstTeam.Id,
               ReferenceTeam = x.Match.FirstTeam.RefTeam,
-              Logo = x.Match.FirstTeam?.Logo,
+              Logo = x.Match.FirstTeam.Logo,
               Name = x.Match.FirstTeam.Name,
               TeamType = x.Match.FirstTeam.TeamType,
               Sport = new SportDTO
@@ -104,7 +227,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
             {
               Id = x.Match.SecondTeam.Id,
               ReferenceTeam = x.Match.SecondTeam.RefTeam,
-              Logo = x.Match.SecondTeam?.Logo,
+              Logo = x.Match.SecondTeam.Logo,
               Name = x.Match.SecondTeam.Name,
               TeamType = x.Match.SecondTeam.TeamType,
               Sport = new SportDTO
@@ -112,7 +235,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
                 Name = x.Match.SecondTeam.Sport.Name,
                 Id = x.Match.SecondTeam.Sport.Id,
                 ReferenceSport = x.Match.SecondTeam.Sport.RefSport,
-                ExactPoints = x.Match.FirsSecondTeamtTeam.Sport.ExactPoints,
+                ExactPoints = x.Match.SecondTeam.Sport.ExactPoints,
                 PartialPoints = x.Match.SecondTeam.Sport.PartialPoints,
                 Tie = x.Match.SecondTeam.Sport.Tie,
               }
