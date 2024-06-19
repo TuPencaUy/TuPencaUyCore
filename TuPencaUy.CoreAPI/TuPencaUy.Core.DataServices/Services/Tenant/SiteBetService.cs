@@ -46,6 +46,11 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       var user = _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Email == userEmail })
         .FirstOrDefault() ?? throw new UserNotFoundException($"User not found with email {userEmail}");
 
+
+      var matchTie = _matchDAL.Get(new List<Expression<Func<Match, bool>>> { x => x.Id == matchId }).Select(x => x.Sport.Tie).FirstOrDefault();
+
+      if (!matchTie && firstTeamScore == secondTeamScore) throw new SportTieException();
+
       var bet = new Bet
       {
         Event = @event,
@@ -271,6 +276,10 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
         bet.ScoreSecondTeam = secondTeamScore.Value;
         changes = changes || true;
       }
+
+      var matchTie = _matchDAL.Get(new List<Expression<Func<Match, bool>>> { x => x.Id == matchId }).Select(x => x.Sport.Tie).FirstOrDefault();
+
+      if (!matchTie && firstTeamScore == secondTeamScore) throw new SportTieException();
 
       if(changes)
       {
