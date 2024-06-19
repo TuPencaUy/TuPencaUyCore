@@ -43,9 +43,10 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       var match = _matchDAL.Get(new List<Expression<Func<Match, bool>>> { x => x.Id == matchId && x.Event_id == eventId })
         .FirstOrDefault() ?? throw new MatchNotFoundException($"Match not found with if {matchId} for event {eventId}");
 
+      if (match.Date >= DateTime.Now) throw new MatchAlreadyStartedException($"The match {matchId} has already started");
+
       var user = _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Email == userEmail })
         .FirstOrDefault() ?? throw new UserNotFoundException($"User not found with email {userEmail}");
-
 
       var matchTie = _matchDAL.Get(new List<Expression<Func<Match, bool>>> { x => x.Id == matchId }).Select(x => x.Sport.Tie).FirstOrDefault();
 
@@ -281,35 +282,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
 
       if (!matchTie && firstTeamScore == secondTeamScore) throw new SportTieException();
 
-      if(changes)
-      {
-        _betDAL.Update(bet);
-        _betDAL.SaveChanges();
-      }
 
-      var @event = _eventDAL.Get(new List<Expression<Func<Event, bool>>> { x => eventId == x.Id })
-        .Select(x => new EventDTO
-        {
-          Name = x.Name,
-          Comission = x.Comission,
-          MatchesCount = x.Matches.Count(),
-          EndDate = x.EndDate,
-          StartDate = x.StartDate,
-          Id = x.Id,
-          ReferenceEvent = x.RefEvent,
-          Instantiable = x.Instantiable,
-          TeamType = x.TeamType,
-          Sport = new SportDTO
-          {
-            Name = x.Sports.FirstOrDefault().Name,
-            Id = x.Sports.FirstOrDefault().Id,
-            ReferenceSport = x.Sports.FirstOrDefault().RefSport,
-            ExactPoints = x.Sports.FirstOrDefault().ExactPoints,
-            PartialPoints = x.Sports.FirstOrDefault().PartialPoints,
-            Tie = x.Sports.FirstOrDefault().Tie,
-          }
-        })
-        .FirstOrDefault();
       var match = _matchDAL.Get(new List<Expression<Func<Match, bool>>> { x => matchId == x.Id })
         .Select(x => new MatchDTO
         {
@@ -363,6 +336,38 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
           }
         })
         .FirstOrDefault();
+
+      if (match.Date >= DateTime.Now) throw new MatchAlreadyStartedException($"The match {matchId} has already started");
+
+      if (changes)
+      {
+        _betDAL.Update(bet);
+        _betDAL.SaveChanges();
+      }
+
+      var @event = _eventDAL.Get(new List<Expression<Func<Event, bool>>> { x => eventId == x.Id })
+        .Select(x => new EventDTO
+        {
+          Name = x.Name,
+          Comission = x.Comission,
+          MatchesCount = x.Matches.Count(),
+          EndDate = x.EndDate,
+          StartDate = x.StartDate,
+          Id = x.Id,
+          ReferenceEvent = x.RefEvent,
+          Instantiable = x.Instantiable,
+          TeamType = x.TeamType,
+          Sport = new SportDTO
+          {
+            Name = x.Sports.FirstOrDefault().Name,
+            Id = x.Sports.FirstOrDefault().Id,
+            ReferenceSport = x.Sports.FirstOrDefault().RefSport,
+            ExactPoints = x.Sports.FirstOrDefault().ExactPoints,
+            PartialPoints = x.Sports.FirstOrDefault().PartialPoints,
+            Tie = x.Sports.FirstOrDefault().Tie,
+          }
+        })
+        .FirstOrDefault();
       var user = _userDAL.Get(new List<Expression<Func<User, bool>>> { x => userEmail == x.Email })
         .Select(x => new UserDTO
         {
@@ -397,8 +402,11 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
           SecondTeamScore = x.SecondTeamScore,
           PartialPoints = x.Sport.PartialPoints,
           ExactPoints = x.Sport.ExactPoints,
+          Date = x.Date,
         })
         .FirstOrDefault() ?? throw new MatchNotFoundException($"Match not found with if {matchId} for event {eventId}");
+
+      if (match.Date >= DateTime.Now) throw new MatchDoesntStartException($"The match {matchId} doesn't start");
 
       var bet = _betDAL.Get(new List<Expression<Func<Bet, bool>>> { x => x.Event_id == eventId && x.Match_id == matchId && x.User_email == userEmail })
         .FirstOrDefault() ?? throw new BetNotFoundException($"Bet not found with event_id: {eventId}, user_email: {userEmail}, match_id: {matchId}");
