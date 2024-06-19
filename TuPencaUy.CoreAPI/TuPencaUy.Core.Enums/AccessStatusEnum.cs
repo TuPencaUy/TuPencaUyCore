@@ -3,7 +3,7 @@
   public enum AccessStatusEnum
   {
     Denied = -1,
-    Earring = 0,
+    Pending = 0,
     Accepted = 1,
   }
 }
