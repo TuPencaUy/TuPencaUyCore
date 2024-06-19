@@ -19,7 +19,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TuPencaUy.Core.Enums", "TuP
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TuPencaUy.Site.DAO", "TuPencaUy.Site.DAO\TuPencaUy.Site.DAO.csproj", "{30F7E79C-4D4A-473F-A8AA-73894844BDB7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TuPencaUy.Core.DAO", "TuPencaUy.Core.DAO\TuPencaUy.Core.DAO.csproj", "{22333ABE-9EB5-4D0D-A9D3-91A1768ACE92}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TuPencaUy.Core.DAO", "TuPencaUy.Core.DAO\TuPencaUy.Core.DAO.csproj", "{22333ABE-9EB5-4D0D-A9D3-91A1768ACE92}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TuPencaUy.ResultsAPI", "TuPencaUy.ResultsAPI\TuPencaUy.ResultsAPI.csproj", "{7D57DEEA-1020-483A-883D-C211D636F016}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +65,10 @@ Global
 		{22333ABE-9EB5-4D0D-A9D3-91A1768ACE92}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22333ABE-9EB5-4D0D-A9D3-91A1768ACE92}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{22333ABE-9EB5-4D0D-A9D3-91A1768ACE92}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D57DEEA-1020-483A-883D-C211D636F016}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D57DEEA-1020-483A-883D-C211D636F016}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D57DEEA-1020-483A-883D-C211D636F016}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D57DEEA-1020-483A-883D-C211D636F016}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
