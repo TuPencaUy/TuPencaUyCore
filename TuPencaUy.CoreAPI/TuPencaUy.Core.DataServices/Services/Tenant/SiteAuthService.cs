@@ -8,6 +8,7 @@
   using TuPencaUy.Core.Enums;
   using TuPencaUy.Exceptions;
   using TuPencaUy.Core.DataServices.Services.CommonLogic;
+  using TuPencaUy.Core.Exceptions;
 
   public class SiteAuthService : IAuthService
   {
@@ -23,8 +24,15 @@
       _roleDAL = roleDAL;
       _authLogic = authLogic;
     }
-    public UserDTO? Authenticate(string email, string password)
+    public UserDTO? Authenticate(string email, string password, bool? auth = false)
     {
+      if (auth != null && auth.Value)
+      {
+        var accessStatus = _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Email == email }).Select(x => x.AccessRequest.AccessStatus)
+          .FirstOrDefault();
+        if (accessStatus != AccessStatusEnum.Accepted) throw new UserNotAdmitedException($"User {email} not admited.");
+      }
+
       var user = _userDAL
         .Get(new List<Expression<Func<User, bool>>> { x => x.Email == email })
         .Select( user => new UserDTO
@@ -47,9 +55,8 @@
       if (user == null) throw new InvalidCredentialsException();
 
       return user.Password.Equals(_authLogic.HashPassword(password, user.Password.Split('$')[0])) ? user : null;
-
     }
-    public UserDTO? Authenticate(string token)
+    public UserDTO? Authenticate(string token, bool? auth = false)
     {
       var tokenHandler = new JwtSecurityTokenHandler();
 
@@ -75,11 +82,18 @@
           } : null,
         })
         .FirstOrDefault();
-
+        
         if (user == null)
         {
           var userName = jwtToken.Claims.FirstOrDefault(x => x.Type == "name")?.Value;
-          return CreateNewUser(userEmail, userName);
+          return CreateNewUser(userEmail, userName, null, auth);
+        }
+
+        if (auth != null && auth.Value)
+        {
+          var accessStatus = _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Email == userEmail }).Select(x => x.AccessRequest.AccessStatus)
+            .FirstOrDefault();
+          if (accessStatus != AccessStatusEnum.Accepted) throw new UserNotAdmitedException($"User {userEmail} not admited.");
         }
 
         return user;
@@ -89,28 +103,38 @@
         throw;
       }
     }
-
-    public UserDTO? SignUp(string email, string password, string name)
+    public UserDTO? SignUp(string email, string password, string name, bool? auth = false)
     {
       var existingUser = _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Email == email });
       if (existingUser.Any()) return null;
 
-      return CreateNewUser(email, name, _authLogic.HashPassword(password));
+      return CreateNewUser(email, name, _authLogic.HashPassword(password), auth);
     }
-    private UserDTO CreateNewUser(string email, string name, string password = null)
+    private UserDTO CreateNewUser(string email, string name, string password = null, bool? auth = false)
     {
       Role role = _roleDAL
         .Get(new List<Expression<Func<Role, bool>>> { x => x.Id == (int)UserRoleEnum.BasicUser })
         .FirstOrDefault();
 
-      _userDAL.Insert(new User
+      var user = new User
       {
         Email = email,
         Name = name,
         Role = role,
-        Password = password
-      });
+        Password = password,
+      };
 
+      if (auth != null && auth.Value)
+      {
+        user.AccessRequest = new AccessRequest
+        {
+          User_email = email,
+          AccessStatus = AccessStatusEnum.Pending,
+          RequestTime = DateTime.Now,
+        };
+      }
+
+      _userDAL.Insert(user);
       _userDAL.SaveChanges();
 
       var userDTO = new UserDTO
