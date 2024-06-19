@@ -14,8 +14,9 @@ namespace TuPencaUy.Site.DAO.Models.Data
     public DbSet<Sport> Sports { get; set; }
     public DbSet<Match> Matches { get; set; }
     public DbSet<Team> Teams { get; set; }
+    public DbSet<Bet> Bets { get; set; }
 
-    public DbSet<Bet> Bets { get; set; } 
+    public DbSet<AccessRequest> AccessRequests { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -29,6 +30,7 @@ namespace TuPencaUy.Site.DAO.Models.Data
       modelBuilder.Entity<Bet>()
         .ToTable("Bet")
         .HasKey(b => new { b.Match_id, b.Event_id, b.User_email });
+      modelBuilder.Entity<AccessRequest>().ToTable("AccessRequest");
     }
   }
 }

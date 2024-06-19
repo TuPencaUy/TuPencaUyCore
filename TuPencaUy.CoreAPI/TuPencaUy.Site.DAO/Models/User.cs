@@ -11,5 +11,6 @@
     public virtual ICollection<Event>? Events { get; set; }
     public virtual ICollection<Bet>? Bets { get; set; }
     public virtual Role? Role { get; set; }
+    public virtual AccessRequest AccessRequest { get; set; }
   }
 }
