@@ -23,11 +23,13 @@ namespace TuPencaUy.CoreAPI.Controllers
     }
 
     [HttpPost("BasicLogin")]
-    public IActionResult BasicLogin([FromBody] LoginRequest login)
+    public IActionResult BasicLogin([FromBody] LoginRequest login, bool? withAuth)
     {
       try
       {
-        var user = _authService.Authenticate(login.Email, login.Password);
+        if (string.IsNullOrEmpty(ObtainTenantFromToken())) withAuth = null;
+
+        var user = _authService.Authenticate(login.Email, login.Password, withAuth);
         if (user != null)
         {
           Request.Headers.TryGetValue("currentTenant", out var currentTenant);
@@ -60,9 +62,10 @@ namespace TuPencaUy.CoreAPI.Controllers
     }
 
     [HttpPost("BasicSignup")]
-    public IActionResult BasicSignup([FromBody] SignUpRequest request)
+    public IActionResult BasicSignup([FromBody] SignUpRequest request, bool? withAuth)
     {
-      var user = _authService.SignUp(request.Email, request.Password, request.Name);
+      if (string.IsNullOrEmpty(ObtainTenantFromToken())) withAuth = null;
+      var user = _authService.SignUp(request.Email, request.Password, request.Name, withAuth);
 
       if (user != null)
       {
@@ -90,9 +93,10 @@ namespace TuPencaUy.CoreAPI.Controllers
     }
 
     [HttpPost("OAuthLogin")]
-    public IActionResult OAuthLogin([FromBody] string authToken)
+    public IActionResult OAuthLogin([FromBody] string authToken, bool? withAuth)
     {
-      var user = _authService.Authenticate(authToken);
+      if (string.IsNullOrEmpty(ObtainTenantFromToken())) withAuth = null;
+      var user = _authService.Authenticate(authToken, withAuth);
 
       if (user != null)
       {
