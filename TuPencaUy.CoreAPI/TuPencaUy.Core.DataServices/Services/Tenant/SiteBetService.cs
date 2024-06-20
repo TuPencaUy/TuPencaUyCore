@@ -43,7 +43,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       var match = _matchDAL.Get(new List<Expression<Func<Match, bool>>> { x => x.Id == matchId && x.Event_id == eventId })
         .FirstOrDefault() ?? throw new MatchNotFoundException($"Match not found with if {matchId} for event {eventId}");
 
-      if (match.Date >= DateTime.Now) throw new MatchAlreadyStartedException($"The match {matchId} has already started");
+      if (match.Date < DateTime.Now) throw new MatchAlreadyStartedException($"The match {matchId} has already started");
 
       var user = _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Email == userEmail })
         .FirstOrDefault() ?? throw new UserNotFoundException($"User not found with email {userEmail}");
@@ -337,7 +337,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
         })
         .FirstOrDefault();
 
-      if (match.Date >= DateTime.Now) throw new MatchAlreadyStartedException($"The match {matchId} has already started");
+      if (match.Date < DateTime.Now) throw new MatchAlreadyStartedException($"The match {matchId} has already started");
 
       if (changes)
       {
