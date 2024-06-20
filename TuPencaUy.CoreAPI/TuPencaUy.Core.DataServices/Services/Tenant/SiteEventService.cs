@@ -41,7 +41,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
           ExactPoints = eventDTO.Sport.ExactPoints,
           PartialPoints = eventDTO.Sport.PartialPoints,
           Tie = eventDTO.Sport.Tie,
-          RefSport = eventDTO.Id.Value,
+          RefSport = eventDTO.Sport.Id.Value,
         };
         _sportDAL.Insert(sport);
         _sportDAL.SaveChanges();
