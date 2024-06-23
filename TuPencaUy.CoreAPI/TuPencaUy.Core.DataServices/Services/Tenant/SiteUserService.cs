@@ -36,12 +36,12 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       User user = _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Id == userId})
         .FirstOrDefault() ?? throw new UserNotFoundException($"User not found with id: {userId}");
 
-      var subscribedUser = _userDAL.Get(new List<Expression<Func<User, bool>>>
+      var unsubscribedUser = _userDAL.Get(new List<Expression<Func<User, bool>>>
       {
         x => x.Id == userId && x.Events.FirstOrDefault(x => x.Id == eventId) == null
       }).Any();
 
-      if (subscribedUser) throw new UserAlreadySubscribedException($"User {userId} is already subscribed to the event {eventId}");
+      if (!unsubscribedUser) throw new UserAlreadySubscribedException($"User {userId} is already subscribed to the event {eventId}");
       if (@event.Users == null) @event.Users = new List<User>();
 
       @event.Users.Add(user);
@@ -105,6 +105,28 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
               .Select(p => new PermissionDTO { Name = p.Name, Id = p.Id })
               .ToList()
           },
+          Events = x.Events != null ? x.Events.Select(ev =>
+          new EventDTO
+          {
+            Id = ev.Id,
+            ReferenceEvent = ev.RefEvent,
+            Name = ev.Name,
+            Comission = ev.Comission,
+            EndDate = ev.EndDate,
+            StartDate = ev.StartDate,
+            Instantiable = ev.Instantiable,
+            MatchesCount = ev.Matches.Count(),
+            TeamType = ev.TeamType,
+            Sport = new SportDTO
+            {
+              Id = ev.Id,
+              ReferenceSport = ev.Sports.FirstOrDefault().Id,
+              Name = ev.Sports.FirstOrDefault().Name,
+              Tie = ev.Sports.FirstOrDefault().Tie,
+              PartialPoints = ev.Sports.FirstOrDefault().PartialPoints,
+              ExactPoints = ev.Sports.FirstOrDefault().ExactPoints,
+            }
+          }).ToList() : new List<EventDTO>()
         })
         .FirstOrDefault() ?? throw new UserNotFoundException();
     }

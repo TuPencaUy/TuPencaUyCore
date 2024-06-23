@@ -16,7 +16,7 @@ namespace TuPencaUy.DTOs
     public string? Password { get; set; }
     public string? Email { get; set; }
     public RoleDTO? Role { get; set; }
-
     public SiteDTO? Site { get; set; }
+    public List<EventDTO>? Events { get; set; }
   }
 }
