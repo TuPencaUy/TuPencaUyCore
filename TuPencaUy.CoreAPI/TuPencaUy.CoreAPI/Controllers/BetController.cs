@@ -8,10 +8,11 @@ using TuPencaUy.Core.API.Model.Responses;
 using TuPencaUy.Core.DataServices;
 using TuPencaUy.Core.DataServices.Services;
 using TuPencaUy.CoreAPI.Controllers.Base;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TuPencaUy.Core.API.Controllers
 {
+  [ApiController]
+  [Route("[Controller]")]
   public class BetController : BaseController
   {
     private readonly IBetService _betService;
