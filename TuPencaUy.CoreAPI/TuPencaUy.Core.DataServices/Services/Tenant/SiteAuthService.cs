@@ -54,15 +54,15 @@
              Instantiable = ev.Instantiable,
              MatchesCount = ev.Matches.Count(),
              TeamType = ev.TeamType,
-             Sport = new SportDTO
+             Sport = ev.Sports.Any() ?  new SportDTO
              {
-               Id = ev.Id,
-               ReferenceSport = ev.Sports.FirstOrDefault().Id,
+               Id = ev.Sports.FirstOrDefault().Id,
+               ReferenceSport = ev.Sports.FirstOrDefault().RefSport,
                Name = ev.Sports.FirstOrDefault().Name,
                Tie = ev.Sports.FirstOrDefault().Tie,
                PartialPoints = ev.Sports.FirstOrDefault().PartialPoints,
                ExactPoints = ev.Sports.FirstOrDefault().ExactPoints,
-             }
+             } : null
            }).ToList() : new List<EventDTO>()
         })
         .FirstOrDefault();
