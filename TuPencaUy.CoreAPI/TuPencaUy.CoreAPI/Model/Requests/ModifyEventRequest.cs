@@ -10,5 +10,6 @@ namespace TuPencaUy.Core.API.Model.Requests
     public DateTime? EndDate { get; set; }
     public float? Comission { get; set; }
     public TeamTypeEnum? TeamType { get; set; }
+    public bool? Instantiable {  get; set; } 
   }
 }

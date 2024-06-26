@@ -253,14 +253,21 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       DateTime? startDate,
       DateTime? endTime,
       float? comission,
-      TeamTypeEnum? teamType)
+      TeamTypeEnum? teamType,
+      bool? instantiable)
     {
       var originEvent = _eventDAL.Get(new List<Expression<Func<Event, bool>>> { x => x.Id == idEvent })
         .FirstOrDefault() ?? throw new EventNotFoundException($"Event with id {idEvent} not found");
 
       bool modified = false;
 
-      if(name != null && name != originEvent.Name)
+      if (instantiable != null && instantiable != originEvent.Instantiable)
+      {
+        originEvent.Instantiable = instantiable.Value;
+        modified = modified || true;
+      }
+
+      if (name != null && name != originEvent.Name)
       {
         originEvent.Name = name;
         modified = modified || true;

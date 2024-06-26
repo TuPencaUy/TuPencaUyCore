@@ -534,7 +534,7 @@ namespace TuPencaUy.Core.API.Controllers
           return BadRequest(new ApiResponse { Error = true, Message = "You must be logged to a central platform" });
         }
 
-        var e = _eventService.ModifyEvent(idEvent, ev.Name, ev.StartDate, ev.EndDate, ev.Comission, ev.TeamType);
+        var e = _eventService.ModifyEvent(idEvent, ev.Name, ev.StartDate, ev.EndDate, ev.Comission, ev.TeamType, ev.Instantiable);
 
         var successResponse = new ApiResponse
         {

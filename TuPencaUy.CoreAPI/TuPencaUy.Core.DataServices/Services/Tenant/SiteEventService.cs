@@ -549,7 +549,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       throw new NotImplementedException();
     }
 
-    public EventDTO ModifyEvent(int idEvent, string? name, DateTime? startDate, DateTime? endTime, float? comission, TeamTypeEnum? teamType)
+    public EventDTO ModifyEvent(int idEvent, string? name, DateTime? startDate, DateTime? endTime, float? comission, TeamTypeEnum? teamType, bool? instantiable)
     {
       throw new NotImplementedException();
     }
