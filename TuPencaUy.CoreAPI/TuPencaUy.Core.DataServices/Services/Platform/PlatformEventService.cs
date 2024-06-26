@@ -475,7 +475,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         EndDate = endDate,
         Comission = comission,
         TeamType = teamType,
-        Instantiable = true,
+        Instantiable = false,
         Sports = new List<Sport>() { sport }
       };
 
