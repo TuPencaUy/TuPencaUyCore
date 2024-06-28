@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TuPencaUy.Site.DAO.Models.Data;
 
@@ -11,9 +12,11 @@ using TuPencaUy.Site.DAO.Models.Data;
 namespace TuPencaUy.Site.DAO.Migrations
 {
     [DbContext(typeof(SiteDbContext))]
-    partial class SiteDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240626233648_add-events-to-sports")]
+    partial class addeventstosports
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -65,56 +68,6 @@ namespace TuPencaUy.Site.DAO.Migrations
                     b.HasIndex("RolesId");
 
                     b.ToTable("PermissionRole");
-                });
-
-            modelBuilder.Entity("TuPencaUy.Site.DAO.Models.Bet", b =>
-                {
-                    b.Property<int>("Match_id")
-                        .HasColumnType("int")
-                        .HasColumnName("Match_id")
-                        .HasColumnOrder(1);
-
-                    b.Property<int>("Event_id")
-                        .HasColumnType("int")
-                        .HasColumnName("Event_id")
-                        .HasColumnOrder(0);
-
-                    b.Property<string>("User_email")
-                        .HasColumnType("varchar")
-                        .HasColumnName("User_email")
-                        .HasColumnOrder(2);
-
-                    b.Property<DateTime?>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("Inactive")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastModificationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("Points")
-                        .HasColumnType("int")
-                        .HasColumnName("Points")
-                        .HasColumnOrder(5);
-
-                    b.Property<int>("ScoreFirstTeam")
-                        .HasColumnType("int")
-                        .HasColumnName("ScoreFirstTeam")
-                        .HasColumnOrder(3);
-
-                    b.Property<int>("ScoreSecondTeam")
-                        .HasColumnType("int")
-                        .HasColumnName("ScoreSecondTeam")
-                        .HasColumnOrder(4);
-
-                    b.HasKey("Match_id", "Event_id", "User_email");
-
-                    b.HasIndex("Event_id");
-
-                    b.HasIndex("User_email");
-
-                    b.ToTable("Bet", (string)null);
                 });
 
             modelBuilder.Entity("TuPencaUy.Site.DAO.Models.Event", b =>
@@ -506,33 +459,6 @@ namespace TuPencaUy.Site.DAO.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TuPencaUy.Site.DAO.Models.Bet", b =>
-                {
-                    b.HasOne("TuPencaUy.Site.DAO.Models.Event", "Event")
-                        .WithMany("Bets")
-                        .HasForeignKey("Event_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TuPencaUy.Site.DAO.Models.Match", "Match")
-                        .WithMany("Bets")
-                        .HasForeignKey("Match_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TuPencaUy.Site.DAO.Models.User", "User")
-                        .WithMany("Bets")
-                        .HasForeignKey("User_email")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Event");
-
-                    b.Navigation("Match");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("TuPencaUy.Site.DAO.Models.Match", b =>
                 {
                     b.HasOne("TuPencaUy.Site.DAO.Models.Event", "Event")
@@ -582,19 +508,7 @@ namespace TuPencaUy.Site.DAO.Migrations
 
             modelBuilder.Entity("TuPencaUy.Site.DAO.Models.Event", b =>
                 {
-                    b.Navigation("Bets");
-
                     b.Navigation("Matches");
-                });
-
-            modelBuilder.Entity("TuPencaUy.Site.DAO.Models.Match", b =>
-                {
-                    b.Navigation("Bets");
-                });
-
-            modelBuilder.Entity("TuPencaUy.Site.DAO.Models.User", b =>
-                {
-                    b.Navigation("Bets");
                 });
 #pragma warning restore 612, 618
         }

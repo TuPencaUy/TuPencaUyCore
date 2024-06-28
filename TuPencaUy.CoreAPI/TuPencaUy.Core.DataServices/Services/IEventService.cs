@@ -81,6 +81,7 @@ namespace TuPencaUy.Core.DataServices.Services
       DateTime? startDate,
       DateTime? endTime,
       float? comission,
-      TeamTypeEnum? teamType);
+      TeamTypeEnum? teamType,
+      bool? instantiable);
   }
 }

@@ -8,6 +8,7 @@
   using TuPencaUy.Core.Enums;
   using TuPencaUy.Exceptions;
   using TuPencaUy.Core.DataServices.Services.CommonLogic;
+  using TuPencaUy.Core.DTOs;
 
   public class SiteAuthService : IAuthService
   {
@@ -41,6 +42,28 @@
              .Select(y => new PermissionDTO { Id = y.Id, Name = y.Name })
              .ToList() ?? new List<PermissionDTO>()
           } : null,
+          Events = user.Events != null ? user.Events.Select(ev =>
+           new EventDTO
+           {
+             Id = ev.Id,
+             ReferenceEvent = ev.RefEvent,
+             Name = ev.Name,
+             Comission = ev.Comission,
+             EndDate = ev.EndDate,
+             StartDate = ev.StartDate,
+             Instantiable = ev.Instantiable,
+             MatchesCount = ev.Matches.Count(),
+             TeamType = ev.TeamType,
+             Sport = ev.Sports.Any() ?  new SportDTO
+             {
+               Id = ev.Sports.FirstOrDefault().Id,
+               ReferenceSport = ev.Sports.FirstOrDefault().RefSport,
+               Name = ev.Sports.FirstOrDefault().Name,
+               Tie = ev.Sports.FirstOrDefault().Tie,
+               PartialPoints = ev.Sports.FirstOrDefault().PartialPoints,
+               ExactPoints = ev.Sports.FirstOrDefault().ExactPoints,
+             } : null
+           }).ToList() : new List<EventDTO>()
         })
         .FirstOrDefault();
 
@@ -73,6 +96,28 @@
              .Select(y => new PermissionDTO { Id = y.Id, Name = y.Name })
              .ToList() ?? new List<PermissionDTO>()
           } : null,
+          Events = user.Events != null ? user.Events.Select(ev =>
+           new EventDTO
+           {
+             Id = ev.Id,
+             ReferenceEvent = ev.RefEvent,
+             Name = ev.Name,
+             Comission = ev.Comission,
+             EndDate = ev.EndDate,
+             StartDate = ev.StartDate,
+             Instantiable = ev.Instantiable,
+             MatchesCount = ev.Matches.Count(),
+             TeamType = ev.TeamType,
+             Sport = new SportDTO
+             {
+               Id = ev.Id,
+               ReferenceSport = ev.Sports.FirstOrDefault().Id,
+               Name = ev.Sports.FirstOrDefault().Name,
+               Tie = ev.Sports.FirstOrDefault().Tie,
+               PartialPoints = ev.Sports.FirstOrDefault().PartialPoints,
+               ExactPoints = ev.Sports.FirstOrDefault().ExactPoints,
+             }
+           }).ToList() : new List<EventDTO>()
         })
         .FirstOrDefault();
 

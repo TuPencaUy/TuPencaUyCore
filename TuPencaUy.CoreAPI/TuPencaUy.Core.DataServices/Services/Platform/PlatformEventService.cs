@@ -253,14 +253,21 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       DateTime? startDate,
       DateTime? endTime,
       float? comission,
-      TeamTypeEnum? teamType)
+      TeamTypeEnum? teamType,
+      bool? instantiable)
     {
       var originEvent = _eventDAL.Get(new List<Expression<Func<Event, bool>>> { x => x.Id == idEvent })
         .FirstOrDefault() ?? throw new EventNotFoundException($"Event with id {idEvent} not found");
 
       bool modified = false;
 
-      if(name != null && name != originEvent.Name)
+      if (instantiable != null && instantiable != originEvent.Instantiable)
+      {
+        originEvent.Instantiable = instantiable.Value;
+        modified = modified || true;
+      }
+
+      if (name != null && name != originEvent.Name)
       {
         originEvent.Name = name;
         modified = modified || true;
@@ -443,6 +450,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
           Comission = ev.Comission,
           StartDate = ev.StartDate,
           TeamType = ev.TeamType,
+          Instantiable = ev.Instantiable,
           Sport =  ev.Sports.Select(x => new SportDTO
           {
             Name = x.Name,
@@ -474,7 +482,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         EndDate = endDate,
         Comission = comission,
         TeamType = teamType,
-        Instantiable = true,
+        Instantiable = false,
         Sports = new List<Sport>() { sport }
       };
 
@@ -556,7 +564,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       }).Any();
 
       if (existingSport) throw new NameAlreadyInUseException($"A sport with the name {name} already exists");
-      
+
 
       var newSport = new Sport
       {
@@ -612,7 +620,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       if (existingTeam) throw new NameAlreadyInUseException($"A team with the name {name} already exists");
 
       var sport = _sportDAL.Get(new List<Expression<Func<Sport, bool>>> { x => x.Id == sportId }).FirstOrDefault();
-      
+
       var newTeam = new Team
       {
         Name = name,

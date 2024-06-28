@@ -27,6 +27,19 @@ namespace TuPencaUy.Core.API.Controllers
       _serviceFactory = serviceFactory;
     }
 
+    [HttpGet]
+    public IActionResult GetSites()
+    {
+      try
+      {
+        return Ok(new ApiResponse { Data = _siteService.GetSites()});
+      }
+      catch (SiteNotFoundException)
+      {
+        return NotFound(new ApiResponse { Error = true, Message = "Something was wrong" });
+      }
+    }
+
     [HttpGet("{domain}")]
     public IActionResult GetSite(string domain)
     {

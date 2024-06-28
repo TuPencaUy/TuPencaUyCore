@@ -41,7 +41,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
           ExactPoints = eventDTO.Sport.ExactPoints,
           PartialPoints = eventDTO.Sport.PartialPoints,
           Tie = eventDTO.Sport.Tie,
-          RefSport = eventDTO.Id.Value,
+          RefSport = eventDTO.Sport.Id.Value,
         };
         _sportDAL.Insert(sport);
         _sportDAL.SaveChanges();
@@ -549,7 +549,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       throw new NotImplementedException();
     }
 
-    public EventDTO ModifyEvent(int idEvent, string? name, DateTime? startDate, DateTime? endTime, float? comission, TeamTypeEnum? teamType)
+    public EventDTO ModifyEvent(int idEvent, string? name, DateTime? startDate, DateTime? endTime, float? comission, TeamTypeEnum? teamType, bool? instantiable)
     {
       throw new NotImplementedException();
     }
