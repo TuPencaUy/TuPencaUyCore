@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TuPencaUy.Site.DAO.Models.Data;
 
@@ -11,9 +12,11 @@ using TuPencaUy.Site.DAO.Models.Data;
 namespace TuPencaUy.Site.DAO.Migrations
 {
     [DbContext(typeof(SiteDbContext))]
-    partial class SiteDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240619021012_add-control-date-to-bet")]
+    partial class addcontroldatetobet
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,21 +24,6 @@ namespace TuPencaUy.Site.DAO.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("EventSport", b =>
-                {
-                    b.Property<int>("EventsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SportsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("EventsId", "SportsId");
-
-                    b.HasIndex("SportsId");
-
-                    b.ToTable("EventSport");
-                });
 
             modelBuilder.Entity("EventUser", b =>
                 {
@@ -326,6 +314,9 @@ namespace TuPencaUy.Site.DAO.Migrations
                     b.Property<DateTime?>("CreationDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("EventId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("ExactPoints")
                         .HasColumnType("int")
                         .HasColumnName("ExactPoints")
@@ -358,6 +349,8 @@ namespace TuPencaUy.Site.DAO.Migrations
                         .HasColumnOrder(2);
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EventId");
 
                     b.ToTable("Sport", (string)null);
                 });
@@ -461,21 +454,6 @@ namespace TuPencaUy.Site.DAO.Migrations
                     b.ToTable("User", (string)null);
                 });
 
-            modelBuilder.Entity("EventSport", b =>
-                {
-                    b.HasOne("TuPencaUy.Site.DAO.Models.Event", null)
-                        .WithMany()
-                        .HasForeignKey("EventsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TuPencaUy.Site.DAO.Models.Sport", null)
-                        .WithMany()
-                        .HasForeignKey("SportsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("EventUser", b =>
                 {
                     b.HasOne("TuPencaUy.Site.DAO.Models.Event", null)
@@ -562,6 +540,13 @@ namespace TuPencaUy.Site.DAO.Migrations
                     b.Navigation("Sport");
                 });
 
+            modelBuilder.Entity("TuPencaUy.Site.DAO.Models.Sport", b =>
+                {
+                    b.HasOne("TuPencaUy.Site.DAO.Models.Event", null)
+                        .WithMany("Sports")
+                        .HasForeignKey("EventId");
+                });
+
             modelBuilder.Entity("TuPencaUy.Site.DAO.Models.Team", b =>
                 {
                     b.HasOne("TuPencaUy.Site.DAO.Models.Sport", "Sport")
@@ -585,6 +570,8 @@ namespace TuPencaUy.Site.DAO.Migrations
                     b.Navigation("Bets");
 
                     b.Navigation("Matches");
+
+                    b.Navigation("Sports");
                 });
 
             modelBuilder.Entity("TuPencaUy.Site.DAO.Models.Match", b =>

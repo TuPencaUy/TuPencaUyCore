@@ -15,6 +15,8 @@ namespace TuPencaUy.Site.DAO.Models.Data
     public DbSet<Match> Matches { get; set; }
     public DbSet<Team> Teams { get; set; }
 
+    public DbSet<Bet> Bets { get; set; } 
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
       modelBuilder.Entity<User>().ToTable("User");
@@ -24,6 +26,9 @@ namespace TuPencaUy.Site.DAO.Models.Data
       modelBuilder.Entity<Sport>().ToTable("Sport");
       modelBuilder.Entity<Match>().ToTable("Match");
       modelBuilder.Entity<Team>().ToTable("Team");
+      modelBuilder.Entity<Bet>()
+        .ToTable("Bet")
+        .HasKey(b => new { b.Match_id, b.Event_id, b.User_email });
     }
   }
 }
