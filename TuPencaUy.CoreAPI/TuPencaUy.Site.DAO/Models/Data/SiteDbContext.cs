@@ -31,6 +31,9 @@ namespace TuPencaUy.Site.DAO.Models.Data
         .ToTable("Bet")
         .HasKey(b => new { b.Match_id, b.Event_id, b.User_email });
       modelBuilder.Entity<AccessRequest>().ToTable("AccessRequest");
+      modelBuilder.Entity<Payment>()
+        .ToTable("Payment")
+        .HasKey(p => new { p.Event_id, p.User_email });
     }
   }
 }

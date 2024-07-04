@@ -1,0 +1,81 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using TuPencaUy.Core.API.Model.Responses;
+using TuPencaUy.Core.DataServices.Services;
+using TuPencaUy.Core.DataServices;
+using TuPencaUy.CoreAPI.Controllers.Base;
+using System.Net;
+using TuPencaUy.Core.API.Model.Requests;
+using System.ComponentModel.DataAnnotations;
+
+namespace TuPencaUy.Core.API.Controllers
+{
+  [Route("[controller]")]
+  public class PaymentController : BaseController
+  {
+    private readonly IPaymentService _paymentService;
+    public PaymentController(IServiceFactory serviceFactory) => _paymentService = serviceFactory.GetService<IPaymentService>();
+
+    [HttpPost]
+    public IActionResult Create([FromBody] CreatePaymentRequest paymentRequest)
+    {
+      try
+      {
+        var payment = _paymentService.CreatePayment(
+          paymentRequest.UserEmail,
+          paymentRequest.EventId,
+          paymentRequest.Amount,
+          paymentRequest.TransactionID);
+
+        return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Data = payment, Message = "Payment created" });
+      }
+      catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
+    }
+
+    [HttpGet]
+    public IActionResult Get(string? userEmail, int? eventId, string? transactionId, int? page, int? pageSize)
+    {
+      try
+      {
+        var list = _paymentService.GetPayments(out int count, userEmail, eventId, transactionId, page, pageSize);
+
+        return Ok(new ApiResponse { Data = new { list, count }, Message = "Returned payments" });
+      }
+      catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
+    }
+
+    [HttpPatch]
+    public IActionResult Modify([Required] ModifyPaymentRequest request)
+    {
+      try
+      {
+        var payment = _paymentService.ModifyPayment(request.UserEmail, request.EventId, request.amount, request.transactionId);
+
+        return Ok(new ApiResponse { Data = payment, Message = "Modified payment" });
+      }
+      catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
+    }
+
+    [HttpDelete]
+    public IActionResult Delete([Required] string userEmail, [Required] int eventId)
+    {
+      try
+      {
+        _paymentService.DeletePayment(userEmail, eventId);
+        return Ok(new ApiResponse { Message = "Payment successfully deleted" });
+      }
+      catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
+    }
+  }
+}
