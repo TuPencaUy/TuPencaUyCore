@@ -35,7 +35,7 @@ namespace TuPencaUy.Site.DAO.Migrations
                         column: x => x.Match_id,
                         principalTable: "Match",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_Bet_User_User_email",
                         column: x => x.User_email,
