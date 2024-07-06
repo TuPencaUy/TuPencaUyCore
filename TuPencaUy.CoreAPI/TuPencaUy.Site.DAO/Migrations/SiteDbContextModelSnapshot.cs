@@ -259,28 +259,48 @@ namespace TuPencaUy.Site.DAO.Migrations
 
             modelBuilder.Entity("TuPencaUy.Site.DAO.Models.Payment", b =>
                 {
-                    b.Property<int>("Event_id")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnName("Event_id")
+                        .HasColumnName("Id")
                         .HasColumnOrder(0);
 
-                    b.Property<string>("User_email")
-                        .HasColumnType("varchar")
-                        .HasColumnName("User_email")
-                        .HasColumnOrder(1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal")
                         .HasColumnName("Amount")
-                        .HasColumnOrder(2);
+                        .HasColumnOrder(3);
+
+                    b.Property<DateTime?>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Event_id")
+                        .HasColumnType("int")
+                        .HasColumnName("Event_id")
+                        .HasColumnOrder(1);
+
+                    b.Property<bool>("Inactive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastModificationDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("TransactionID")
                         .IsRequired()
                         .HasColumnType("varchar")
                         .HasColumnName("TransactionID")
+                        .HasColumnOrder(4);
+
+                    b.Property<string>("User_email")
+                        .IsRequired()
+                        .HasColumnType("varchar")
+                        .HasColumnName("User_email")
                         .HasColumnOrder(2);
 
-                    b.HasKey("Event_id", "User_email");
+                    b.HasKey("Id");
+
+                    b.HasIndex("Event_id");
 
                     b.HasIndex("User_email");
 

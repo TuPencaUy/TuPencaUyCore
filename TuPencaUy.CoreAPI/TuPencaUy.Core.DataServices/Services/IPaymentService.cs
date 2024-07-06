@@ -10,6 +10,6 @@ namespace TuPencaUy.Core.DataServices.Services
 
     PaymentDTO ModifyPayment(string userEmail, int eventId, int? amount, string? transactionID);
 
-    void DeletePayment(string userEmail, int eventId);
+    void DeletePayment(int id);
   }
 }

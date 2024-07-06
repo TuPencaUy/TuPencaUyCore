@@ -15,6 +15,7 @@ namespace TuPencaUy.Site.DAO.Models.Data
     public DbSet<Match> Matches { get; set; }
     public DbSet<Team> Teams { get; set; }
     public DbSet<Bet> Bets { get; set; }
+    public DbSet<Payment> Payments { get; set; }
 
     public DbSet<AccessRequest> AccessRequests { get; set; }
 
@@ -31,9 +32,7 @@ namespace TuPencaUy.Site.DAO.Models.Data
         .ToTable("Bet")
         .HasKey(b => new { b.Match_id, b.Event_id, b.User_email });
       modelBuilder.Entity<AccessRequest>().ToTable("AccessRequest");
-      modelBuilder.Entity<Payment>()
-        .ToTable("Payment")
-        .HasKey(p => new { p.Event_id, p.User_email });
+      modelBuilder.Entity<Payment>().ToTable("Payment");
     }
   }
 }

@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace TuPencaUy.Site.DAO.Migrations
 {
     /// <inheritdoc />
-    public partial class AddingPayments : Migration
+    public partial class addingpayments : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -14,14 +15,19 @@ namespace TuPencaUy.Site.DAO.Migrations
                 name: "Payment",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Event_id = table.Column<int>(type: "int", nullable: false),
                     User_email = table.Column<string>(type: "varchar(50)", nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(18,0)", nullable: false),
-                    TransactionID = table.Column<string>(type: "varchar", nullable: false)
+                    TransactionID = table.Column<string>(type: "varchar", nullable: false),
+                    Inactive = table.Column<bool>(type: "bit", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Payment", x => new { x.Event_id, x.User_email });
+                    table.PrimaryKey("PK_Payment", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Payment_Event_Event_id",
                         column: x => x.Event_id,
@@ -35,6 +41,11 @@ namespace TuPencaUy.Site.DAO.Migrations
                         principalColumn: "Email",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Payment_Event_id",
+                table: "Payment",
+                column: "Event_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Payment_User_email",

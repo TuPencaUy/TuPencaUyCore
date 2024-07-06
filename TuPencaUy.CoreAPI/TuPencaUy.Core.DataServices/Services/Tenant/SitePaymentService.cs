@@ -40,6 +40,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       IQueryable<PaymentDTO> paymentsQuery = _paymentDAL.Get(conditions)
         .Select(x => new PaymentDTO
         {
+          Id = x.Id,
           Amount = x.Amount,
           TransactionID = x.TransactionID,
           Event = new EventDTO
@@ -77,8 +78,8 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
 
     public PaymentDTO CreatePayment(string userEmail, int eventId, decimal amount, string transactionID)
     {
-      var existingBet = _paymentDAL.Get(new List<Expression<Func<Payment, bool>>> { x => x.Event_id == eventId && x.User_email == userEmail }).Any();
-      if (existingBet) throw new PaymentAlreadyExists($"Payment already exists with event_id: {eventId}, user_email: {userEmail}");
+      var existingPayment = _paymentDAL.Get(new List<Expression<Func<Payment, bool>>> { x => x.Event_id == eventId && x.User_email == userEmail }).Any();
+      if (existingPayment) throw new PaymentAlreadyExists($"Payment already exists with event_id: {eventId}, user_email: {userEmail}");
 
       var @event = _eventDAL.Get(new List<Expression<Func<Event, bool>>> { x => x.Id == eventId })
         .FirstOrDefault() ?? throw new EventNotFoundException($"Event not found with id {eventId}");
@@ -99,6 +100,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
 
       return new PaymentDTO
       {
+        Id = payment.Id,
         Amount = payment.Amount,
         TransactionID = payment.TransactionID,
         Event = new EventDTO
@@ -188,6 +190,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
 
       return new PaymentDTO
       {
+        Id = payment.Id,
         Amount = payment.Amount,
         TransactionID = payment.TransactionID,
         Event = @event,
@@ -195,10 +198,10 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       };
     }
 
-    public void DeletePayment(string userEmail, int eventId)
+    public void DeletePayment(int id)
     {
-      var payment = _paymentDAL.Get(new List<Expression<Func<Payment, bool>>> { x => x.Event_id == eventId && x.User_email == userEmail })
-        .FirstOrDefault() ?? throw new PaymentNotFoundException($"Bet not found with event_id: {eventId}, user_email: {userEmail}");
+      var payment = _paymentDAL.Get(new List<Expression<Func<Payment, bool>>> { x => x.Id == id })
+        .FirstOrDefault() ?? throw new PaymentNotFoundException($"Payment not found with id: {id}");
 
       _paymentDAL.Delete(payment);
       _paymentDAL.SaveChanges();

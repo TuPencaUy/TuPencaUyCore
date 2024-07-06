@@ -64,12 +64,12 @@ namespace TuPencaUy.Core.API.Controllers
       }
     }
 
-    [HttpDelete]
-    public IActionResult Delete([Required] string userEmail, [Required] int eventId)
+    [HttpDelete("{paymentId}")]
+    public IActionResult Delete(int paymentId)
     {
       try
       {
-        _paymentService.DeletePayment(userEmail, eventId);
+        _paymentService.DeletePayment(paymentId);
         return Ok(new ApiResponse { Message = "Payment successfully deleted" });
       }
       catch (Exception ex)
