@@ -28,7 +28,7 @@
     {
       var user = _userDAL
         .Get(new List<Expression<Func<User, bool>>> { x => x.Email == email })
-        .Select( user => new UserDTO
+        .Select(user => new UserDTO
         {
           Password = user.Password,
           Email = user.Email,
@@ -70,7 +70,6 @@
       if (user == null) throw new InvalidCredentialsException();
 
       return user.Password.Equals(_authLogic.HashPassword(password, user.Password.Split('$')[0])) ? user : null;
-
     }
     public UserDTO? Authenticate(string token)
     {
@@ -148,18 +147,21 @@
         .Get(new List<Expression<Func<Role, bool>>> { x => x.Id == (int)UserRoleEnum.BasicUser })
         .FirstOrDefault();
 
-      _userDAL.Insert(new User
+      User user = new User
       {
         Email = email,
         Name = name,
         Role = role,
         Password = password
-      });
+      };
+
+      _userDAL.Insert(user);
 
       _userDAL.SaveChanges();
 
       var userDTO = new UserDTO
       {
+        Id = user.Id,
         Email = email,
         Name = name
       };
