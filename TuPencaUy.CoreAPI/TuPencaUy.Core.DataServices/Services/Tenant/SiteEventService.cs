@@ -536,13 +536,14 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
         SecondTeam = teams.Where(x => x.RefTeam == secondTeamId).First(),
       };
 
+      _matchDAL.Insert(match);
       _matchDAL.SaveChanges();
 
       return null;
     }
     public void ModifyMatches(int? idFirstTeam, int? idSecondTeam, DateTime? date, int? firstTeamScore, int? secondTeamScore, int? sportId, int? refMatch = null)
     {
-      var matches = _matchDAL.Get([x => x.Id == refMatch]).ToList();
+      var matches = _matchDAL.Get([x => x.RefMatch == refMatch]).ToList();
 
       foreach(var match in matches)
       {
@@ -564,8 +565,9 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
         if (date.HasValue && date != match.Date) match.Date = date;
         if (firstTeamScore.HasValue && firstTeamScore != match.FirstTeamScore) match.FirstTeamScore = firstTeamScore;
         if (secondTeamScore.HasValue && secondTeamScore != match.SecondTeamScore) match.SecondTeamScore = secondTeamScore;
-      }
 
+        _matchDAL.Update(match);
+      }
       _matchDAL.SaveChanges();
     }
 

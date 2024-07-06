@@ -181,8 +181,8 @@ namespace TuPencaUy.Core.API.Controllers
           localEventService.CreateMatch(
             tenantEvent.Id.Value,
             match.FirstTeam.Id,
-            match.FirstTeamScore,
             match.SecondTeam.Id,
+            match.FirstTeamScore,
             match.SecondTeamScore,
             match.Sport.Id.Value,
             match.Date.Value,
