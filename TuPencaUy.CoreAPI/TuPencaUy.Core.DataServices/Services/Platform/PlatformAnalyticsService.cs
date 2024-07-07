@@ -24,7 +24,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       SetPagination(page, pageSize);
 
       var points = _eventDAL
-        .Get([ev => ev.Id == eventId])?
+        .Get([ev => ev.RefEvent == eventId])?
         .Select(x => new
         {
           x.Sports.FirstOrDefault().PartialPoints,
@@ -39,7 +39,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       {
         _serviceFactory.CreateTenantServices(site.ConnectionString);
         var betDAL = _serviceFactory.GetService<IGenericRepository<Bet>>();
-        bets.AddRange(betDAL.Get([bet => bet.Event_id == eventId && bet.Match.Finished]).ToList());
+        bets.AddRange(betDAL.Get([bet => bet.Event.RefEvent == eventId && bet.Match.Finished]).ToList());
       }
 
       var betUsers = bets.GroupBy(bet => new { bet.User.Name, bet.User_email })
