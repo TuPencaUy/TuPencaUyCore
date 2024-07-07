@@ -24,7 +24,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       SetPagination(page, pageSize);
 
       var points = _eventDAL
-        .Get([ev => ev.RefEvent == eventId])?
+        .Get([ev => ev.Id == eventId])?
         .Select(x => new
         {
           x.Sports.FirstOrDefault().PartialPoints,
