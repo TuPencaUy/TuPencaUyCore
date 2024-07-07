@@ -17,7 +17,7 @@ namespace TuPencaUy.Platform.DAO.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -128,6 +128,11 @@ namespace TuPencaUy.Platform.DAO.Migrations
                         .HasColumnType("int")
                         .HasColumnName("Event_id")
                         .HasColumnOrder(7);
+
+                    b.Property<bool>("Finished")
+                        .HasColumnType("bit")
+                        .HasColumnName("Finished")
+                        .HasColumnOrder(8);
 
                     b.Property<int?>("FirstTeamScore")
                         .HasColumnType("int")
