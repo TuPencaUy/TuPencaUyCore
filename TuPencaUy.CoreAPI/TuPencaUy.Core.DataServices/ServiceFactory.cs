@@ -88,6 +88,7 @@ namespace TuPencaUy.Core.DataServices
       _serviceCollection.AddScoped<IUserService, SiteUserService>();
       _serviceCollection.AddScoped<IEventService, SiteEventService>();
       _serviceCollection.AddScoped<IBetService, SiteBetService>();
+      _serviceCollection.AddScoped<IAnalyticsService, SiteAnalyticsService>();
     }
   }
 }

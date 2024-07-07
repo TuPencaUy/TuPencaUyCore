@@ -10,5 +10,6 @@
     public SportDTO Sport { get; set; }
     public DateTime? Date { get; set; }
     public int? ReferenceMatch { get; set; }
+    public bool? Finished { get; set; }
   }
 }

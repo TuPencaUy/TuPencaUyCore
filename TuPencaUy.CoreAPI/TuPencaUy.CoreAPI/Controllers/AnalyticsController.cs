@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using TuPencaUy.Core.API.Model.Responses;
 using TuPencaUy.Core.DataServices;
+using TuPencaUy.Core.DataServices.Services;
+using TuPencaUy.Core.DTOs;
 using TuPencaUy.CoreAPI.Controllers.Base;
 
 namespace TuPencaUy.Core.API.Controllers
@@ -10,18 +13,30 @@ namespace TuPencaUy.Core.API.Controllers
   public class AnalyticsController : BaseController
   {
     private readonly IServiceFactory _serviceFactory;
+    private readonly IAnalyticsService _analyticsService;
 
     public AnalyticsController(IServiceFactory serviceFactory)
     {
       _serviceFactory = serviceFactory;
+      _analyticsService = _serviceFactory.GetService<IAnalyticsService>();
     }
 
-    [HttpGet("PositionsTable/{eventId}")]
-    public IActionResult GetPositionsTable([Required] int eventId, [FromQuery] int? page, [FromQuery] int? pageSize)
+    [HttpGet("Leaderboard/{eventId}")]
+    public IActionResult GetLeaderboard([Required] int eventId, [FromQuery] int? page, [FromQuery] int? pageSize)
     {
       try
       {
-        return Ok();
+        List<BetUserDTO> leaderboard = _analyticsService.GetLeaderboard(out int count, eventId, page, pageSize);
+
+        return Ok(new ApiResponse
+        {
+          Data = new
+          {
+            leaderboard,
+            count
+          },
+          Message = count == 0 ? "No bets found" : "Positions table returned"
+        });
       }
       catch(Exception ex)
       {
