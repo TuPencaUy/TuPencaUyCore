@@ -46,7 +46,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
 
       count = betUsers.Count();
 
-      return betUsers.Skip((_page - 1) * _pageSize).Take(_pageSize).ToList();
+      return betUsers.OrderByDescending(x => x.Points).Skip((_page - 1) * _pageSize).Take(_pageSize).ToList();
     }
     private void SetPagination(int? page, int? pageSize)
     {
