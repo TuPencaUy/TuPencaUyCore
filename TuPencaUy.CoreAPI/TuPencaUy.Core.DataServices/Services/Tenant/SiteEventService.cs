@@ -84,6 +84,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
 
         matchesToInsert.Add(new Match
         {
+          Finished = match.Finished.Value,
           RefMatch = match.Id.Value,
           FirstTeam = firstTeam,
           SecondTeam = secondTeam,
@@ -134,6 +135,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
         },
         matchesToInsert.Select(x => new MatchDTO
         {
+          Finished = x.Finished,
           Id = x.Id,
           ReferenceMatch = x.RefMatch,
           Date = x.Date,
@@ -193,6 +195,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
         .Get(new List<Expression<Func<Match, bool>>> { match => match.Id == idMatch })?
         .Select(match => new MatchDTO
         {
+          Finished = match.Finished,
           ReferenceMatch = match.RefMatch,
           Id = match.Id,
           FirstTeam = match.FirstTeam != null ? new TeamDTO
@@ -251,6 +254,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       int? sportId,
       DateTime? fromDate,
       DateTime? untilDate,
+      bool? finished,
       int? page, int? pageSize)
     {
       SetPagination(page, pageSize);
@@ -283,6 +287,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       IQueryable<MatchDTO> matches = _matchDAL.Get(conditions)
         .Select(match => new MatchDTO
         {
+          Finished = match.Finished,
           ReferenceMatch = match.Id,
           Id = match.Id,
           FirstTeam = match.FirstTeam != null ? new TeamDTO
@@ -534,6 +539,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
         Sport = sport,
         FirstTeam = teams.Where(x => x.RefTeam == firstTeamId).First(),
         SecondTeam = teams.Where(x => x.RefTeam == secondTeamId).First(),
+        Finished = false,
       };
 
       _matchDAL.Insert(match);
@@ -541,7 +547,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
 
       return null;
     }
-    public void ModifyMatches(int? idFirstTeam, int? idSecondTeam, DateTime? date, int? firstTeamScore, int? secondTeamScore, int? sportId, int? refMatch = null)
+    public void ModifyMatches(int? idFirstTeam, int? idSecondTeam, DateTime? date, int? firstTeamScore, int? secondTeamScore, int? sportId, bool? finished, int? refMatch = null)
     {
       var matches = _matchDAL.Get([x => x.RefMatch == refMatch]).ToList();
 
@@ -565,6 +571,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
         if (date.HasValue && date != match.Date) match.Date = date;
         if (firstTeamScore.HasValue && firstTeamScore != match.FirstTeamScore) match.FirstTeamScore = firstTeamScore;
         if (secondTeamScore.HasValue && secondTeamScore != match.SecondTeamScore) match.SecondTeamScore = secondTeamScore;
+        if (finished.HasValue && match.Finished != finished) match.Finished = finished.Value;
 
         _matchDAL.Update(match);
       }
@@ -574,7 +581,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
 
     #region Don't need implementation
 
-    public MatchDTO ModifyMatch(int idMatch, int? idFirstTeam, int? idSecondTeam, DateTime? date, int? firstTeamScore, int? secondTeamScore, int? sportId, int? refMatch = null)
+    public MatchDTO ModifyMatch(int idMatch, int? idFirstTeam, int? idSecondTeam, DateTime? date, int? firstTeamScore, int? secondTeamScore, int? sportId, bool? finished, int? refMatch = null)
     {
       throw new NotImplementedException();
     }
@@ -667,6 +674,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
     {
       IQueryable<MatchDTO> matches = _matchDAL.Get([x => x.RefMatch == refMatchId]).Select(match => new MatchDTO
       {
+        Finished = match.Finished,
         ReferenceMatch = match.Id,
         Id = match.Id,
         FirstTeam = match.FirstTeam != null ? new TeamDTO

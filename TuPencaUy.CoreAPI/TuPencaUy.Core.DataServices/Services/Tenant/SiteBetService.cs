@@ -93,6 +93,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
         },
         Match = new MatchDTO
         {
+          Finished = bet.Match.Finished,
           Date = bet.Match.Date,
           FirstTeamScore = bet.Match.FirstTeamScore,
           SecondTeamScore = bet.Match.SecondTeamScore,
@@ -198,6 +199,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
           },
           Match = new MatchDTO
           {
+            Finished = x.Match.Finished,
             Date = x.Match.Date,
             FirstTeamScore = x.Match.FirstTeamScore,
             SecondTeamScore = x.Match.SecondTeamScore,
@@ -286,6 +288,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       var match = _matchDAL.Get(new List<Expression<Func<Match, bool>>> { x => matchId == x.Id })
         .Select(x => new MatchDTO
         {
+          Finished = x.Finished,
           Date = x.Date,
           FirstTeamScore = x.FirstTeamScore,
           SecondTeamScore = x.SecondTeamScore,
