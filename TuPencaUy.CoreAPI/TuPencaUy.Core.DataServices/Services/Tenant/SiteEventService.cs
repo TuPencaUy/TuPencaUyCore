@@ -15,6 +15,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
     private readonly IGenericRepository<Sport> _sportDAL;
     private readonly IGenericRepository<Team> _teamDAL;
     private readonly IGenericRepository<Match> _matchDAL;
+    private readonly IGenericRepository<Bet> _betDAL;
 
     private int _page = 1;
     private int _pageSize = 10;
@@ -22,19 +23,21 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       IGenericRepository<Event> eventDAL,
       IGenericRepository<Sport> sportDAL,
       IGenericRepository<Team> teamDAL,
-      IGenericRepository<Match> matchDAL)
+      IGenericRepository<Match> matchDAL,
+      IGenericRepository<Bet> betDAL)
     {
       _eventDAL = eventDAL;
       _sportDAL = sportDAL;
       _teamDAL = teamDAL;
       _matchDAL = matchDAL;
+      _betDAL = betDAL;
     }
     public Tuple<EventDTO, List<MatchDTO>> InstantiateEvent(EventDTO eventDTO, List<MatchDTO> matches)
     {
       Sport sport = _sportDAL
         .Get(new List<Expression<Func<Sport, bool>>> { sport => sport.RefSport == eventDTO.Sport.Id })?.FirstOrDefault();
 
-      if(sport == null)
+      if (sport == null)
       {
         sport = new Sport
         {
@@ -53,7 +56,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       foreach (var match in matches)
       {
         var firstTeam = _teamDAL.Get(new List<Expression<Func<Team, bool>>> { x => x.RefTeam == match.FirstTeam.Id }).FirstOrDefault();
-        if(firstTeam == null)
+        if (firstTeam == null)
         {
           firstTeam = new Team
           {
@@ -518,10 +521,10 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
     {
       var ev = _eventDAL.Get([x => x.Id == eventID]).FirstOrDefault();
 
-      if(ev == null) return new MatchDTO();
+      if (ev == null) return new MatchDTO();
 
       Sport sport = _sportDAL
-        .Get([ sport => sport.RefSport == sportId ])?.FirstOrDefault();
+        .Get([sport => sport.RefSport == sportId])?.FirstOrDefault();
 
       var teamsId = new List<int> { firstTeamId.Value, secondTeamId.Value };
 
@@ -551,7 +554,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
     {
       var matches = _matchDAL.Get([x => x.RefMatch == refMatch]).ToList();
 
-      foreach(var match in matches)
+      foreach (var match in matches)
       {
         if (match.Sport.RefSport != sportId)
         {
@@ -571,7 +574,30 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
         if (date.HasValue && date != match.Date) match.Date = date;
         if (firstTeamScore.HasValue && firstTeamScore != match.FirstTeamScore) match.FirstTeamScore = firstTeamScore;
         if (secondTeamScore.HasValue && secondTeamScore != match.SecondTeamScore) match.SecondTeamScore = secondTeamScore;
-        if (finished.HasValue && match.Finished != finished) match.Finished = finished.Value;
+        if (finished.HasValue && match.Finished != finished)
+        {
+          var bets = _betDAL.Get([x => x.Match_id == match.Id]).ToList();
+
+          foreach(var bet in bets)
+          {
+            if (bet.ScoreFirstTeam == match.FirstTeamScore && match.SecondTeamScore == bet.ScoreSecondTeam)
+            {
+              bet.Points = match.Sport.ExactPoints;
+            }
+            else if (
+              (match.FirstTeamScore > match.SecondTeamScore && bet.ScoreFirstTeam > bet.ScoreSecondTeam) ||
+              (match.FirstTeamScore < match.SecondTeamScore && bet.ScoreFirstTeam < bet.ScoreSecondTeam) ||
+              (match.FirstTeamScore == match.SecondTeamScore && bet.ScoreFirstTeam == bet.ScoreSecondTeam))
+            {
+              bet.Points = match.Sport.PartialPoints;
+            }
+
+            _betDAL.Update(bet);
+          }
+
+          match.Finished = finished.Value;
+        }
+
 
         _matchDAL.Update(match);
       }
@@ -728,5 +754,23 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       return matches.ToList();
     }
 
+    private void CalculatePoints(ref Bet bet, int firstTeamScore, int secondTeamScore, int partialPoints, int exactPoints)
+    {
+      int points = 0;
+
+      if (bet.ScoreFirstTeam == firstTeamScore && secondTeamScore == bet.ScoreSecondTeam)
+      {
+        points = exactPoints;
+      }
+      else if (
+        (firstTeamScore > secondTeamScore && bet.ScoreFirstTeam > bet.ScoreSecondTeam) ||
+        (firstTeamScore < secondTeamScore && bet.ScoreFirstTeam < bet.ScoreSecondTeam) ||
+        (firstTeamScore == secondTeamScore && bet.ScoreFirstTeam == bet.ScoreSecondTeam))
+      {
+        points = partialPoints;
+      }
+
+      bet.Points = points;
+    }
   }
 }
