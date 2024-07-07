@@ -1,7 +1,8 @@
-﻿using TuPencaUy.Core.DataAccessLogic;
+﻿using System.Linq.Expressions;
+using TuPencaUy.Core.DataAccessLogic;
 using TuPencaUy.Core.DTOs;
 using TuPencaUy.Core.Exceptions;
-using TuPencaUy.Site.DAO.Models;
+using TuPencaUy.Platform.DAO.Models;
 
 namespace TuPencaUy.Core.DataServices.Services.Platform
 {
@@ -33,12 +34,12 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
 
       var sites = _serviceFactory.GetService<ISiteService>().GetSites(); 
 
-      List<Bet> bets = new List<Bet>();
+      List<TuPencaUy.Site.DAO.Models.Bet> bets = new List<TuPencaUy.Site.DAO.Models.Bet>();
 
       foreach (var site in sites)
       {
         _serviceFactory.CreateTenantServices(site.ConnectionString);
-        var betDAL = _serviceFactory.GetService<IGenericRepository<Bet>>();
+        var betDAL = _serviceFactory.GetService<IGenericRepository<TuPencaUy.Site.DAO.Models.Bet>>();
         bets.AddRange(betDAL.Get([bet => bet.Event.RefEvent == eventId && bet.Match.Finished]).ToList());
       }
 
@@ -56,6 +57,51 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       count = betUsers.Count;
 
       return betUsers.OrderByDescending(x => x.Points).Skip((_page - 1) * _pageSize).Take(_pageSize).ToList();
+    }
+
+    public List<BetMatchDTO> GetMatchBets(int? matchId)
+    {
+      var conditions = new List<Expression<Func<TuPencaUy.Site.DAO.Models.Bet, bool>>>();
+
+      if (matchId != null) conditions.Add(x => x.Match_id == matchId);
+
+      var sites = _serviceFactory.GetService<ISiteService>().GetSites();
+
+      List<TuPencaUy.Site.DAO.Models.Bet> bets = new List<TuPencaUy.Site.DAO.Models.Bet>();
+
+      foreach (var site in sites)
+      {
+        _serviceFactory.CreateTenantServices(site.ConnectionString);
+        var betDAL = _serviceFactory.GetService<IGenericRepository<TuPencaUy.Site.DAO.Models.Bet>>();
+        bets.AddRange(betDAL.Get(conditions).ToList());
+      }
+
+      var matchBets = bets
+        .GroupBy(bet => new { bet.Match })
+        .Select(x => new BetMatchDTO
+        {
+          EventName = x.Key.Match.Event.Name,
+          MatchDate = x.Key.Match.Date.Value,
+          FirstTeam = x.Key.Match.FirstTeam.Name,
+          SecondTeam = x.Key.Match.SecondTeam.Name,
+          TotalBets = x.Count(),
+          FirstTeamWinnerBets = x.Count(x => x.ScoreFirstTeam > x.ScoreSecondTeam),
+          SecondTeamWinnerBets = x.Count(x => x.ScoreFirstTeam < x.ScoreSecondTeam),
+          TieBets = x.Count(x => x.ScoreFirstTeam == x.ScoreSecondTeam),
+          PopularBets = x
+            .GroupBy(g => new { g.ScoreFirstTeam, g.ScoreSecondTeam })
+            .Select(s => new BetScoreDTO
+            {
+              FirstTeamScore = s.Key.ScoreFirstTeam,
+              SecondTeamScore = s.Key.ScoreSecondTeam,
+              TotalBets = s.Count(),
+              BetPercentage = s.Count() / x.Count()
+            })
+            .OrderByDescending(o => o.TotalBets).Take(3)
+            .ToList(),
+        }).ToList();
+
+      return matchBets;
     }
 
     private void SetPagination(int? page, int? pageSize)

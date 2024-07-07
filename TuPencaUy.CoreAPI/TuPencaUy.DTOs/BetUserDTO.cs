@@ -20,14 +20,14 @@
       {
         if (PredictedMatches == 0 || Hits == 0) return 0;
 
-        return (decimal)Hits / (decimal)PredictedMatches * 100;
+        return (decimal)Hits / (decimal)PredictedMatches;
       }
     }
     public decimal PartialHitsPercentage {
       get
       {
         if (PredictedMatches == 0 || PartialHits == 0) return 0;
-        return (decimal)PartialHits / (decimal)PredictedMatches * 100;
+        return (decimal)PartialHits / (decimal)PredictedMatches;
       }
     }
   }

@@ -49,6 +49,7 @@ namespace TuPencaUy.Core.API.Controllers
           sportId: null,
           fromDate: null,
           untilDate: null,
+          finished: null,
           page: null,
           pageSize: int.MaxValue);
 

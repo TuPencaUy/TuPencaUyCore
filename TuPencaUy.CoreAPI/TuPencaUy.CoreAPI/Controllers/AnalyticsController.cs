@@ -49,7 +49,13 @@ namespace TuPencaUy.Core.API.Controllers
     {
       try
       {
-        return Ok();
+        var matchBets = _analyticsService.GetMatchBets(matchId);
+
+        return Ok(new ApiResponse
+        {
+          Data = matchBets.Count > 1 ? matchBets : matchBets.FirstOrDefault(),
+          Message = "Match data returned",
+        });
       }
       catch (Exception ex)
       {

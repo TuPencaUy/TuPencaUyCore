@@ -1,4 +1,5 @@
-﻿using TuPencaUy.Core.DataAccessLogic;
+﻿using System.Linq.Expressions;
+using TuPencaUy.Core.DataAccessLogic;
 using TuPencaUy.Core.DTOs;
 using TuPencaUy.Core.Exceptions;
 using TuPencaUy.Site.DAO.Models;
@@ -47,6 +48,39 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       count = betUsers.Count();
 
       return betUsers.OrderByDescending(x => x.Points).Skip((_page - 1) * _pageSize).Take(_pageSize).ToList();
+    }
+    public List<BetMatchDTO> GetMatchBets(int? matchId)
+    {
+      var conditions = new List<Expression<Func<Bet, bool>>>();
+
+      if(matchId != null) conditions.Add(x => x.Match_id == matchId);
+
+      var matchBets = _betDAL.Get(conditions)
+        .GroupBy(bet => new { bet.Match })
+        .Select(x => new BetMatchDTO
+        {
+          EventName = x.Key.Match.Event.Name,
+          MatchDate = x.Key.Match.Date.Value,
+          FirstTeam = x.Key.Match.FirstTeam.Name,
+          SecondTeam = x.Key.Match.SecondTeam.Name,
+          TotalBets = x.Count(),
+          FirstTeamWinnerBets = x.Count(x => x.ScoreFirstTeam > x.ScoreSecondTeam),
+          SecondTeamWinnerBets = x.Count(x => x.ScoreFirstTeam < x.ScoreSecondTeam),
+          TieBets = x.Count(x => x.ScoreFirstTeam == x.ScoreSecondTeam),
+          PopularBets = x
+            .GroupBy(g => new { g.ScoreFirstTeam, g.ScoreSecondTeam })
+            .Select(s => new BetScoreDTO
+            {
+              FirstTeamScore = s.Key.ScoreFirstTeam,
+              SecondTeamScore = s.Key.ScoreSecondTeam,
+              TotalBets = s.Count(),
+              BetPercentage = s.Count() / x.Count()
+            })
+            .OrderByDescending(o => o.TotalBets).Take(3)
+            .ToList(),
+        }).ToList();
+
+      return matchBets;
     }
     private void SetPagination(int? page, int? pageSize)
     {
