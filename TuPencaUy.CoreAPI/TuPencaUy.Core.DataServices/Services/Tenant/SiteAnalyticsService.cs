@@ -79,7 +79,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
             .ToList(),
         }).ToList();
 
-      matchBets.ForEach(mb => mb.PopularBets.ForEach(pb => pb.BetPercentage = pb.TotalBets / mb.TotalBets));
+      matchBets.ForEach(mb => mb.PopularBets.ForEach(pb => pb.BetPercentage = (decimal)pb.TotalBets / (decimal)mb.TotalBets));
 
       return matchBets;
     }
