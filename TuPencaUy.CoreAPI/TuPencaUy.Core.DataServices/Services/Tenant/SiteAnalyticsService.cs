@@ -56,13 +56,13 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       if(matchId != null) conditions.Add(x => x.Match_id == matchId);
 
       var matchBets = _betDAL.Get(conditions)
-        .GroupBy(bet => new { bet.Match })
+        .GroupBy(bet => new { eventName = bet.Match.Event.Name, bet.Match.Date, firstTeamName = bet.Match.FirstTeam.Name, secondTeamName = bet.Match.SecondTeam.Name})
         .Select(x => new BetMatchDTO
         {
-          EventName = x.Key.Match.Event.Name,
-          MatchDate = x.Key.Match.Date.Value,
-          FirstTeam = x.Key.Match.FirstTeam.Name,
-          SecondTeam = x.Key.Match.SecondTeam.Name,
+          EventName = x.Key.eventName,
+          MatchDate = x.Key.Date.Value,
+          FirstTeam = x.Key.firstTeamName,
+          SecondTeam = x.Key.secondTeamName,
           TotalBets = x.Count(),
           FirstTeamWinnerBets = x.Count(x => x.ScoreFirstTeam > x.ScoreSecondTeam),
           SecondTeamWinnerBets = x.Count(x => x.ScoreFirstTeam < x.ScoreSecondTeam),
