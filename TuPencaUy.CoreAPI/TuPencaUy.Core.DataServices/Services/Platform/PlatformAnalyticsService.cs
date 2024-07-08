@@ -77,13 +77,13 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       }
 
       var matchBets = bets
-        .GroupBy(bet => new { bet.Match })
+        .GroupBy(bet => new { eventName = bet.Match.Event.Name, bet.Match.Date, firstTeamName = bet.Match.FirstTeam.Name, secondTeamName = bet.Match.SecondTeam.Name })
         .Select(x => new BetMatchDTO
         {
-          EventName = x.Key.Match.Event.Name,
-          MatchDate = x.Key.Match.Date.Value,
-          FirstTeam = x.Key.Match.FirstTeam.Name,
-          SecondTeam = x.Key.Match.SecondTeam.Name,
+          EventName = x.Key.eventName,
+          MatchDate = x.Key.Date.Value,
+          FirstTeam = x.Key.firstTeamName,
+          SecondTeam = x.Key.secondTeamName,
           TotalBets = x.Count(),
           FirstTeamWinnerBets = x.Count(x => x.ScoreFirstTeam > x.ScoreSecondTeam),
           SecondTeamWinnerBets = x.Count(x => x.ScoreFirstTeam < x.ScoreSecondTeam),
@@ -95,11 +95,13 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
               FirstTeamScore = s.Key.ScoreFirstTeam,
               SecondTeamScore = s.Key.ScoreSecondTeam,
               TotalBets = s.Count(),
-              BetPercentage = s.Count() / x.Count()
             })
             .OrderByDescending(o => o.TotalBets).Take(3)
             .ToList(),
         }).ToList();
+
+
+      matchBets.ForEach(mb => mb.PopularBets.ForEach(pb => pb.BetPercentage = (decimal)pb.TotalBets / (decimal)mb.TotalBets));
 
       return matchBets;
     }
