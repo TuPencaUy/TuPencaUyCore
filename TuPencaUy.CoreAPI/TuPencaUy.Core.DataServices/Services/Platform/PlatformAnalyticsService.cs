@@ -59,6 +59,11 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       return betUsers.OrderByDescending(x => x.Points).Skip((_page - 1) * _pageSize).Take(_pageSize).ToList();
     }
 
+    public List<BetEventDTO> GetEventBets(int? eventId)
+    {
+      throw new NotImplementedException();
+    }
+
     public List<BetMatchDTO> GetMatchBets(int? matchId)
     {
       var conditions = new List<Expression<Func<TuPencaUy.Site.DAO.Models.Bet, bool>>>();

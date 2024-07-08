@@ -63,25 +63,18 @@ namespace TuPencaUy.Core.API.Controllers
       }
     }
 
-    [HttpGet("Bets/Users")]
-    public IActionResult GetBetsUsers([FromQuery] int? matchId, [FromQuery] int? eventId)
-    {
-      try
-      {
-        return Ok();
-      }
-      catch (Exception ex)
-      {
-        return ManageException(ex);
-      }
-    }
-
     [HttpGet("Bets/Events")]
     public IActionResult GetEventBets([FromQuery] int? eventId)
     {
       try
       {
-        return Ok();
+        var eventBets = _analyticsService.GetEventBets(eventId);
+
+        return Ok(new ApiResponse
+        {
+          Data = eventBets.Count > 1 ? eventBets : eventBets.FirstOrDefault(),
+          Message = "Event data returned",
+        });
       }
       catch (Exception ex)
       {
