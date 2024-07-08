@@ -75,6 +75,11 @@ namespace TuPencaUy.Platform.DAO.Migrations
                         .HasColumnName("EndDate")
                         .HasColumnOrder(3);
 
+                    b.Property<bool>("Finished")
+                        .HasColumnType("bit")
+                        .HasColumnName("Finished")
+                        .HasColumnOrder(6);
+
                     b.Property<bool>("Inactive")
                         .HasColumnType("bit");
 
