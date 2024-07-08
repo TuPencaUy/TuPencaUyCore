@@ -74,11 +74,12 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
               FirstTeamScore = s.Key.ScoreFirstTeam,
               SecondTeamScore = s.Key.ScoreSecondTeam,
               TotalBets = s.Count(),
-              BetPercentage = s.Count() / x.Count()
             })
             .OrderByDescending(o => o.TotalBets).Take(3)
             .ToList(),
         }).ToList();
+
+      matchBets.ForEach(mb => mb.PopularBets.ForEach(pb => pb.BetPercentage = pb.TotalBets / mb.TotalBets));
 
       return matchBets;
     }
