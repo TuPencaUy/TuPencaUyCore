@@ -77,13 +77,23 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       }
 
       var matchBets = bets
-        .GroupBy(bet => new { eventName = bet.Match.Event.Name, bet.Match.Date, firstTeamName = bet.Match.FirstTeam.Name, secondTeamName = bet.Match.SecondTeam.Name })
+        .GroupBy(bet => new
+        {
+          eventName = bet.Match.Event.Name,
+          bet.Match.Date,
+          firstTeamName = bet.Match.FirstTeam.Name,
+          secondTeamName = bet.Match.SecondTeam.Name,
+          firstTeamLogo = bet.Match.FirstTeam.Logo,
+          secondTeamLogo = bet.Match.SecondTeam.Logo
+        })
         .Select(x => new BetMatchDTO
         {
           EventName = x.Key.eventName,
           MatchDate = x.Key.Date.Value,
           FirstTeam = x.Key.firstTeamName,
           SecondTeam = x.Key.secondTeamName,
+          FirstTeamLogo = x.Key.firstTeamLogo,
+          SecondTeamLogo = x.Key.secondTeamLogo,
           TotalBets = x.Count(),
           FirstTeamWinnerBets = x.Count(x => x.ScoreFirstTeam > x.ScoreSecondTeam),
           SecondTeamWinnerBets = x.Count(x => x.ScoreFirstTeam < x.ScoreSecondTeam),

@@ -6,6 +6,8 @@
     public DateTime MatchDate { get; set; }
     public string FirstTeam { get; set; }
     public string SecondTeam { get; set; }
+    public byte[] FirstTeamLogo { get; set; }
+    public byte[] SecondTeamLogo { get; set; }
     public int TotalBets { get; set; }
     public int FirstTeamWinnerBets { get; set; }
     public int SecondTeamWinnerBets { get; set; }
