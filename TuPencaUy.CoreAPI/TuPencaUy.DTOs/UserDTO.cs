@@ -15,6 +15,7 @@ namespace TuPencaUy.DTOs
     [JsonIgnore]
     public string? Password { get; set; }
     public string? Email { get; set; }
+    public string? PaypalEmail { get; set; }
     public RoleDTO? Role { get; set; }
     public SiteDTO? Site { get; set; }
     public List<EventDTO>? Events { get; set; }

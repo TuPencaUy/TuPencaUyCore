@@ -12,6 +12,6 @@ namespace TuPencaUy.Core.DataServices.Services
     Tuple<UserDTO, EventDTO> SubscribeUser(int userId, int eventId);
     UserDTO GetUserByEmail(string email);
     bool CreateUser(string email, string name, string? password, UserRoleEnum role);
-    UserDTO ModifyUser(int userId, string? email, string? name, string? password);
+    UserDTO ModifyUser(int userId, string? email, string? name, string? password, string? paypalEmail);
   }
 }

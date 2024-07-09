@@ -21,5 +21,8 @@ namespace TuPencaUy.Core.DAO
     [MaxLength(100)]
     [Column("Password", Order = 3, TypeName = "varchar")]
     public string? Password { get; set; }
+
+    [Column("paypalEmail", Order = 4)]
+    public string? PaypalEmail { get; set; }
   }
 }

@@ -71,7 +71,7 @@ namespace TuPencaUy.Core.API.Controllers
     {
       try
       {
-        var user = _userService.ModifyUser(userId, userRequest.Email, userRequest.Name, userRequest.Password);
+        var user = _userService.ModifyUser(userId, userRequest.Email, userRequest.Name, userRequest.Password, userRequest.PaypalEmail);
 
         var response = new ApiResponse
         {
