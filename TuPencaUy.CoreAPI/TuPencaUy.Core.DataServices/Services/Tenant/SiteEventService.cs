@@ -451,8 +451,8 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
           Comission = ev.Comission,
           StartDate = ev.StartDate,
           TeamType = ev.TeamType,
-          Price = x.Price,
-          PrizePercentage = x.PrizePercentage,
+          Price = ev.Price,
+          PrizePercentage = ev.PrizePercentage,
           Sport = ev.Sports.Select(x => new SportDTO
           {
             ReferenceSport = x.RefSport,
