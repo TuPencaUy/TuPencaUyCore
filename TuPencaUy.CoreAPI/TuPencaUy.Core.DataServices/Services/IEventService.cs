@@ -5,7 +5,7 @@ namespace TuPencaUy.Core.DataServices.Services
 {
   public interface IEventService
   {
-    Tuple<EventDTO, List<MatchDTO>> InstantiateEvent(EventDTO eventDTO, List<MatchDTO> matches);
+    Tuple<EventDTO, List<MatchDTO>> InstantiateEvent(EventDTO eventDTO, List<MatchDTO> matches, int price, decimal prizePercentage);
     EventDTO CreateEvent(
       string name,
       DateTime? startDate,

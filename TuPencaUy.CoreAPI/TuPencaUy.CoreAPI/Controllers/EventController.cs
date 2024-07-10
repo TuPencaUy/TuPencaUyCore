@@ -23,7 +23,7 @@ namespace TuPencaUy.Core.API.Controllers
     }
 
     [HttpPost("InstantiateEvent")]
-    public IActionResult InstantiateEvent([Required] int eventId)
+    public IActionResult InstantiateEvent([Required] int eventId, [Required] int price, [Required] decimal prizePercentage)
     {
       try
       {
@@ -52,7 +52,7 @@ namespace TuPencaUy.Core.API.Controllers
 
         _serviceFactory.CreateTenantServices(connStringTennant);
 
-        var newEvent = _serviceFactory.GetService<IEventService>().InstantiateEvent(searchedEvent, searchedMatches);
+        var newEvent = _serviceFactory.GetService<IEventService>().InstantiateEvent(searchedEvent, searchedMatches, price, prizePercentage);
 
         var data = new { Event = newEvent.Item1, Matches = newEvent.Item2 };
 

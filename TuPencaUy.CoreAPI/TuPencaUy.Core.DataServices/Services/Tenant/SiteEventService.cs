@@ -28,7 +28,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       _teamDAL = teamDAL;
       _matchDAL = matchDAL;
     }
-    public Tuple<EventDTO, List<MatchDTO>> InstantiateEvent(EventDTO eventDTO, List<MatchDTO> matches)
+    public Tuple<EventDTO, List<MatchDTO>> InstantiateEvent(EventDTO eventDTO, List<MatchDTO> matches, int price, decimal prizePercentage)
     {
       Sport sport = _sportDAL
         .Get(new List<Expression<Func<Sport, bool>>> { sport => sport.RefSport == eventDTO.Sport.Id })?.FirstOrDefault();
@@ -103,7 +103,9 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
         Instantiable = true,
         Name = eventDTO.Name,
         TeamType = eventDTO.TeamType,
-        Matches = matchesToInsert
+        Matches = matchesToInsert,
+        Price = price,
+        PrizePercentage = prizePercentage,
       };
 
       _eventDAL.Insert(ev);

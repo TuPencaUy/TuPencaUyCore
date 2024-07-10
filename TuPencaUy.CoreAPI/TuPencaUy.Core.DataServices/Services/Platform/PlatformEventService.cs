@@ -27,7 +27,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       _teamDAL = teamDAL;
       _matchDAL = matchDAL;
     }
-    public Tuple<EventDTO, List<MatchDTO>> InstantiateEvent(EventDTO eventDTO, List<MatchDTO> matches)
+    public Tuple<EventDTO, List<MatchDTO>> InstantiateEvent(EventDTO eventDTO, List<MatchDTO> matches, int price, decimal prizePercentage)
     {
       throw new NotImplementedException();
     }
