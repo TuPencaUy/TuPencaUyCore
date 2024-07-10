@@ -22,6 +22,7 @@ namespace TuPencaUy.Core.DAO
     [Column("Amount", Order = 3, TypeName = "decimal")]
     public decimal Amount { get; set; }
 
+    [MaxLength(100)]
     [Column("TransactionID", Order = 4, TypeName = "varchar")]
     public string TransactionID { get; set; }
 
