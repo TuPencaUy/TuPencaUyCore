@@ -10,6 +10,7 @@ using TuPencaUy.CoreAPI.Controllers.Base;
 
 namespace TuPencaUy.Core.API.Controllers
 {
+  [ApiController]
   [Route("[controller]")]
   public class EventController : BaseController
   {
@@ -170,7 +171,8 @@ namespace TuPencaUy.Core.API.Controllers
 
       try
       {
-        var createdTeam = _eventService.CreateTeam(team.Name, team.Logo, team.Sport, team.TeamType);
+        byte[]? logo = team.Logo == null ? null : Convert.FromBase64String(team.Logo);
+        var createdTeam = _eventService.CreateTeam(team.Name, logo, team.Sport, team.TeamType);
 
         return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Data = createdTeam, Message = "Successfully created team" });
       }
@@ -194,84 +196,6 @@ namespace TuPencaUy.Core.API.Controllers
             list,
             count
           },
-        };
-
-        return Ok(successResponse);
-      }
-      catch (Exception ex)
-      {
-        return ManageException(ex);
-      }
-    }
-
-    [HttpPost("Match")]
-    public IActionResult CreateMatch([FromBody] CreateMatchRequest match)
-    {
-      try
-      {
-        if (!string.IsNullOrEmpty(ObtainTenantFromToken()))
-        {
-          return BadRequest(new ApiResponse { Error = true, Message = "You must be logged to a central platform" });
-        }
-
-        var createdMatch = _eventService
-          .CreateMatch(match.EventId, match.FirstTeam, match.SecondTeam, match.FirstTeamScore, match.SecondTeamScore, match.Sport, match.Date);
-
-        return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Data = createdMatch, Message = "Successfully created match" });
-      }
-      catch(Exception ex)
-      {
-        return ManageException(ex);
-      }
-    }
-
-    [HttpGet("Match")]
-    public IActionResult GetMatches(int? page, int? pageSize, int? idTeam, int? otherIdTeam, int? eventId, int? sportId, DateTime? fromDate, DateTime? untilDate)
-    {
-      try
-      {
-        var list = _eventService.GetMatches(
-          out int count,
-          idTeam,
-          otherIdTeam,
-          eventId,
-          sportId,
-          fromDate,
-          untilDate,
-          page, pageSize);
-
-        var successResponse = new ApiResponse
-        {
-          Data = new
-          {
-            list,
-            count
-          },
-        };
-
-        return Ok(successResponse);
-      }
-      catch (Exception ex)
-      {
-        var errorResponse = new ApiResponse
-        {
-          Message = ex.Message,
-          Error = true
-        };
-        return BadRequest(errorResponse);
-      }
-    }
-
-    [HttpGet("Match/{idMatch}")]
-    public IActionResult GetMatch(int idMatch)
-    {
-      try
-      {
-        var match = _eventService.GetMatch(idMatch);
-
-        var successResponse = new ApiResponse
-        {
-          Data = match,
         };
 
         return Ok(successResponse);
@@ -332,31 +256,6 @@ namespace TuPencaUy.Core.API.Controllers
         var successResponse = new ApiResponse
         {
           Data = ev,
-        };
-
-        return Ok(successResponse);
-      }
-      catch (Exception ex)
-      {
-        return ManageException(ex);
-      }
-    }
-
-    [HttpDelete("Match/{idMatch}")]
-    public IActionResult DeleteMatch(int idMatch)
-    {
-      try
-      {
-        if (!string.IsNullOrEmpty(ObtainTenantFromToken()))
-        {
-          return BadRequest(new ApiResponse { Error = true, Message = "You must be logged to a central platform" });
-        }
-
-        _eventService.DeleteMatch(idMatch);
-
-        var successResponse = new ApiResponse
-        {
-          Message = $"The match with id {idMatch} was deleted",
         };
 
         return Ok(successResponse);
@@ -442,32 +341,6 @@ namespace TuPencaUy.Core.API.Controllers
       }
     }
 
-    [HttpPatch("Match/{idMatch}")]
-    public IActionResult ModifyMatch(int idMatch, [FromBody] ModifyMatchRequest match)
-    {
-      try
-      {
-        if (!string.IsNullOrEmpty(ObtainTenantFromToken()))
-        {
-          return BadRequest(new ApiResponse { Error = true, Message = "You must be logged to a central platform" });
-        }
-
-        var m = _eventService.ModifyMatch(idMatch, match.FirstTeam, match.SecondTeam, match.Date, match.FirstTeamScore, match.SecondTeamScore, match.Sport);
-
-        var successResponse = new ApiResponse
-        {
-          Data = m,
-          Message = $"The match with id {idMatch} was modified",
-        };
-
-        return Ok(successResponse);
-      }
-      catch (Exception ex)
-      {
-        return ManageException(ex);
-      }
-    }
-
     [HttpPatch("Team/{idTeam}")]
     public IActionResult ModifyTeam(int idTeam, [FromBody] ModifyTeamRequest team)
     {
@@ -530,7 +403,7 @@ namespace TuPencaUy.Core.API.Controllers
           return BadRequest(new ApiResponse { Error = true, Message = "You must be logged to a central platform" });
         }
 
-        var e = _eventService.ModifyEvent(idEvent, ev.Name, ev.StartDate, ev.EndDate, ev.Comission, ev.TeamType);
+        var e = _eventService.ModifyEvent(idEvent, ev.Name, ev.StartDate, ev.EndDate, ev.Comission, ev.TeamType, ev.Instantiable);
 
         var successResponse = new ApiResponse
         {

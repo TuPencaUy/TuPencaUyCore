@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TuPencaUy.Core.DAO;
 
 namespace TuPencaUy.Site.DAO.Models
 {
-  public class Bet
+  public class Bet : ControlDate
   {
     [ForeignKey("Event")]
     [Column("Event_id", Order = 0)]

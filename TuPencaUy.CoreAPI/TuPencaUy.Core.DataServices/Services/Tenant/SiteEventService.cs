@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using Microsoft.EntityFrameworkCore.Diagnostics;
+using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 using TuPencaUy.Core.DataAccessLogic;
 using TuPencaUy.Core.DTOs;
@@ -41,7 +42,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
           ExactPoints = eventDTO.Sport.ExactPoints,
           PartialPoints = eventDTO.Sport.PartialPoints,
           Tie = eventDTO.Sport.Tie,
-          RefSport = eventDTO.Id.Value,
+          RefSport = eventDTO.Sport.Id.Value,
         };
         _sportDAL.Insert(sport);
         _sportDAL.SaveChanges();
@@ -512,13 +513,76 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       return events.Skip((_page - 1) * _pageSize).Take(_pageSize).ToList();
     }
 
+    public MatchDTO CreateMatch(int eventID, int? firstTeamId, int? secondTeamId, int? firstTeamScore, int? secondTeamScore, int sportId, DateTime date, int? refMatch = null)
+    {
+      var ev = _eventDAL.Get([x => x.Id == eventID]).FirstOrDefault();
+
+      if(ev == null) return new MatchDTO();
+
+      Sport sport = _sportDAL
+        .Get([ sport => sport.RefSport == sportId ])?.FirstOrDefault();
+
+      var teamsId = new List<int> { firstTeamId.Value, secondTeamId.Value };
+
+      var teams = _teamDAL
+        .Get([team => teamsId.Contains(team.RefTeam)])?.ToList();
+
+      var match = new Match
+      {
+        RefMatch = refMatch.Value,
+        Event = ev,
+        SecondTeam_id = secondTeamId,
+        FirstTeamScore = firstTeamScore,
+        SecondTeamScore = secondTeamScore,
+        Date = date,
+        Sport = sport,
+        FirstTeam = teams.Where(x => x.RefTeam == firstTeamId).First(),
+        SecondTeam = teams.Where(x => x.RefTeam == secondTeamId).First(),
+      };
+
+      _matchDAL.Insert(match);
+      _matchDAL.SaveChanges();
+
+      return null;
+    }
+    public void ModifyMatches(int? idFirstTeam, int? idSecondTeam, DateTime? date, int? firstTeamScore, int? secondTeamScore, int? sportId, int? refMatch = null)
+    {
+      var matches = _matchDAL.Get([x => x.RefMatch == refMatch]).ToList();
+
+      foreach(var match in matches)
+      {
+        if (match.Sport.RefSport != sportId)
+        {
+          match.Sport = _sportDAL.Get([x => x.RefSport == sportId]).FirstOrDefault();
+        }
+
+        if (match.FirstTeam.RefTeam != idFirstTeam)
+        {
+          match.FirstTeam = _teamDAL.Get([x => x.RefTeam == idFirstTeam]).FirstOrDefault();
+        }
+
+        if (match.SecondTeam.RefTeam != idSecondTeam)
+        {
+          match.SecondTeam = _teamDAL.Get([x => x.RefTeam == idSecondTeam]).FirstOrDefault();
+        }
+
+        if (date.HasValue && date != match.Date) match.Date = date;
+        if (firstTeamScore.HasValue && firstTeamScore != match.FirstTeamScore) match.FirstTeamScore = firstTeamScore;
+        if (secondTeamScore.HasValue && secondTeamScore != match.SecondTeamScore) match.SecondTeamScore = secondTeamScore;
+
+        _matchDAL.Update(match);
+      }
+      _matchDAL.SaveChanges();
+    }
+
+
     #region Don't need implementation
-    public EventDTO CreateEvent(string name, DateTime? startDate, DateTime? endDate, float? comission, TeamTypeEnum? teamType, int sportId)
+
+    public MatchDTO ModifyMatch(int idMatch, int? idFirstTeam, int? idSecondTeam, DateTime? date, int? firstTeamScore, int? secondTeamScore, int? sportId, int? refMatch = null)
     {
       throw new NotImplementedException();
     }
-
-    public MatchDTO CreateMatch(int eventID, int? firstTeamId, int? secondTeamId, int? firstTeamScore, int? secondTeamScore, int sportId, DateTime date)
+    public EventDTO CreateEvent(string name, DateTime? startDate, DateTime? endDate, float? comission, TeamTypeEnum? teamType, int sportId)
     {
       throw new NotImplementedException();
     }
@@ -538,7 +602,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       throw new NotImplementedException();
     }
 
-    public void DeleteMatch(int idMatch)
+    public void DeleteMatch(int idMatch, int? refMatch = null)
     {
       throw new NotImplementedException();
     }
@@ -553,12 +617,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       throw new NotImplementedException();
     }
 
-    public EventDTO ModifyEvent(int idEvent, string? name, DateTime? startDate, DateTime? endTime, float? comission, TeamTypeEnum? teamType)
-    {
-      throw new NotImplementedException();
-    }
-
-    public MatchDTO ModifyMatch(int idMatch, int? idFirstTeam, int? idSecondTeam, DateTime? date, int? firstTeamScore, int? secondTeamScore, int? sportId)
+    public EventDTO ModifyEvent(int idEvent, string? name, DateTime? startDate, DateTime? endTime, float? comission, TeamTypeEnum? teamType, bool? instantiable)
     {
       throw new NotImplementedException();
     }
@@ -575,11 +634,95 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
 
     #endregion
 
-
     private void SetPagination(int? page, int? pageSize)
     {
       _page = page != null && page.Value > 0 ? page.Value : _page;
       _pageSize = pageSize != null && pageSize.Value > 0 ? pageSize.Value : _pageSize;
     }
+
+    public List<EventDTO> GetEvents(int refEventId)
+    {
+      IQueryable<EventDTO> events = _eventDAL.Get([x => x.RefEvent == refEventId]).Select(x => new EventDTO
+      {
+        ReferenceEvent = x.RefEvent,
+        Id = x.Id,
+        Name = x.Name,
+        StartDate = x.StartDate,
+        EndDate = x.EndDate,
+        Comission = x.Comission,
+        TeamType = x.TeamType,
+        Instantiable = x.Instantiable,
+        Sport = x.Sports.Select(x => new SportDTO
+        {
+          ReferenceSport = x.RefSport,
+          Name = x.Name,
+          Tie = x.Tie,
+          Id = x.Id,
+          ExactPoints = x.ExactPoints,
+          PartialPoints = x.PartialPoints,
+        }).FirstOrDefault(),
+        MatchesCount = x.Matches != null ? x.Matches.Count() : 0,
+      });
+
+      return events.ToList();
+    }
+
+    public List<MatchDTO> GetMatches(int refMatchId)
+    {
+      IQueryable<MatchDTO> matches = _matchDAL.Get([x => x.RefMatch == refMatchId]).Select(match => new MatchDTO
+      {
+        ReferenceMatch = match.Id,
+        Id = match.Id,
+        FirstTeam = match.FirstTeam != null ? new TeamDTO
+        {
+          ReferenceTeam = match.FirstTeam.RefTeam,
+          Id = match.FirstTeam.Id,
+          Name = match.FirstTeam.Name,
+          TeamType = match.FirstTeam.TeamType,
+          Sport = match.FirstTeam.Sport != null ? new SportDTO
+          {
+            ReferenceSport = match.FirstTeam.Sport.RefSport,
+            Id = match.FirstTeam.Sport.Id,
+            Name = match.FirstTeam.Sport.Name,
+            ExactPoints = match.FirstTeam.Sport.ExactPoints,
+            Tie = match.FirstTeam.Sport.Tie,
+            PartialPoints = match.FirstTeam.Sport.PartialPoints,
+          } : null,
+          Logo = match.FirstTeam.Logo,
+        } : null,
+        SecondTeam = match.SecondTeam != null ? new TeamDTO
+        {
+          ReferenceTeam = match.SecondTeam.RefTeam,
+          Id = match.SecondTeam.Id,
+          Name = match.SecondTeam.Name,
+          TeamType = match.SecondTeam.TeamType,
+          Sport = match.SecondTeam.Sport != null ? new SportDTO
+          {
+            ReferenceSport = match.SecondTeam.Sport.RefSport,
+            Id = match.SecondTeam.Sport.Id,
+            Name = match.SecondTeam.Sport.Name,
+            ExactPoints = match.SecondTeam.Sport.ExactPoints,
+            Tie = match.SecondTeam.Sport.Tie,
+            PartialPoints = match.SecondTeam.Sport.PartialPoints,
+          } : null,
+          Logo = match.SecondTeam.Logo,
+        } : null,
+        FirstTeamScore = match.FirstTeamScore,
+        SecondTeamScore = match.SecondTeamScore,
+        Date = match.Date,
+        Sport = match.Sport != null ? new SportDTO
+        {
+          ReferenceSport = match.Sport.RefSport,
+          Id = match.Sport.Id,
+          Name = match.Sport.Name,
+          ExactPoints = match.Sport.ExactPoints,
+          Tie = match.Sport.Tie,
+          PartialPoints = match.Sport.PartialPoints,
+        } : null,
+      });
+
+      return matches.ToList();
+    }
+
   }
 }

@@ -30,7 +30,7 @@
         .Get(new List<Expression<Func<User, bool>>> { x => x.Email == email })
         .Select(user => new UserDTO
         {
-          Site = user.Sites != null ? user.Sites
+          Site = user.Sites != null ? user.Sites.Where(site => !site.Inactive)
             .Select(site => new SiteDTO
             {
               AccessType = site.AccessType,
@@ -73,7 +73,7 @@
         var user = _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Email == userEmail })
         .Select(user => new UserDTO
         {
-          Site = user.Sites != null ? user.Sites
+          Site = user.Sites != null ? user.Sites.Where(site => !site.Inactive)
             .Select(site => new SiteDTO
             {
               AccessType = site.AccessType,
@@ -160,6 +160,6 @@
 
       return userDTO;
     }
-    
+
   }
 }

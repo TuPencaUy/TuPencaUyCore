@@ -8,6 +8,7 @@
   using TuPencaUy.Core.Enums;
   using TuPencaUy.Exceptions;
   using TuPencaUy.Core.DataServices.Services.CommonLogic;
+  using TuPencaUy.Core.DTOs;
   using TuPencaUy.Core.Exceptions;
 
   public class SiteAuthService : IAuthService
@@ -35,7 +36,7 @@
 
       var user = _userDAL
         .Get(new List<Expression<Func<User, bool>>> { x => x.Email == email })
-        .Select( user => new UserDTO
+        .Select(user => new UserDTO
         {
           Password = user.Password,
           Email = user.Email,
@@ -49,6 +50,28 @@
              .Select(y => new PermissionDTO { Id = y.Id, Name = y.Name })
              .ToList() ?? new List<PermissionDTO>()
           } : null,
+          Events = user.Events != null ? user.Events.Select(ev =>
+           new EventDTO
+           {
+             Id = ev.Id,
+             ReferenceEvent = ev.RefEvent,
+             Name = ev.Name,
+             Comission = ev.Comission,
+             EndDate = ev.EndDate,
+             StartDate = ev.StartDate,
+             Instantiable = ev.Instantiable,
+             MatchesCount = ev.Matches.Count(),
+             TeamType = ev.TeamType,
+             Sport = ev.Sports.Any() ?  new SportDTO
+             {
+               Id = ev.Sports.FirstOrDefault().Id,
+               ReferenceSport = ev.Sports.FirstOrDefault().RefSport,
+               Name = ev.Sports.FirstOrDefault().Name,
+               Tie = ev.Sports.FirstOrDefault().Tie,
+               PartialPoints = ev.Sports.FirstOrDefault().PartialPoints,
+               ExactPoints = ev.Sports.FirstOrDefault().ExactPoints,
+             } : null
+           }).ToList() : new List<EventDTO>()
         })
         .FirstOrDefault();
 
@@ -80,9 +103,31 @@
              .Select(y => new PermissionDTO { Id = y.Id, Name = y.Name })
              .ToList() ?? new List<PermissionDTO>()
           } : null,
+          Events = user.Events != null ? user.Events.Select(ev =>
+           new EventDTO
+           {
+             Id = ev.Id,
+             ReferenceEvent = ev.RefEvent,
+             Name = ev.Name,
+             Comission = ev.Comission,
+             EndDate = ev.EndDate,
+             StartDate = ev.StartDate,
+             Instantiable = ev.Instantiable,
+             MatchesCount = ev.Matches.Count(),
+             TeamType = ev.TeamType,
+             Sport = new SportDTO
+             {
+               Id = ev.Id,
+               ReferenceSport = ev.Sports.FirstOrDefault().Id,
+               Name = ev.Sports.FirstOrDefault().Name,
+               Tie = ev.Sports.FirstOrDefault().Tie,
+               PartialPoints = ev.Sports.FirstOrDefault().PartialPoints,
+               ExactPoints = ev.Sports.FirstOrDefault().ExactPoints,
+             }
+           }).ToList() : new List<EventDTO>()
         })
         .FirstOrDefault();
-        
+
         if (user == null)
         {
           var userName = jwtToken.Claims.FirstOrDefault(x => x.Type == "name")?.Value;
@@ -116,12 +161,12 @@
         .Get(new List<Expression<Func<Role, bool>>> { x => x.Id == (int)UserRoleEnum.BasicUser })
         .FirstOrDefault();
 
-      var user = new User
+      User user = new User
       {
         Email = email,
         Name = name,
         Role = role,
-        Password = password,
+        Password = password
       };
 
       if (auth != null && auth.Value)
@@ -139,6 +184,7 @@
 
       var userDTO = new UserDTO
       {
+        Id = user.Id,
         Email = email,
         Name = name
       };

@@ -4,6 +4,8 @@ namespace TuPencaUy.Core.DataServices.Services
 {
   public interface ISiteService
   {
+    List<SiteDTO> GetSites();
+
     SiteDTO GetSiteByDomain(string domain);
 
     bool CreateNewSite(string ownerEmail, SiteDTO site, out string? errorMessage, out string? connectionString);

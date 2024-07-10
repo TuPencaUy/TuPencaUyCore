@@ -21,6 +21,7 @@ namespace TuPencaUy.Core.DataServices.Services
       TeamTypeEnum? teamType,
       bool? instantiable,
       int? page, int? pageSize);
+    List<EventDTO> GetEvents(int refEventId);
     SportDTO CreateSport(string name, bool tie, int? exactPoints, int? partialPoints);
     List<SportDTO> GetSports(out int count, string? name, int? page, int? pageSize);
     TeamDTO CreateTeam(string name, byte[]? logo, int sportId, TeamTypeEnum? teamType);
@@ -37,7 +38,8 @@ namespace TuPencaUy.Core.DataServices.Services
       int? firstTeamScore,
       int? secondTeamScore,
       int sportId,
-      DateTime date);
+      DateTime date,
+      int? refMatch = null);
     List<MatchDTO> GetMatches(
       out int count,
       int? idTeam,
@@ -47,11 +49,13 @@ namespace TuPencaUy.Core.DataServices.Services
       DateTime? fromDate,
       DateTime? untilDate,
       int? page, int? pageSize);
+
+    List<MatchDTO> GetMatches(int refMatchId);
     MatchDTO GetMatch(int idMatch);
     TeamDTO GetTeam(int idTeam);
     SportDTO GetSport(int idSport);
     EventDTO GetEvent(int idEvent);
-    void DeleteMatch(int idMatch);
+    void DeleteMatch(int idMatch, int? refMatch = null);
     void DeleteTeam(int idTeam);
     void DeleteSport(int idSport);
     void DeleteEvent(int idEvent);
@@ -62,7 +66,16 @@ namespace TuPencaUy.Core.DataServices.Services
       DateTime? date,
       int? firstTeamScore,
       int? secondTeamScore,
-      int? sportId);
+      int? sportId,
+      int? refMatch = null);
+    void ModifyMatches(
+      int? idFirstTeam,
+      int? idSecondTeam,
+      DateTime? date,
+      int? firstTeamScore,
+      int? secondTeamScore,
+      int? sportId,
+      int? refMatch = null);
     TeamDTO ModifyTeam(
       int idTeam,
       string? name,
@@ -81,6 +94,7 @@ namespace TuPencaUy.Core.DataServices.Services
       DateTime? startDate,
       DateTime? endTime,
       float? comission,
-      TeamTypeEnum? teamType);
+      TeamTypeEnum? teamType,
+      bool? instantiable);
   }
 }

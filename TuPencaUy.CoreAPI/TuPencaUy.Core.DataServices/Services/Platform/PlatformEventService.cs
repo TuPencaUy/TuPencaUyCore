@@ -39,7 +39,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       DateTime? date,
       int? firstTeamScore,
       int? secondTeamScore,
-      int? sportId)
+      int? sportId, int? refMatch = null)
     {
       var originMatch = _matchDAL.Get(new List<Expression<Func<Match, bool>>> { x => x.Id == idMatch })
         .FirstOrDefault() ?? throw new MatchNotFoundException($"Match with id {idMatch} not found");
@@ -253,14 +253,21 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       DateTime? startDate,
       DateTime? endTime,
       float? comission,
-      TeamTypeEnum? teamType)
+      TeamTypeEnum? teamType,
+      bool? instantiable)
     {
       var originEvent = _eventDAL.Get(new List<Expression<Func<Event, bool>>> { x => x.Id == idEvent })
         .FirstOrDefault() ?? throw new EventNotFoundException($"Event with id {idEvent} not found");
 
       bool modified = false;
 
-      if(name != null && name != originEvent.Name)
+      if (instantiable != null && instantiable != originEvent.Instantiable)
+      {
+        originEvent.Instantiable = instantiable.Value;
+        modified = modified || true;
+      }
+
+      if (name != null && name != originEvent.Name)
       {
         originEvent.Name = name;
         modified = modified || true;
@@ -306,7 +313,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         TeamType = originEvent.TeamType,
       };
     }
-    public void DeleteMatch(int idMatch)
+    public void DeleteMatch(int idMatch, int? refMatch = null)
     {
       var match = _matchDAL.Get(new List<Expression<Func<Match, bool>>> { match => match.Id == idMatch })
         .FirstOrDefault() ?? throw new MatchNotFoundException($"Match with id {idMatch} not found");
@@ -443,6 +450,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
           Comission = ev.Comission,
           StartDate = ev.StartDate,
           TeamType = ev.TeamType,
+          Instantiable = ev.Instantiable,
           Sport =  ev.Sports.Select(x => new SportDTO
           {
             Name = x.Name,
@@ -474,7 +482,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         EndDate = endDate,
         Comission = comission,
         TeamType = teamType,
-        Instantiable = true,
+        Instantiable = false,
         Sports = new List<Sport>() { sport }
       };
 
@@ -556,7 +564,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       }).Any();
 
       if (existingSport) throw new NameAlreadyInUseException($"A sport with the name {name} already exists");
-      
+
 
       var newSport = new Sport
       {
@@ -612,7 +620,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       if (existingTeam) throw new NameAlreadyInUseException($"A team with the name {name} already exists");
 
       var sport = _sportDAL.Get(new List<Expression<Func<Sport, bool>>> { x => x.Id == sportId }).FirstOrDefault();
-      
+
       var newTeam = new Team
       {
         Name = name,
@@ -680,7 +688,8 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       return teams.Skip((_page - 1) * _pageSize).Take(_pageSize).ToList();
     }
 
-    public MatchDTO CreateMatch(int eventID, int? firstTeamId, int? secondTeamId, int? firstTeamScore, int? secondTeamScore, int sportId, DateTime date)
+    public MatchDTO CreateMatch(int eventID, int? firstTeamId, int? secondTeamId, int? firstTeamScore, int? secondTeamScore, int sportId, DateTime date,
+      int? refMatch = null)
     {
       Event? eventSearch = _eventDAL.Get(new List<Expression<Func<Event, bool>>>
       {
@@ -860,5 +869,29 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       _page = page != null && page.Value > 0 ? page.Value : _page;
       _pageSize = pageSize != null && pageSize.Value > 0 ? pageSize.Value : _pageSize;
     }
+
+    #region NotImplemented
+
+    public List<EventDTO> GetEvents(int refEventId)
+    {
+      throw new NotImplementedException();
+    }
+
+    public List<MatchDTO> GetMatches(int refMatchId)
+    {
+      throw new NotImplementedException();
+    }
+
+    public Tuple<EventDTO, List<MatchDTO>> InstantiateEvent(EventDTO eventDTO, List<MatchDTO> matches)
+    {
+      throw new NotImplementedException();
+    }
+
+    public void ModifyMatches(int? idFirstTeam, int? idSecondTeam, DateTime? date, int? firstTeamScore, int? secondTeamScore, int? sportId, int? refMatch = null)
+    {
+      throw new NotImplementedException();
+    }
+
+    #endregion
   }
 }

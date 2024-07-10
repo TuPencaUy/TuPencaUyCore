@@ -23,6 +23,19 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       _configuration = configuration;
     }
 
+    public List<SiteDTO> GetSites()
+    {
+      return _siteDAL.Get().Select(x => new SiteDTO
+      {
+        Id = x.Id,
+        Name = x.Name,
+        Domain = x.Domain,
+        ConnectionString = x.ConnectionString,
+        Color = x.Color,
+        AccessType = x.AccessType,
+      }).ToList();
+    }
+
     public SiteDTO GetSiteByDomain(string domain)
     {
       return _siteDAL.Get(new List<Expression<Func<TuPencaUy.Platform.DAO.Models.Site, bool>>> { x => x.Domain == domain })
@@ -87,7 +100,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
 
       if (owner.Sites is null || !owner.Sites.Any()) owner.Sites = new List<TuPencaUy.Platform.DAO.Models.Site>() { newSite };
       else owner.Sites.Add(newSite);
-      
+
       _userDAL.SaveChanges();
 
       return true;
