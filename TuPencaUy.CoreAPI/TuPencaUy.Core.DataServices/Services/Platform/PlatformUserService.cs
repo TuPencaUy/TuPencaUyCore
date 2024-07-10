@@ -129,11 +129,9 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       if (email is not null) dbUser.Email = email;
       if (name is not null) dbUser.Name = name;
       if (password is not null) dbUser.Password = _authLogic.HashPassword(password);
-      if (paypalEmail is not null) dbUser.PaypalEmail = paypalEmail;
 
       if ((email is not null && email != dbUser.Email)
         || (name is not null && name != dbUser.Name)
-        || (paypalEmail is not null && paypalEmail != dbUser.PaypalEmail)
         || (password is not null))
       {
         _userDAL.Update(dbUser);
@@ -146,7 +144,6 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         Email = dbUser.Email,
         Id = dbUser.Id,
         Password = dbUser.Password,
-        PaypalEmail = dbUser.PaypalEmail,
         Role = dbUser.Role == null ? null : new RoleDTO
         {
           Name = dbUser.Role.Name,

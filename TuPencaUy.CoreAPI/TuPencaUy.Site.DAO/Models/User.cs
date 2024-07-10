@@ -6,8 +6,11 @@
   public class User : BaseUser
   {
     [ForeignKey("Role")]
-    [Column("RoleId", Order = 5)]
+    [Column("RoleId", Order = 4)]
     public int? roleId { get; set; }
+
+    [Column("paypalEmail", Order = 5)]
+    public string? PaypalEmail { get; set; }
     public virtual ICollection<Event>? Events { get; set; }
     public virtual ICollection<Bet>? Bets { get; set; }
     public virtual Role? Role { get; set; }

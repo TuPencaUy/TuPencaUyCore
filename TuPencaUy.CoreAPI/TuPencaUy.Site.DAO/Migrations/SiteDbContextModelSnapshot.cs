@@ -275,6 +275,11 @@ namespace TuPencaUy.Site.DAO.Migrations
                     b.Property<DateTime?>("CreationDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("Date")
+                        .HasColumnName("Date")
+                        .HasColumnOrder(5);
+
                     b.Property<int>("Event_id")
                         .HasColumnType("int")
                         .HasColumnName("Event_id")
@@ -520,12 +525,12 @@ namespace TuPencaUy.Site.DAO.Migrations
                     b.Property<string>("PaypalEmail")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("paypalEmail")
-                        .HasColumnOrder(4);
+                        .HasColumnOrder(5);
 
                     b.Property<int?>("roleId")
                         .HasColumnType("int")
                         .HasColumnName("RoleId")
-                        .HasColumnOrder(5);
+                        .HasColumnOrder(4);
 
                     b.HasKey("Email");
 

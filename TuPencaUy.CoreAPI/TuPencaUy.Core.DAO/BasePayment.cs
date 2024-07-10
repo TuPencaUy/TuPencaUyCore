@@ -24,5 +24,8 @@ namespace TuPencaUy.Core.DAO
 
     [Column("TransactionID", Order = 4, TypeName = "varchar")]
     public string TransactionID { get; set; }
+
+    [Column("Date", Order = 5, TypeName = "Date")]
+    public DateTime Date { get; set; }
   }
 }
