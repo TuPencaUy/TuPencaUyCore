@@ -293,6 +293,7 @@ namespace TuPencaUy.Site.DAO.Migrations
 
                     b.Property<string>("TransactionID")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("varchar")
                         .HasColumnName("TransactionID")
                         .HasColumnOrder(4);

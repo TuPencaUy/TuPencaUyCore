@@ -12,8 +12,8 @@ using TuPencaUy.Site.DAO.Models.Data;
 namespace TuPencaUy.Site.DAO.Migrations
 {
     [DbContext(typeof(SiteDbContext))]
-    [Migration("20240710010813_adding-paypal-email")]
-    partial class addingpaypalemail
+    [Migration("20240710221106_add-payment-and-paypal-email")]
+    partial class addpaymentandpaypalemail
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -296,6 +296,7 @@ namespace TuPencaUy.Site.DAO.Migrations
 
                     b.Property<string>("TransactionID")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("varchar")
                         .HasColumnName("TransactionID")
                         .HasColumnOrder(4);

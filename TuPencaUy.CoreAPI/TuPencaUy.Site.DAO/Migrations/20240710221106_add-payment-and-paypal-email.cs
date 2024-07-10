@@ -6,11 +6,18 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TuPencaUy.Site.DAO.Migrations
 {
     /// <inheritdoc />
-    public partial class addingpayments : Migration
+    public partial class addpaymentandpaypalemail : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AddColumn<string>(
+                name: "paypalEmail",
+                table: "User",
+                type: "nvarchar(max)",
+                nullable: true)
+                .Annotation("Relational:ColumnOrder", 5);
+
             migrationBuilder.CreateTable(
                 name: "Payment",
                 columns: table => new
@@ -20,7 +27,8 @@ namespace TuPencaUy.Site.DAO.Migrations
                     Event_id = table.Column<int>(type: "int", nullable: false),
                     User_email = table.Column<string>(type: "varchar(50)", nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(18,0)", nullable: false),
-                    TransactionID = table.Column<string>(type: "varchar", nullable: false),
+                    TransactionID = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
+                    Date = table.Column<DateTime>(type: "Date", nullable: false),
                     Inactive = table.Column<bool>(type: "bit", nullable: false),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LastModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -58,6 +66,10 @@ namespace TuPencaUy.Site.DAO.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Payment");
+
+            migrationBuilder.DropColumn(
+                name: "paypalEmail",
+                table: "User");
         }
     }
 }
