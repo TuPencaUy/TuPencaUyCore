@@ -122,6 +122,8 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
           StartDate = ev.StartDate,
           Instantiable = ev.Instantiable,
           MatchesCount = matchesToInsert.Count(),
+          PrizePercentage = prizePercentage,
+          Price = price,
           TeamType = ev.TeamType,
           Sport = new SportDTO
           {
