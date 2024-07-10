@@ -25,6 +25,7 @@ namespace TuPencaUy.CoreAPI.Controllers.Base
     protected string ObtainTenantFromToken()
     {
       string authHeader = Request.Headers["Authorization"];
+      if (string.IsNullOrEmpty(authHeader)) return null;
 
       var tokenHandler = new JwtSecurityTokenHandler();
       var jwtToken = tokenHandler.ReadJwtToken(authHeader.Split(' ')[1].Trim());
