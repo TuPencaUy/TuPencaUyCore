@@ -127,6 +127,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       site.Domain = siteDTO.Domain;
       site.Color = siteDTO.Color;
       site.AccessType = siteDTO.AccessType;
+      if(siteDTO.PaypalEmail != null) site.PaypalEmail = siteDTO.PaypalEmail;
 
       _siteDAL.Update(site);
       _siteDAL.SaveChanges();

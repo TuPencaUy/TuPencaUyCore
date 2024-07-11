@@ -13,5 +13,6 @@ namespace TuPencaUy.Core.DTOs
     public string ConnectionString { get; set; }
     public SiteAccessTypeEnum? AccessType { get; set; }
     public SiteColorEnum? Color { get; set; }
+    public string? PaypalEmail { get; set; }
   }
 }

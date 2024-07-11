@@ -121,7 +121,8 @@ namespace TuPencaUy.Core.API.Controllers
           Color = site.Color,
           Domain = site.Domain,
           Name = site.Name,
-          Id = siteID
+          Id = siteID,
+          PaypalEmail = site.PaypalEmail
         };
 
         _siteService.UpdateSite(siteDTO);
