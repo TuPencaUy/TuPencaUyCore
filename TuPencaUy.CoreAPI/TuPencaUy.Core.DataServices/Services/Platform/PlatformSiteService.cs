@@ -47,6 +47,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
           ConnectionString = x.ConnectionString,
           Color = x.Color,
           AccessType = x.AccessType,
+          PaypalEmail = x.PaypalEmail,
         })
         .FirstOrDefault() ?? throw new SiteNotFoundException($"No site was found with domain {domain}");
     }
