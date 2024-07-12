@@ -7,6 +7,7 @@ using TuPencaUy.Core.Enums;
 using TuPencaUy.Core.Exceptions;
 using TuPencaUy.DTOs;
 using TuPencaUy.Exceptions;
+using TuPencaUy.Platform.DAO.Models;
 using TuPencaUy.Site.DAO.Models;
 
 namespace TuPencaUy.Core.DataServices.Services.Platform
@@ -236,24 +237,24 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         }
       }
       bool update = false;
-      if (email is not null)
+      if (email is not null && dbUser.Email != email)
       {
         dbUser.Email = email;
         update = true;
       }
-      if (name is not null)
+      if (name is not null && dbUser.Name != name)
       {
         dbUser.Name = name;
         update = true;
       }
       
-      if (password is not null)
+      if (password is not null && dbUser.Password != _authLogic.HashPassword(password, dbUser.Password.Split('$')[0]))
       {
         dbUser.Password = _authLogic.HashPassword(password);
         update = true;
       }
       
-      if (paypalEmail is not null)
+      if (paypalEmail is not null && dbUser.PaypalEmail != paypalEmail)
       {
         dbUser.PaypalEmail = paypalEmail;
         update = true;
