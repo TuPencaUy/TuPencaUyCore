@@ -7,7 +7,6 @@ using TuPencaUy.Core.Enums;
 using TuPencaUy.Core.Exceptions;
 using TuPencaUy.DTOs;
 using TuPencaUy.Exceptions;
-using TuPencaUy.Platform.DAO.Models;
 using TuPencaUy.Site.DAO.Models;
 
 namespace TuPencaUy.Core.DataServices.Services.Platform
@@ -247,7 +246,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         dbUser.Name = name;
         update = true;
       }
-      
+
       if (password is not null && dbUser.Password != _authLogic.HashPassword(password, dbUser.Password.Split('$')[0]))
       {
         dbUser.Password = _authLogic.HashPassword(password);
