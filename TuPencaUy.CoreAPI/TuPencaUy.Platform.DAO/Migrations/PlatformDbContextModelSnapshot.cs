@@ -75,6 +75,11 @@ namespace TuPencaUy.Platform.DAO.Migrations
                         .HasColumnName("EndDate")
                         .HasColumnOrder(3);
 
+                    b.Property<bool>("Finished")
+                        .HasColumnType("bit")
+                        .HasColumnName("Finished")
+                        .HasColumnOrder(6);
+
                     b.Property<bool>("Inactive")
                         .HasColumnType("bit");
 
@@ -128,6 +133,11 @@ namespace TuPencaUy.Platform.DAO.Migrations
                         .HasColumnType("int")
                         .HasColumnName("Event_id")
                         .HasColumnOrder(7);
+
+                    b.Property<bool>("Finished")
+                        .HasColumnType("bit")
+                        .HasColumnName("Finished")
+                        .HasColumnOrder(8);
 
                     b.Property<int?>("FirstTeamScore")
                         .HasColumnType("int")

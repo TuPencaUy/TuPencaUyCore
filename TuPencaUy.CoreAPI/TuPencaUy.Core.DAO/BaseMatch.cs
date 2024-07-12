@@ -34,5 +34,8 @@ namespace TuPencaUy.Core.DAO
     [ForeignKey("Event")]
     [Column("Event_id", Order = 7)]
     public int Event_id { get; set; }
+
+    [Column("Finished", Order = 8)]
+    public bool Finished { get; set; }  
   }
 }

@@ -46,7 +46,7 @@ namespace TuPencaUy.Core.API.Controllers
     }
 
     [HttpGet]
-    public IActionResult GetMatches(int? page, int? pageSize, int? idTeam, int? otherIdTeam, int? eventId, int? sportId, DateTime? fromDate, DateTime? untilDate)
+    public IActionResult GetMatches(int? page, int? pageSize, int? idTeam, int? otherIdTeam, int? eventId, int? sportId, DateTime? fromDate, DateTime? untilDate, bool? finished)
     {
       try
       {
@@ -58,6 +58,7 @@ namespace TuPencaUy.Core.API.Controllers
           sportId,
           fromDate,
           untilDate,
+          finished,
           page, pageSize);
 
         var successResponse = new ApiResponse
@@ -112,7 +113,7 @@ namespace TuPencaUy.Core.API.Controllers
           return BadRequest(new ApiResponse { Error = true, Message = "You must be logged to a central platform" });
         }
 
-        var m = _eventService.ModifyMatch(idMatch, match.FirstTeam, match.SecondTeam, match.Date, match.FirstTeamScore, match.SecondTeamScore, match.Sport);
+        var m = _eventService.ModifyMatch(idMatch, match.FirstTeam, match.SecondTeam, match.Date, match.FirstTeamScore, match.SecondTeamScore, match.Sport, match.Finished);
 
         ManageTenantMatches(idEvent: null, m);
 
@@ -201,6 +202,7 @@ namespace TuPencaUy.Core.API.Controllers
         match.FirstTeamScore,
         match.SecondTeamScore,
         match.Sport.Id.Value,
+        finished: match.Finished ?? false,
         match.Id
         );
     }
