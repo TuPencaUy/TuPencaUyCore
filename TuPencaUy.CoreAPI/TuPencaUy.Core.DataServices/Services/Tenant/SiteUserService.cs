@@ -252,16 +252,16 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         dbUser.Password = _authLogic.HashPassword(password);
         update = true;
       }
-      
+
       if (paypalEmail is not null && dbUser.PaypalEmail != paypalEmail)
       {
         dbUser.PaypalEmail = paypalEmail;
         update = true;
-      }      
+      }
 
       if (update)
       {
-        _userDAL.Update(dbUser);
+        _userDAL.Update(dbUser.Email, dbUser);
         _userDAL.SaveChanges();
       }
 

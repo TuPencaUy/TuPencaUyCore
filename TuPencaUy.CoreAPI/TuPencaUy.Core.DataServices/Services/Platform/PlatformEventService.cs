@@ -795,7 +795,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       int? sportId,
       DateTime? fromDate,
       DateTime? untilDate,
-      bool? finished, 
+      bool? finished,
       int? page, int? pageSize)
     {
       SetPagination(page, pageSize);

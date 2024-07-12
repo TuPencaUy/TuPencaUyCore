@@ -68,12 +68,13 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
           Id = x.Id,
         }).FirstOrDefault();
 
-
+      double prizeAmount = (double)(payment * (1 - (decimal)ev.Comission.Value) * ev.PrizePercentage);
+      double siteRevenueAmount = (double)(payment * (1 - (decimal)ev.Comission.Value) - (decimal) prizeAmount);
       return new EventPaymentDTO
       {
-        PrizeAmount = (double)(payment * ev.PrizePercentage),
+        PrizeAmount = prizeAmount,
         Winner = user,
-        SiteRevenueAmount = (double) (payment * (1 - (decimal) ev.Comission.Value))
+        SiteRevenueAmount = siteRevenueAmount,
       };
     }
     public BetDTO CreateBet(string userEmail, int matchId, int eventId, int firstTeamScore, int secondTeamScore)
@@ -300,7 +301,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
           }
         });
 
-      count = betsQuery.Count(); 
+      count = betsQuery.Count();
 
       return betsQuery.ToList();
     }
@@ -477,7 +478,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       if (bet.ScoreFirstTeam == firstTeamScore && secondTeamScore == bet.ScoreSecondTeam)
       {
         points = exactPoints;
-      } 
+      }
       else if(
         (firstTeamScore > secondTeamScore && bet.ScoreFirstTeam > bet.ScoreSecondTeam) ||
         (firstTeamScore < secondTeamScore && bet.ScoreFirstTeam < bet.ScoreSecondTeam) ||

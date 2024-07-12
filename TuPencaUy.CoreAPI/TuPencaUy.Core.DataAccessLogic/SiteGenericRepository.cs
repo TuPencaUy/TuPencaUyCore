@@ -75,6 +75,17 @@ namespace TuPencaUy.Core.DataAccessLogic
       _context.Entry(entity).State = EntityState.Modified;
     }
 
+    public void Update(object id, TEntity entity)
+    {
+      if (entity is ControlDate controlDateEntity)
+      {
+        controlDateEntity.LastModificationDate = DateTime.Now;
+      }
+
+      var dbEntity = _dbSet.Find(id);
+      _context.Entry(dbEntity).CurrentValues.SetValues(entity);
+    }
+
     public void SaveChanges()
     {
       try
