@@ -16,6 +16,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
     private readonly IGenericRepository<Event> _eventDAL;
     private readonly IGenericRepository<Match> _matchDAL;
     private readonly IGenericRepository<User> _userDAL;
+    private readonly IGenericRepository<Payment> _paymentDAL;
 
     private int _page = 1;
     private int _pageSize = 10;
@@ -24,13 +25,56 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       IGenericRepository<Bet> betDAL,
       IGenericRepository<Event> eventDAL,
       IGenericRepository<Match> matchDAL,
-      IGenericRepository<User> userDAL
+      IGenericRepository<User> userDAL,
+      IGenericRepository<Payment> paymentDAL
       )
     {
       _betDAL = betDAL;
       _eventDAL = eventDAL;
       _matchDAL = matchDAL;
       _userDAL = userDAL;
+      _paymentDAL = paymentDAL;
+    }
+
+    public EventPaymentDTO EndEvent(int eventId)
+    {
+      var ev = _eventDAL.Get([x => x.Id == eventId])
+        .FirstOrDefault() ?? throw new EventNotFoundException($"Not found event with id {eventId}");
+
+      //ev.Finished = true;
+
+      _eventDAL.Update(ev);
+      _eventDAL.SaveChanges();
+
+      var winner = _betDAL.Get([x => x.Event_id == eventId])
+        .GroupBy(x => new { x.User_email })
+        .Select(bet => new
+        {
+          UserEmail = bet.Key.User_email,
+          TotalPoints = bet.Sum(b => b.Points)
+        })
+        .OrderByDescending(bet => bet.TotalPoints)
+        .FirstOrDefault();
+
+      var payment = _paymentDAL.Get([x => x.Event_id == eventId])
+        .Sum(x => x.Amount);
+
+      var user = _userDAL.Get([x => x.Email == winner.UserEmail])
+        .Select(x => new UserDTO
+        {
+          Email = x.Email,
+          PaypalEmail = x.PaypalEmail,
+          Name = x.Name,
+          Id = x.Id,
+        }).FirstOrDefault();
+
+
+      return new EventPaymentDTO
+      {
+        PrizeAmount = (double)(payment * ev.PrizePercentage),
+        Winner = user,
+        SiteRevenueAmount = (double) (payment * (1 - (decimal)ev.Comission.Value))
+      };
     }
     public BetDTO CreateBet(string userEmail, int matchId, int eventId, int firstTeamScore, int secondTeamScore)
     {
