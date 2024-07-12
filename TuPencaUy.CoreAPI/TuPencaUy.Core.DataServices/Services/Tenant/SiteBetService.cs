@@ -41,7 +41,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       var ev = _eventDAL.Get([x => x.Id == eventId])
         .FirstOrDefault() ?? throw new EventNotFoundException($"Not found event with id {eventId}");
 
-      //ev.Finished = true;
+      ev.Finished = true;
 
       _eventDAL.Update(ev);
       _eventDAL.SaveChanges();
@@ -73,7 +73,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       {
         PrizeAmount = (double)(payment * ev.PrizePercentage),
         Winner = user,
-        SiteRevenueAmount = (double) (payment * (1 - (decimal)ev.Comission.Value))
+        SiteRevenueAmount = (double) (payment * (1 - (decimal) ev.Comission.Value))
       };
     }
     public BetDTO CreateBet(string userEmail, int matchId, int eventId, int firstTeamScore, int secondTeamScore)

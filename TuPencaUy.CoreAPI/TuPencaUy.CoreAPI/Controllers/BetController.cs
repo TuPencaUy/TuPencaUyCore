@@ -41,7 +41,7 @@ namespace TuPencaUy.Core.API.Controllers
         _serviceFactory.CreatePlatformServices();
         var site = _serviceFactory.GetService<ISiteService>().GetSiteByDomain(tenant);
 
-        //payment.SitePaypalEmail = site.Pa
+        payment.SitePaypalEmail = site.PaypalEmail;
 
         return Ok(new ApiResponse
         {
