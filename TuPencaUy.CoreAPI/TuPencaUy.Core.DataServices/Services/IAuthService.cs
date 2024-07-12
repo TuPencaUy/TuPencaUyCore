@@ -4,8 +4,8 @@
 
   public interface IAuthService
   {
-    UserDTO? SignUp(string email, string password, string name);
-    UserDTO? Authenticate(string email, string password);
-    UserDTO? Authenticate(string token);
+    UserDTO? SignUp(string email, string password, string name, bool? auth = false);
+    UserDTO? Authenticate(string email, string password, bool? auth = false);
+    UserDTO? Authenticate(string token, bool? auth = false);
   }
 }

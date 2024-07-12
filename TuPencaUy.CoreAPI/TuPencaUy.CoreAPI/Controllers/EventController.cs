@@ -1,15 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using TuPencaUy.Core.API.Model.Requests;
 using TuPencaUy.Core.API.Model.Responses;
 using TuPencaUy.Core.DataServices;
 using TuPencaUy.Core.DataServices.Services;
-using TuPencaUy.Core.DTOs;
 using TuPencaUy.Core.Enums;
 using TuPencaUy.CoreAPI.Controllers.Base;
-using TuPencaUy.DTOs;
 
 namespace TuPencaUy.Core.API.Controllers
 {
@@ -27,7 +24,7 @@ namespace TuPencaUy.Core.API.Controllers
     }
 
     [HttpPost("InstantiateEvent")]
-    public IActionResult InstantiateEvent([Required] int eventId)
+    public IActionResult InstantiateEvent([Required] int eventId, [Required] int price, [Required] decimal prizePercentage)
     {
       try
       {
@@ -49,6 +46,7 @@ namespace TuPencaUy.Core.API.Controllers
           sportId: null,
           fromDate: null,
           untilDate: null,
+          finished: null,
           page: null,
           pageSize: int.MaxValue);
 
@@ -56,7 +54,7 @@ namespace TuPencaUy.Core.API.Controllers
 
         _serviceFactory.CreateTenantServices(connStringTennant);
 
-        var newEvent = _serviceFactory.GetService<IEventService>().InstantiateEvent(searchedEvent, searchedMatches);
+        var newEvent = _serviceFactory.GetService<IEventService>().InstantiateEvent(searchedEvent, searchedMatches, price, prizePercentage);
 
         var data = new { Event = newEvent.Item1, Matches = newEvent.Item2 };
 

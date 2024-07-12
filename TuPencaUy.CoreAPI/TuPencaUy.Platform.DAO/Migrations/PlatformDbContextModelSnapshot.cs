@@ -17,7 +17,7 @@ namespace TuPencaUy.Platform.DAO.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -75,6 +75,11 @@ namespace TuPencaUy.Platform.DAO.Migrations
                         .HasColumnName("EndDate")
                         .HasColumnOrder(3);
 
+                    b.Property<bool>("Finished")
+                        .HasColumnType("bit")
+                        .HasColumnName("Finished")
+                        .HasColumnOrder(6);
+
                     b.Property<bool>("Inactive")
                         .HasColumnType("bit");
 
@@ -128,6 +133,11 @@ namespace TuPencaUy.Platform.DAO.Migrations
                         .HasColumnType("int")
                         .HasColumnName("Event_id")
                         .HasColumnOrder(7);
+
+                    b.Property<bool>("Finished")
+                        .HasColumnType("bit")
+                        .HasColumnName("Finished")
+                        .HasColumnOrder(8);
 
                     b.Property<int?>("FirstTeamScore")
                         .HasColumnType("int")
@@ -287,6 +297,9 @@ namespace TuPencaUy.Platform.DAO.Migrations
                         .HasColumnType("varchar")
                         .HasColumnName("Name")
                         .HasColumnOrder(1);
+
+                    b.Property<string>("PaypalEmail")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserEmail")
                         .HasColumnType("varchar(50)");

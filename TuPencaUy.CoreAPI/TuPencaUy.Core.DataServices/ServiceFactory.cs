@@ -67,6 +67,7 @@ namespace TuPencaUy.Core.DataServices
       _serviceCollection.AddScoped<IUserService, PlatformUserService>();
       _serviceCollection.AddScoped<ISiteService, PlatformSiteService>();
       _serviceCollection.AddScoped<IEventService, PlatformEventService>();
+      _serviceCollection.AddScoped<IAnalyticsService, PlatformAnalyticsService>();
     }
 
     public void CreateTenantServices(string connectionString)
@@ -88,6 +89,9 @@ namespace TuPencaUy.Core.DataServices
       _serviceCollection.AddScoped<IUserService, SiteUserService>();
       _serviceCollection.AddScoped<IEventService, SiteEventService>();
       _serviceCollection.AddScoped<IBetService, SiteBetService>();
+      _serviceCollection.AddScoped<IAccessRequestService, SiteAccessRequestService>();
+      _serviceCollection.AddScoped<IPaymentService, SitePaymentService>();
+      _serviceCollection.AddScoped<IAnalyticsService, SiteAnalyticsService>();
     }
   }
 }

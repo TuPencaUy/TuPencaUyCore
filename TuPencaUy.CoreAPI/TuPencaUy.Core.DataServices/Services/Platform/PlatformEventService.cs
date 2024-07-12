@@ -27,6 +27,10 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       _teamDAL = teamDAL;
       _matchDAL = matchDAL;
     }
+    public Tuple<EventDTO, List<MatchDTO>> InstantiateEvent(EventDTO eventDTO, List<MatchDTO> matches, int price, decimal prizePercentage)
+    {
+      throw new NotImplementedException();
+    }
 
     public MatchDTO ModifyMatch(
       int idMatch,
@@ -35,12 +39,20 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       DateTime? date,
       int? firstTeamScore,
       int? secondTeamScore,
-      int? sportId, int? refMatch = null)
+      int? sportId,
+      bool? finished,
+      int? refMatch = null)
     {
       var originMatch = _matchDAL.Get(new List<Expression<Func<Match, bool>>> { x => x.Id == idMatch })
         .FirstOrDefault() ?? throw new MatchNotFoundException($"Match with id {idMatch} not found");
 
       bool modified = false;
+
+      if (finished != null && finished != originMatch.Finished)
+      {
+        originMatch.Finished = finished.Value;
+        modified = modified || true;
+      }
 
       if (idFirstTeam != null && idFirstTeam != originMatch.FirstTeam_id)
       {
@@ -89,6 +101,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
 
       return new MatchDTO
       {
+        Finished = originMatch.Finished,
         Id = idMatch,
         FirstTeam = originMatch.FirstTeam != null ? new TeamDTO
         {
@@ -357,6 +370,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         .Get(new List<Expression<Func<Match, bool>>> { match => match.Id == idMatch })?
         .Select(match => new MatchDTO
         {
+          Finished = match.Finished,
           Id = match.Id,
           FirstTeam = match.FirstTeam != null ? new TeamDTO
           {
@@ -713,6 +727,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         FirstTeamScore = firstTeamScore,
         SecondTeamScore = secondTeamScore,
         Date = date,
+        Finished = false,
       };
 
       if(eventSearch.Matches == null)
@@ -726,6 +741,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
 
       return new MatchDTO
       {
+        Finished = newMatch.Finished,
         Id = newMatch.Id,
         FirstTeam = firstTeam != null ? new TeamDTO
         {
@@ -779,6 +795,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       int? sportId,
       DateTime? fromDate,
       DateTime? untilDate,
+      bool? finished,
       int? page, int? pageSize)
     {
       SetPagination(page, pageSize);
@@ -789,6 +806,9 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
 
       if (fromDate != null) conditions.Add(x => x.Date >= fromDate);
       if (untilDate != null) conditions.Add(x => x.Date <= fromDate);
+
+
+      if (finished != null) conditions.Add(x => x.Finished == finished.Value);
 
       if (idTeam != null && otherIdTeam != null && idTeam != otherIdTeam)
       {
@@ -811,6 +831,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       IQueryable<MatchDTO> matches = _matchDAL.Get(conditions)
         .Select(match => new MatchDTO
         {
+          Finished = match.Finished,
           Id = match.Id,
           FirstTeam = match.FirstTeam != null ? new TeamDTO
           {
@@ -883,7 +904,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       throw new NotImplementedException();
     }
 
-    public void ModifyMatches(int? idFirstTeam, int? idSecondTeam, DateTime? date, int? firstTeamScore, int? secondTeamScore, int? sportId, int? refMatch = null)
+    public void ModifyMatches(int? idFirstTeam, int? idSecondTeam, DateTime? date, int? firstTeamScore, int? secondTeamScore, int? sportId, bool? finished, int? refMatch = null)
     {
       throw new NotImplementedException();
     }

@@ -25,6 +25,7 @@ namespace TuPencaUy.CoreAPI.Controllers.Base
     protected string ObtainTenantFromToken()
     {
       string authHeader = Request.Headers["Authorization"];
+      if (string.IsNullOrEmpty(authHeader)) return null;
 
       var tokenHandler = new JwtSecurityTokenHandler();
       var jwtToken = tokenHandler.ReadJwtToken(authHeader.Split(' ')[1].Trim());
@@ -36,22 +37,13 @@ namespace TuPencaUy.CoreAPI.Controllers.Base
     protected IActionResult ManageException(Exception ex)
     {
       var errorResponse = new ApiResponse();
-
-      if (ex is NotFoundException)
-      {
-        errorResponse.Error = true;
-        errorResponse.Message = ex.Message;
-        return StatusCode((int)HttpStatusCode.NotFound, errorResponse);
-      }
-
-      if(ex is BadRequestException)
-      {
-        errorResponse.Error = true;
-        errorResponse.Message = ex.Message;
-        return StatusCode((int)HttpStatusCode.BadRequest, errorResponse);
-      }
-
       errorResponse.Error = true;
+      errorResponse.Message = ex.Message;
+
+      if (ex is NotFoundException) return StatusCode((int)HttpStatusCode.NotFound, errorResponse);
+      if(ex is BadRequestException) return StatusCode((int)HttpStatusCode.BadRequest, errorResponse);
+      if (ex is UnauthorizedException) return StatusCode((int)HttpStatusCode.Unauthorized, errorResponse);
+
       errorResponse.Message = "An internal error has occurred";
       return StatusCode((int)HttpStatusCode.InternalServerError, errorResponse);
     }

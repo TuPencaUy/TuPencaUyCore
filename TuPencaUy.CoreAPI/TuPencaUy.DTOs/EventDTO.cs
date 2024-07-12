@@ -14,5 +14,7 @@ namespace TuPencaUy.Core.DTOs
     public int MatchesCount { get; set; }
     public int? ReferenceEvent { get; set; }
     public SportDTO? Sport { get; set; }
+    public int? Price { get; set; }
+    public decimal? PrizePercentage { get; set; }
   }
 }

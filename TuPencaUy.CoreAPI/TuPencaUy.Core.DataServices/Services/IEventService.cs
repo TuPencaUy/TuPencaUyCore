@@ -5,7 +5,7 @@ namespace TuPencaUy.Core.DataServices.Services
 {
   public interface IEventService
   {
-    Tuple<EventDTO, List<MatchDTO>> InstantiateEvent(EventDTO eventDTO, List<MatchDTO> matches);
+    Tuple<EventDTO, List<MatchDTO>> InstantiateEvent(EventDTO eventDTO, List<MatchDTO> matches, int price, decimal prizePercentage);
     EventDTO CreateEvent(
       string name,
       DateTime? startDate,
@@ -48,6 +48,7 @@ namespace TuPencaUy.Core.DataServices.Services
       int? sportId,
       DateTime? fromDate,
       DateTime? untilDate,
+      bool? finished,
       int? page, int? pageSize);
 
     List<MatchDTO> GetMatches(int refMatchId);
@@ -67,6 +68,7 @@ namespace TuPencaUy.Core.DataServices.Services
       int? firstTeamScore,
       int? secondTeamScore,
       int? sportId,
+      bool? finished,
       int? refMatch = null);
     void ModifyMatches(
       int? idFirstTeam,
@@ -75,6 +77,7 @@ namespace TuPencaUy.Core.DataServices.Services
       int? firstTeamScore,
       int? secondTeamScore,
       int? sportId,
+      bool? finished,
       int? refMatch = null);
     TeamDTO ModifyTeam(
       int idTeam,

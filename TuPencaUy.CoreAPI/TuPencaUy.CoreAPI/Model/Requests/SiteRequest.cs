@@ -12,5 +12,6 @@ namespace TuPencaUy.Core.API.Model.Requests
     public required string Domain { get; set; }
     public SiteAccessTypeEnum? AccessType { get; set; }
     public SiteColorEnum? Color { get; set; }
+    public string? PaypalEmail { get; set; }
   }
 }

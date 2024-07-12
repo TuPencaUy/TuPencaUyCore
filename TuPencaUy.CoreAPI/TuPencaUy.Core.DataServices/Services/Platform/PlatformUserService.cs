@@ -109,7 +109,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       return true;
     }
 
-    public UserDTO ModifyUser(int userId, string? email, string? name, string? password)
+    public UserDTO ModifyUser(int userId, string? email, string? name, string? password, string? paypalEmail)
     {
       var dbUser = _userDAL.Get(new List<Expression<Func<User, bool>>> { user => user.Id == userId })
         .FirstOrDefault() ?? throw new UserNotFoundException();
@@ -126,11 +126,11 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         }
       }
 
-      if(email is not null) dbUser.Email = email;
-      if(name is not null) dbUser.Name = name;
-      if(password is not null) dbUser.Password = _authLogic.HashPassword(password);
+      if (email is not null) dbUser.Email = email;
+      if (name is not null) dbUser.Name = name;
+      if (password is not null) dbUser.Password = _authLogic.HashPassword(password);
 
-      if((email is not null && email != dbUser.Email)
+      if ((email is not null && email != dbUser.Email)
         || (name is not null && name != dbUser.Name)
         || (password is not null))
       {

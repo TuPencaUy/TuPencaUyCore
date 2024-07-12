@@ -24,5 +24,6 @@ namespace TuPencaUy.Platform.DAO.Models
     public required string ConnectionString { get; set; }
     public SiteAccessTypeEnum? AccessType { get; set; }
     public SiteColorEnum? Color { get; set; }
+    public string? PaypalEmail { get; set; }
   }
 }

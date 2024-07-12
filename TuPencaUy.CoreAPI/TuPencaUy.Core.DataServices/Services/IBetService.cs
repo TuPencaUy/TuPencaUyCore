@@ -13,5 +13,7 @@ namespace TuPencaUy.Core.DataServices.Services
     void DeleteBet(string userEmail, int matchId, int eventId);
 
     void UpdatePoints(string userEmail, int matchId, int eventId);
+
+    EventPaymentDTO EndEvent(int eventId);
   }
 }

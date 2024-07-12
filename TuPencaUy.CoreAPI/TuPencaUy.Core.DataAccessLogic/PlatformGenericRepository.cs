@@ -76,6 +76,11 @@ namespace TuPencaUy.Core.DataAccessLogic
       _context.Entry(entity).State = EntityState.Modified;
     }
 
+    public void Update(object id, TEntity entity)
+    {
+      throw new NotImplementedException();
+    }
+
     public void SaveChanges()
     {
       try

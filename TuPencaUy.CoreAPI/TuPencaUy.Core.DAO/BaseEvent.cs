@@ -26,6 +26,9 @@ namespace TuPencaUy.Core.DAO
 
     [Column("Instantiable", Order = 5, TypeName = "bit")]
     public required bool Instantiable { get; set; } = true;
+
+    [Column("Finished", Order = 6, TypeName = "bit")]
+    public bool Finished { get; set; } = false;
     public TeamTypeEnum? TeamType { get; set; }
   }
 }

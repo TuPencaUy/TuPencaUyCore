@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
@@ -16,7 +17,43 @@ namespace TuPencaUy.Core.API.Controllers
   public class BetController : BaseController
   {
     private readonly IBetService _betService;
-    public BetController(IServiceFactory serviceFactory) => _betService = serviceFactory.GetService<IBetService>();
+    private readonly IServiceFactory _serviceFactory;
+    public BetController(IServiceFactory serviceFactory)
+    {
+      _serviceFactory = serviceFactory;
+      _betService = serviceFactory.GetService<IBetService>();
+    }
+
+
+    [HttpPost("EndEvent/{idEvent}")]
+    public IActionResult EndEvent([Required] int idEvent)
+    {
+      try
+      {
+        var tenant = ObtainTenantFromToken();
+        if (string.IsNullOrEmpty(tenant))
+        {
+          return BadRequest(new ApiResponse { Error = true, Message = "You must be logged to a tenant" });
+        }
+
+        var payment = _betService.EndEvent(idEvent);
+
+        _serviceFactory.CreatePlatformServices();
+        var site = _serviceFactory.GetService<ISiteService>().GetSiteByDomain(tenant);
+
+        payment.SitePaypalEmail = site.PaypalEmail;
+
+        return Ok(new ApiResponse
+        {
+          Data = payment,
+          Message = "Event ended"
+        });
+      }
+      catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
+    }
 
     [HttpGet]
     public IActionResult Get(int? page, int? pageSize, string? userEmail, int? matchId, int? eventId)

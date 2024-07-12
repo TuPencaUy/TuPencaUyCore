@@ -219,7 +219,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       return true;
     }
 
-    public UserDTO ModifyUser(int userId, string? email, string? name, string? password)
+    public UserDTO ModifyUser(int userId, string? email, string? name, string? password, string? paypalEmail)
     {
       var dbUser = _userDAL.Get(new List<Expression<Func<User, bool>>> { user => user.Id == userId })
         .FirstOrDefault() ?? throw new UserNotFoundException();
@@ -235,16 +235,33 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
           throw new EmailAlreadyInUseException($"The email {email} is already in use");
         }
       }
-
-      if (email is not null) dbUser.Email = email;
-      if (name is not null) dbUser.Name = name;
-      if (password is not null) dbUser.Password = _authLogic.HashPassword(password);
-
-      if ((email is not null && email != dbUser.Email)
-        || (name is not null && name != dbUser.Name)
-        || (password is not null))
+      bool update = false;
+      if (email is not null && dbUser.Email != email)
       {
-        _userDAL.Update(dbUser);
+        dbUser.Email = email;
+        update = true;
+      }
+      if (name is not null && dbUser.Name != name)
+      {
+        dbUser.Name = name;
+        update = true;
+      }
+
+      if (password is not null && dbUser.Password != _authLogic.HashPassword(password, dbUser.Password.Split('$')[0]))
+      {
+        dbUser.Password = _authLogic.HashPassword(password);
+        update = true;
+      }
+
+      if (paypalEmail is not null && dbUser.PaypalEmail != paypalEmail)
+      {
+        dbUser.PaypalEmail = paypalEmail;
+        update = true;
+      }
+
+      if (update)
+      {
+        _userDAL.Update(dbUser.Email, dbUser);
         _userDAL.SaveChanges();
       }
 
@@ -254,6 +271,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         Email = dbUser.Email,
         Id = dbUser.Id,
         Password = dbUser.Password,
+        PaypalEmail = dbUser.PaypalEmail,
         Role = dbUser.Role == null ? null : new RoleDTO
         {
           Name = dbUser.Role.Name,
