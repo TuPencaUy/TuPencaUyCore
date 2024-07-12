@@ -235,16 +235,31 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
           throw new EmailAlreadyInUseException($"The email {email} is already in use");
         }
       }
+      bool update = false;
+      if (email is not null)
+      {
+        dbUser.Email = email;
+        update = true;
+      }
+      if (name is not null)
+      {
+        dbUser.Name = name;
+        update = true;
+      }
+      
+      if (password is not null)
+      {
+        dbUser.Password = _authLogic.HashPassword(password);
+        update = true;
+      }
+      
+      if (paypalEmail is not null)
+      {
+        dbUser.PaypalEmail = paypalEmail;
+        update = true;
+      }      
 
-      if (email is not null) dbUser.Email = email;
-      if (name is not null) dbUser.Name = name;
-      if (password is not null) dbUser.Password = _authLogic.HashPassword(password);
-      if (paypalEmail is not null) dbUser.PaypalEmail = paypalEmail;
-
-      if ((email is not null && email != dbUser.Email)
-        || (name is not null && name != dbUser.Name)
-        || (paypalEmail is not null && paypalEmail != dbUser.PaypalEmail)
-        || (password is not null))
+      if (update)
       {
         _userDAL.Update(dbUser);
         _userDAL.SaveChanges();
