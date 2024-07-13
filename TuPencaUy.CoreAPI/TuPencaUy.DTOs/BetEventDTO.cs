@@ -10,19 +10,37 @@ namespace TuPencaUy.Core.DTOs
   {
     public string EventName { get; set; }
     public int UsersCount { get; set; }
-    public decimal Prize { get; set; }
+    public decimal Prize
+    {
+      get
+      {
+        return TotalAmount * (1 - EventComission) * EventPrizePercentage;
+      }
+    }
     public bool Finished { get; set; }
-    public decimal AmountCollected { get; set; }  
+    public decimal EventComission { get; set; }
+    public decimal EventPrizePercentage { get; set; }
+    public decimal TotalAmount { get; set; }
+    public decimal AmountCollected
+    {
+      get
+      {
+        return TotalAmount * (1 - EventComission) * (1 - EventPrizePercentage);
+      }
+    }
     public int TotalBets { get; set; }
     public int TotalHits { get; set; }
     public int TotalPartialHits { get; set; }
-    public int TotalErrors {
+    public int OpenBets { get; set; }
+    public int TotalErrors
+    {
       get
       {
         if (TotalBets == 0) return 0;
-        return TotalBets - TotalHits - TotalPartialHits; 
+        return TotalBets - TotalHits - TotalPartialHits - OpenBets;
       }
     }
+
     public decimal HitsPercentage
     {
       get

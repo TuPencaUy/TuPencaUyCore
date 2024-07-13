@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using Microsoft.Extensions.Configuration;
+using System.Linq.Expressions;
 using TuPencaUy.Core.DataAccessLogic;
 using TuPencaUy.Core.DTOs;
 using TuPencaUy.Core.Exceptions;
@@ -14,9 +15,9 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
     private int _page = 1;
     private int _pageSize = 10;
 
-    public PlatformAnalyticsService(IServiceFactory serviceFactory, IGenericRepository<Event> eventDAL)
+    public PlatformAnalyticsService(IConfiguration configuration, IGenericRepository<Event> eventDAL)
     {
-      _serviceFactory = serviceFactory;
+      _serviceFactory = new ServiceFactory(configuration);
       _eventDAL = eventDAL;
     }
 
