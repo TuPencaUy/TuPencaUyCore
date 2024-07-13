@@ -878,6 +878,8 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
 
       count = matches.Count();
 
+      if (int.MaxValue == pageSize && int.MaxValue == page) return matches.ToList();
+
       return matches.Skip((_page - 1) * _pageSize).Take(_pageSize).ToList();
     }
 
