@@ -37,7 +37,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
 
       IQueryable<BetUserDTO> betUsers = _betDAL
         .Get([bet => bet.Event_id == eventId && bet.Match.Finished])
-        .GroupBy(bet => new { bet.User.Name , bet.User_email })
+        .GroupBy(bet => new { bet.User.Name, bet.User_email })
         .Select(x => new BetUserDTO
         {
           Name = x.Key.Name,
@@ -64,18 +64,19 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
         {
           bet.Event_id,
           bet.Event.Name,
-          bet.Event.Comission,
           bet.Event.PrizePercentage,
           bet.Event.Price,
         })
         .Select(x => new BetEventDTO
         {
           EventName = x.Key.Name,
-          AmountCollected = x.First().Event.Payments.Sum(p => p.Amount) * (decimal)(1 - x.Key.Comission) * (decimal)(1 - x.Key.PrizePercentage),
+          TotalAmount = x.First().Event.Payments.Sum(p => p.Amount),
+          EventComission = (decimal)x.First().Event.Comission,
+          EventPrizePercentage = x.Key.PrizePercentage,
           TotalBets = x.Count(),
+          OpenBets = x.Count(b => !b.Match.Finished),
           TotalHits = x.Count(bet => bet.Points == bet.Event.Sports.First().ExactPoints),
           TotalPartialHits = x.Count(bet => bet.Points == bet.Event.Sports.First().PartialPoints),
-          Prize = x.First().Event.Payments.Sum(p => p.Amount) * (decimal)(1 - x.Key.Comission) * x.Key.PrizePercentage,
           UsersCount = x.First(bet => bet.Event_id == x.Key.Event_id).Event.Users.Count(),
           Finished = x.First(bet => bet.Event_id == x.Key.Event_id).Event.Finished,
         }).ToList();
@@ -87,7 +88,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
     {
       var conditions = new List<Expression<Func<Bet, bool>>>();
 
-      if(matchId != null) conditions.Add(x => x.Match_id == matchId);
+      if (matchId != null) conditions.Add(x => x.Match_id == matchId);
 
       var matchBets = _betDAL.Get(conditions)
         .GroupBy(bet => new
