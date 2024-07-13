@@ -10,6 +10,7 @@ namespace TuPencaUy.Site.DAO.Models
     public virtual ICollection<Match>? Matches { get; set; }
     public virtual ICollection<User>? Users { get; set; }
     public virtual ICollection<Bet>? Bets { get; set; }
+    public virtual ICollection<Payment>? Payments { get; set; }
     public virtual int RefEvent { get; set; }
   }
 }
