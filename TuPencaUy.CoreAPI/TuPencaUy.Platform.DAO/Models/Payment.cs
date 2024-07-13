@@ -10,9 +10,9 @@ namespace TuPencaUy.Platform.DAO.Models
 
     [ForeignKey("Site")]
     [Column("Site_id", Order = 5, TypeName = "int")]
-    public int Site_id { get; set; }
+    public int? Site_id { get; set; }
 
     public virtual required Event Event { get; set; }
-    public virtual required Site Site { get; set; }
+    public virtual Site? Site { get; set; }
   }
 }

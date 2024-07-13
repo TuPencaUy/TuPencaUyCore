@@ -76,7 +76,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       return paymentsQuery.ToList();
     }
 
-    public PaymentDTO CreatePayment(string userEmail, int eventId, decimal amount, string transactionID)
+    public PaymentDTO CreatePayment(string userEmail, int eventId, decimal amount, string transactionID, int? siteId = null)
     {
       var existingPayment = _paymentDAL.Get(new List<Expression<Func<Payment, bool>>> { x => x.Event_id == eventId && x.User_email == userEmail }).Any();
       if (existingPayment) throw new PaymentAlreadyExists($"Payment already exists with event_id: {eventId}, user_email: {userEmail}");
