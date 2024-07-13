@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using TuPencaUy.Core.DAO;
 
 namespace TuPencaUy.Platform.DAO.Models
@@ -6,6 +7,7 @@ namespace TuPencaUy.Platform.DAO.Models
   public class Payment : BasePayment
   {
     [Column("User_email", Order = 4, TypeName = "varchar")]
+    [MaxLength(100)]
     public string User_email { get; set; }
 
     [ForeignKey("Site")]
