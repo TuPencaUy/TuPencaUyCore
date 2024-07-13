@@ -183,6 +183,60 @@ namespace TuPencaUy.Platform.DAO.Migrations
                     b.ToTable("Match", (string)null);
                 });
 
+            modelBuilder.Entity("TuPencaUy.Platform.DAO.Models.Payout", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal")
+                        .HasColumnName("Amount")
+                        .HasColumnOrder(3);
+
+                    b.Property<DateTime?>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Event_id")
+                        .HasColumnType("int")
+                        .HasColumnName("Event_id")
+                        .HasColumnOrder(5);
+
+                    b.Property<bool>("Inactive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastModificationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaypalEmail")
+                        .IsRequired()
+                        .HasColumnType("varchar")
+                        .HasColumnName("PaypalEmail")
+                        .HasColumnOrder(2);
+
+                    b.Property<int>("Site_id")
+                        .HasColumnType("int")
+                        .HasColumnName("Site_id")
+                        .HasColumnOrder(1);
+
+                    b.Property<string>("TransactionID")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar")
+                        .HasColumnName("TransactionID")
+                        .HasColumnOrder(4);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Event_id");
+
+                    b.ToTable("Payout", (string)null);
+                });
+
             modelBuilder.Entity("TuPencaUy.Platform.DAO.Models.Permission", b =>
                 {
                     b.Property<int>("Id")
@@ -510,6 +564,17 @@ namespace TuPencaUy.Platform.DAO.Migrations
                     b.Navigation("SecondTeam");
 
                     b.Navigation("Sport");
+                });
+
+            modelBuilder.Entity("TuPencaUy.Platform.DAO.Models.Payout", b =>
+                {
+                    b.HasOne("TuPencaUy.Platform.DAO.Models.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("Event_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
                 });
 
             modelBuilder.Entity("TuPencaUy.Platform.DAO.Models.Site", b =>
