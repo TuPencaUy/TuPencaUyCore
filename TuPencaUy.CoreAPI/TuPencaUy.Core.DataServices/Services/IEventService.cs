@@ -10,7 +10,7 @@ namespace TuPencaUy.Core.DataServices.Services
       string name,
       DateTime? startDate,
       DateTime? endDate,
-      float? comission,
+      decimal? comission,
       TeamTypeEnum? teamType,
       int sportId);
     List<EventDTO> GetEvents(
@@ -96,7 +96,7 @@ namespace TuPencaUy.Core.DataServices.Services
       string? name,
       DateTime? startDate,
       DateTime? endTime,
-      float? comission,
+      decimal? comission,
       TeamTypeEnum? teamType,
       bool? instantiable);
   }

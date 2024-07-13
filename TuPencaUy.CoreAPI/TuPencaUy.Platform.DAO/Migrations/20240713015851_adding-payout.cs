@@ -3,73 +3,51 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace TuPencaUy.Site.DAO.Migrations
+namespace TuPencaUy.Platform.DAO.Migrations
 {
     /// <inheritdoc />
-    public partial class addpaymentandpaypalemail : Migration
+    public partial class addingpayout : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "paypalEmail",
-                table: "User",
-                type: "nvarchar(max)",
-                nullable: true)
-                .Annotation("Relational:ColumnOrder", 5);
-
             migrationBuilder.CreateTable(
-                name: "Payment",
+                name: "Payout",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Event_id = table.Column<int>(type: "int", nullable: false),
-                    User_email = table.Column<string>(type: "varchar(50)", nullable: false),
+                    Site_id = table.Column<int>(type: "int", nullable: false),
+                    PaypalEmail = table.Column<string>(type: "varchar", nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(18,0)", nullable: false),
                     TransactionID = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
-                    Date = table.Column<DateTime>(type: "Date", nullable: false),
+                    Event_id = table.Column<int>(type: "int", nullable: false),
                     Inactive = table.Column<bool>(type: "bit", nullable: false),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LastModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Payment", x => x.Id);
+                    table.PrimaryKey("PK_Payout", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Payment_Event_Event_id",
+                        name: "FK_Payout_Event_Event_id",
                         column: x => x.Event_id,
                         principalTable: "Event",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Payment_User_User_email",
-                        column: x => x.User_email,
-                        principalTable: "User",
-                        principalColumn: "Email",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Payment_Event_id",
-                table: "Payment",
+                name: "IX_Payout_Event_id",
+                table: "Payout",
                 column: "Event_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Payment_User_email",
-                table: "Payment",
-                column: "User_email");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Payment");
-
-            migrationBuilder.DropColumn(
-                name: "paypalEmail",
-                table: "User");
+                name: "Payout");
         }
     }
 }

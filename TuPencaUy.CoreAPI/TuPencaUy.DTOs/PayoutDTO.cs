@@ -2,13 +2,13 @@
 
 namespace TuPencaUy.Core.DTOs
 {
-  public class PaymentDTO
+  public class PayoutDTO
   {
     public int? Id { get; set; }
     public EventDTO Event { get; set; }
-    public UserDTO User { get; set; }
     public decimal? Amount { get; set; }
     public string? TransactionID { get; set; }
-    public string? User_email { get; set; }
+    public string? PaypalEmail { get; set; }
+    public SiteDTO SiteDTO { get; set; }
   }
 }

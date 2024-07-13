@@ -34,7 +34,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 
 //To run migrations
-builder.Services.AddDbContext<PlatformDbContext>(options =>
+builder.Services.AddDbContext<SiteDbContext>(options =>
 {
   options.UseSqlServer(builder.Configuration.GetConnectionString("Platform"))
   .LogTo(s => System.Diagnostics.Debug.WriteLine(s)); // To log queries

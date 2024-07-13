@@ -13,7 +13,12 @@ namespace TuPencaUy.Core.API.Controllers
   public class PaymentController : BaseController
   {
     private readonly IPaymentService _paymentService;
-    public PaymentController(IServiceFactory serviceFactory) => _paymentService = serviceFactory.GetService<IPaymentService>();
+    private readonly IServiceFactory _serviceFactory;
+
+    public PaymentController(IServiceFactory serviceFactory){
+      _paymentService = serviceFactory.GetService<IPaymentService>();
+      _serviceFactory = serviceFactory;
+     }
 
     [HttpPost]
     public IActionResult Create([FromBody] CreatePaymentRequest paymentRequest)
@@ -25,6 +30,17 @@ namespace TuPencaUy.Core.API.Controllers
           paymentRequest.EventId,
           paymentRequest.Amount,
           paymentRequest.TransactionID);
+
+        _serviceFactory.CreatePlatformServices();
+        ISiteService siteService = _serviceFactory.GetService<ISiteService>();
+        int siteId = siteService.GetSiteByDomain(ObtainTenantFromToken()).Id;
+
+        _serviceFactory.GetService<IPaymentService>().CreatePayment(
+          paymentRequest.UserEmail,
+          payment.Event.ReferenceEvent.Value,
+          paymentRequest.Amount,
+          paymentRequest.TransactionID,
+          siteId);
 
         return StatusCode((int)HttpStatusCode.Created, new ApiResponse { Data = payment, Message = "Payment created" });
       }

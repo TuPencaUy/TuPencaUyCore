@@ -261,7 +261,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       string? name,
       DateTime? startDate,
       DateTime? endTime,
-      float? comission,
+      decimal? comission,
       TeamTypeEnum? teamType,
       bool? instantiable)
     {
@@ -473,7 +473,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         }).FirstOrDefault() ?? throw new EventNotFoundException($"Event with id {idEvent} not found");
     }
 
-    public EventDTO CreateEvent(string name, DateTime? startDate, DateTime? endDate, float? comission, TeamTypeEnum? teamType, int sportId)
+    public EventDTO CreateEvent(string name, DateTime? startDate, DateTime? endDate, decimal? comission, TeamTypeEnum? teamType, int sportId)
     {
       var existingEvent = _eventDAL.Get(new List<Expression<Func<Event, bool>>>
       {

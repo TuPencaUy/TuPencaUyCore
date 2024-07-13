@@ -21,8 +21,8 @@ namespace TuPencaUy.Core.DAO
     [Column("EndDate", Order = 3, TypeName = "DateTime")]
     public required DateTime? EndDate { get; set; }
 
-    [Column("Comission", Order = 4, TypeName = "float")]
-    public required float? Comission { get; set; }
+    [Column("Comission", Order = 4, TypeName = "decimal(18,2)")]
+    public required decimal? Comission { get; set; }
 
     [Column("Instantiable", Order = 5, TypeName = "bit")]
     public required bool Instantiable { get; set; } = true;

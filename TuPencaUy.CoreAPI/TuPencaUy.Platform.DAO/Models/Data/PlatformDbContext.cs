@@ -16,6 +16,8 @@ namespace TuPencaUy.Platform.DAO.Models.Data
     public DbSet<Sport> Sports { get; set; }
     public DbSet<Match> Matches { get; set; }
     public DbSet<Team> Teams { get; set; }
+    public DbSet<Payout> Payouts { get; set; }
+    public DbSet<Payment> Payments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -28,6 +30,8 @@ namespace TuPencaUy.Platform.DAO.Models.Data
       modelBuilder.Entity<Sport>().ToTable("Sport");
       modelBuilder.Entity<Match>().ToTable("Match");
       modelBuilder.Entity<Team>().ToTable("Team");
+      modelBuilder.Entity<Payout>().ToTable("Payout");
+      modelBuilder.Entity<Payment>().ToTable("Payment");
     }
   }
 }

@@ -619,7 +619,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
     {
       throw new NotImplementedException();
     }
-    public EventDTO CreateEvent(string name, DateTime? startDate, DateTime? endDate, float? comission, TeamTypeEnum? teamType, int sportId)
+    public EventDTO CreateEvent(string name, DateTime? startDate, DateTime? endDate, decimal? comission, TeamTypeEnum? teamType, int sportId)
     {
       throw new NotImplementedException();
     }
@@ -654,7 +654,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       throw new NotImplementedException();
     }
 
-    public EventDTO ModifyEvent(int idEvent, string? name, DateTime? startDate, DateTime? endTime, float? comission, TeamTypeEnum? teamType, bool? instantiable)
+    public EventDTO ModifyEvent(int idEvent, string? name, DateTime? startDate, DateTime? endTime, decimal? comission, TeamTypeEnum? teamType, bool? instantiable)
     {
       throw new NotImplementedException();
     }
