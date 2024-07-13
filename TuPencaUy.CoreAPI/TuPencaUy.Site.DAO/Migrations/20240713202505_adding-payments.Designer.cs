@@ -12,8 +12,8 @@ using TuPencaUy.Site.DAO.Models.Data;
 namespace TuPencaUy.Site.DAO.Migrations
 {
     [DbContext(typeof(SiteDbContext))]
-    [Migration("20240713034519_updating-payment-amount-precision")]
-    partial class updatingpaymentamountprecision
+    [Migration("20240713202505_adding-payments")]
+    partial class addingpayments
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -161,8 +161,8 @@ namespace TuPencaUy.Site.DAO.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<double?>("Comission")
-                        .HasColumnType("float")
+                    b.Property<decimal?>("Comission")
+                        .HasColumnType("decimal(18,2)")
                         .HasColumnName("Comission")
                         .HasColumnOrder(4);
 
@@ -307,7 +307,7 @@ namespace TuPencaUy.Site.DAO.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("Amount")
-                        .HasColumnOrder(3);
+                        .HasColumnOrder(2);
 
                     b.Property<DateTime?>("CreationDate")
                         .HasColumnType("datetime2");
@@ -328,13 +328,13 @@ namespace TuPencaUy.Site.DAO.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar")
                         .HasColumnName("TransactionID")
-                        .HasColumnOrder(4);
+                        .HasColumnOrder(3);
 
                     b.Property<string>("User_email")
                         .IsRequired()
                         .HasColumnType("varchar")
                         .HasColumnName("User_email")
-                        .HasColumnOrder(2);
+                        .HasColumnOrder(4);
 
                     b.HasKey("Id");
 
@@ -682,7 +682,7 @@ namespace TuPencaUy.Site.DAO.Migrations
             modelBuilder.Entity("TuPencaUy.Site.DAO.Models.Payment", b =>
                 {
                     b.HasOne("TuPencaUy.Site.DAO.Models.Event", "Event")
-                        .WithMany()
+                        .WithMany("Payments")
                         .HasForeignKey("Event_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -721,6 +721,8 @@ namespace TuPencaUy.Site.DAO.Migrations
                     b.Navigation("Bets");
 
                     b.Navigation("Matches");
+
+                    b.Navigation("Payments");
                 });
 
             modelBuilder.Entity("TuPencaUy.Site.DAO.Models.Match", b =>

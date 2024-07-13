@@ -15,15 +15,11 @@ namespace TuPencaUy.Core.DAO
     [Column("Event_id", Order = 1)]
     public int Event_id { get; set; }
 
-    [ForeignKey("User")]
-    [Column("User_email", Order = 2, TypeName = "varchar")]
-    public string User_email { get; set; }
-
-    [Column("Amount", Order = 3, TypeName = "decimal(18,2)")]
+    [Column("Amount", Order = 2, TypeName = "decimal(18,2)")]
     public decimal Amount { get; set; }
 
     [MaxLength(100)]
-    [Column("TransactionID", Order = 4, TypeName = "varchar")]
+    [Column("TransactionID", Order = 3, TypeName = "varchar")]
     public string TransactionID { get; set; }
   }
 }
