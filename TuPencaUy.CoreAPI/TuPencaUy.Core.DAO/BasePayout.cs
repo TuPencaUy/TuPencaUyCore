@@ -15,6 +15,7 @@ namespace TuPencaUy.Core.DAO
     [Column("Site_id", Order = 1)]
     public int Site_id { get; set; }
 
+    [MaxLength(100)]
     [Column("PaypalEmail", Order = 2, TypeName = "varchar")]
     public string PaypalEmail { get; set; }
 
