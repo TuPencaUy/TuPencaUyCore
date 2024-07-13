@@ -19,7 +19,7 @@ namespace TuPencaUy.Core.DAO
     [Column("User_email", Order = 2, TypeName = "varchar")]
     public string User_email { get; set; }
 
-    [Column("Amount", Order = 3, TypeName = "decimal")]
+    [Column("Amount", Order = 3, TypeName = "decimal(18,2)")]
     public decimal Amount { get; set; }
 
     [MaxLength(100)]
