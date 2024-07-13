@@ -651,13 +651,6 @@ namespace TuPencaUy.Site.DAO.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TuPencaUy.Site.DAO.Models.Sport", b =>
-                {
-                    b.HasOne("TuPencaUy.Site.DAO.Models.Event", null)
-                        .WithMany("Sports")
-                        .HasForeignKey("EventId");
-                });
-
             modelBuilder.Entity("TuPencaUy.Site.DAO.Models.Team", b =>
                 {
                     b.HasOne("TuPencaUy.Site.DAO.Models.Sport", "Sport")
