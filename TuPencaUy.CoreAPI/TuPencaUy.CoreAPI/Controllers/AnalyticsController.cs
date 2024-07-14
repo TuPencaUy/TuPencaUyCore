@@ -106,11 +106,15 @@ namespace TuPencaUy.Core.API.Controllers
     {
       try
       {
-        var sitesAnalytics = _analyticsService.GetSitesAnalytics();
+        var sites = _analyticsService.GetSitesAnalytics();
 
         return Ok(new ApiResponse
         {
-          Data = sitesAnalytics,
+          Data = new
+          {
+            Sites = sites,
+            TotalUsers = sites.Sum(x => x.TotalUsers)
+          },
           Message = "Sites analytics returned"
         });
       }
@@ -125,7 +129,17 @@ namespace TuPencaUy.Core.API.Controllers
     {
       try
       {
-        return Ok();
+        var events = _analyticsService.GetEventsAnalytics();
+
+        return Ok(new ApiResponse
+        {
+          Data = new
+          {
+            Events = events,
+            TotalUsers = events.Sum(x => x.TotalUsers)
+          },
+          Message = "Sites analytics returned"
+        });
       }
       catch (Exception ex)
       {

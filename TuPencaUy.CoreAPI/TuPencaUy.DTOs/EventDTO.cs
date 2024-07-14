@@ -17,5 +17,6 @@ namespace TuPencaUy.Core.DTOs
     public int? Price { get; set; }
     public decimal? PrizePercentage { get; set; }
     public bool? Finished { get; set; }
+    public int? TotalUsers { get; set; }
   }
 }

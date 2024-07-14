@@ -11,15 +11,21 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
     private readonly IGenericRepository<Bet> _betDAL;
     private readonly IGenericRepository<Event> _eventDAL;
     private readonly IGenericRepository<Payment> _paymentDAL;
+    private readonly IGenericRepository<User> _userDAL;
 
     private int _page = 1;
     private int _pageSize = 10;
 
-    public SiteAnalyticsService(IGenericRepository<Bet> betDAL, IGenericRepository<Event> eventDAL, IGenericRepository<Payment> paymentDAL)
+    public SiteAnalyticsService(
+      IGenericRepository<Bet> betDAL,
+      IGenericRepository<Event> eventDAL,
+      IGenericRepository<Payment> paymentDAL,
+      IGenericRepository<User> userDAL)
     {
       _betDAL = betDAL;
       _eventDAL = eventDAL;
       _paymentDAL = paymentDAL;
+      _userDAL = userDAL;
     }
 
 
@@ -46,7 +52,19 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
           Points = x.Sum(bet => bet.Points ?? 0),
           Hits = x.Count(bet => bet.Points == points.ExactPoints),
           PartialHits = x.Count(bet => bet.Points == points.PartialPoints),
-        });
+        })
+        .Union(
+          _userDAL.Get([x => x.Events.Any(e => e.Id == eventId)])
+            .Select(u => new BetUserDTO
+            {
+              Name = u.Name,
+              Email = u.Email,
+              PredictedMatches = 0,
+              Points = 0,
+              Hits = 0,
+              PartialHits = 0
+            })
+        );
 
       count = betUsers.Count();
 
@@ -139,7 +157,12 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       throw new NotImplementedException();
     }
 
-    public PlatformSitesAnalyticsDTO GetSitesAnalytics()
+    public List<SiteDTO> GetSitesAnalytics()
+    {
+      throw new NotImplementedException();
+    }
+
+    public List<EventDTO> GetEventsAnalytics()
     {
       throw new NotImplementedException();
     }
