@@ -68,7 +68,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
 
       count = betUsers.Count();
 
-      return betUsers.OrderByDescending(x => x.Points).Skip((_page - 1) * _pageSize).Take(_pageSize).ToList();
+      return betUsers.OrderByDescending(x => x.Points).ThenByDescending(x => x.PredictedMatches).Skip((_page - 1) * _pageSize).Take(_pageSize).ToList();
     }
 
     public List<BetEventDTO> GetEventBets(int? eventId)
