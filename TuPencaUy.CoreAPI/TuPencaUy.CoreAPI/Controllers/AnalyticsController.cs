@@ -81,5 +81,50 @@ namespace TuPencaUy.Core.API.Controllers
         return ManageException(ex);
       }
     }
+
+    [HttpGet("Platform/Finances")]
+    public IActionResult GetFinances()
+    {
+      try
+      {
+        var finances = _analyticsService.GetFinances();
+
+        return Ok(new ApiResponse
+        {
+          Data = finances,
+          Message = "Finances returned"
+        });
+      }
+      catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
+    }
+
+    [HttpGet("Platform/Sites")]
+    public IActionResult GetSites()
+    {
+      try
+      {
+        return Ok();
+      }
+      catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
+    }
+
+    [HttpGet("Platform/Events")]
+    public IActionResult GetEvents()
+    {
+      try
+      {
+        return Ok();
+      }
+      catch (Exception ex)
+      {
+        return ManageException(ex);
+      }
+    }
   }
 }

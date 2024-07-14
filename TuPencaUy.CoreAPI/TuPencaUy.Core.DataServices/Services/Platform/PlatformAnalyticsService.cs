@@ -11,13 +11,15 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
   {
     private readonly IServiceFactory _serviceFactory;
     private readonly IGenericRepository<Event> _eventDAL;
+    private readonly IGenericRepository<Payment> _paymentDAL;
 
     private int _page = 1;
     private int _pageSize = 10;
 
-    public PlatformAnalyticsService(IConfiguration configuration, IGenericRepository<Event> eventDAL)
+    public PlatformAnalyticsService(IConfiguration configuration, IGenericRepository<Event> eventDAL, IGenericRepository<Payment> paymentDAL)
     {
       _serviceFactory = new ServiceFactory(configuration);
+      _paymentDAL = paymentDAL;
       _eventDAL = eventDAL;
     }
 
@@ -121,11 +123,38 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
 
       return matchBets;
     }
+    public PlatformFinancesAnalyticsDTO GetFinances()
+    {
+      var sitesFinances = _paymentDAL.Get()
+        .GroupBy(x => x.Site_id)
+        .Select(x => new SiteFinanceDTO
+        {
+          SiteId = x.Key.Value,
+          SiteName = x.First().Site.Name,
+          TotalRaised = x.Sum(p => p.Amount) * (x.First().Event.Comission ?? 0),
+        }).ToList();
+
+      var eventFinances = _paymentDAL.Get()
+        .GroupBy(x => new { x.Event_id, x.Event.Comission, x.Event.Name, x.Event.Id })
+        .Select(x => new EventFinanceDTO
+        {
+          EventId = x.Key.Id,
+          EventName = x.Key.Name,
+          TotalRaised = x.Sum(p => p.Amount) * (x.First().Event.Comission ?? 0),
+        }).ToList();
+
+      return new PlatformFinancesAnalyticsDTO
+      {
+        Events = eventFinances,
+        Sites = sitesFinances,
+      };
+    }
 
     private void SetPagination(int? page, int? pageSize)
     {
       _page = page != null && page.Value > 0 ? page.Value : _page;
       _pageSize = pageSize != null && pageSize.Value > 0 ? pageSize.Value : _pageSize;
     }
+
   }
 }

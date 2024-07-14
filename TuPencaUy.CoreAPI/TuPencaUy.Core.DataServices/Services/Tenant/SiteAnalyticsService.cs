@@ -133,5 +133,10 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       _page = page != null && page.Value > 0 ? page.Value : _page;
       _pageSize = pageSize != null && pageSize.Value > 0 ? pageSize.Value : _pageSize;
     }
+
+    public PlatformFinancesAnalyticsDTO GetFinances()
+    {
+      throw new NotImplementedException();
+    }
   }
 }
