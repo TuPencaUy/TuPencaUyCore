@@ -25,8 +25,8 @@ namespace TuPencaUy.ResultsAPI.Controllers
             m.Id,
             m.FirstTeamScore,
             m.SecondTeamScore,
-            GameStatusCode = CalculateGameStatus(m.Date),
-            GameStatus = Enum.GetName(typeof(GameStatusEnum), CalculateGameStatus(m.Date))
+            GameStatusCode = m.Finished.Value ? GameStatusEnum.Finalized : CalculateGameStatus(m.Date),
+            GameStatus = Enum.GetName(typeof(GameStatusEnum), m.Finished.Value ? GameStatusEnum.Finalized : CalculateGameStatus(m.Date))
           },
           Message = "Match result returned"
         });
@@ -42,14 +42,14 @@ namespace TuPencaUy.ResultsAPI.Controllers
     {
       try
       {
-        var m = _eventService.GetMatches(out int count, null, null, eventId, null, null, null, int.MaxValue, int.MaxValue);
+        var m = _eventService.GetMatches(out int count, null, null, eventId, null, null, null, null, int.MaxValue, int.MaxValue);
         var matchesResult = m.Select(x => new
         {
           x.Id,
           x.FirstTeamScore,
           x.SecondTeamScore,
-          GameStatusCode = CalculateGameStatus(x.Date),
-          GameStatus = Enum.GetName(typeof(GameStatusEnum), CalculateGameStatus(x.Date))
+          GameStatusCode = x.Finished.Value ? GameStatusEnum.Finalized : CalculateGameStatus(x.Date),
+          GameStatus = Enum.GetName(typeof(GameStatusEnum), x.Finished.Value ? GameStatusEnum.Finalized : CalculateGameStatus(x.Date))
         }).ToArray();
 
         return Ok(new ApiResponse

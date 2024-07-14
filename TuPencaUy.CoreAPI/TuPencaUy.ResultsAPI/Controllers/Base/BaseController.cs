@@ -13,7 +13,8 @@ namespace TuPencaUy.ResultsAPI.Controllers.Base
 
       if (DateTime.Now < startTime.Value) return GameStatusEnum.Pending;
       if (DateTime.Now < startTime.Value.AddMinutes(200)) return GameStatusEnum.InProgress; // Prudential time
-      return GameStatusEnum.Finalized;
+
+      return GameStatusEnum.Uknown;
     }
     protected IActionResult ManageException(Exception ex)
     {
