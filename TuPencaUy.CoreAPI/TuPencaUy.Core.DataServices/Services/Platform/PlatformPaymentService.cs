@@ -40,6 +40,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
           TransactionID = x.TransactionID,
           Event = new EventDTO
           {
+            Finished = x.Event.Finished,
             Name = x.Event.Name,
             Comission = x.Event.Comission,
             MatchesCount = x.Event.Matches.Count(),
@@ -92,6 +93,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         TransactionID = payment.TransactionID,
         Event = new EventDTO
         {
+          Finished = payment.Event.Finished,
           Name = payment.Event.Name,
           Comission = payment.Event.Comission,
           MatchesCount = payment.Event.Matches.Count(),

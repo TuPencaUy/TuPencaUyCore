@@ -117,6 +117,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
         Points = bet.Points,
         Event = new EventDTO
         {
+          Finished = bet.Event.Finished,
           Name = bet.Event.Name,
           Comission = bet.Event.Comission,
           MatchesCount = bet.Event.Matches.Count(),
@@ -223,6 +224,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
           Points = x.Points,
           Event = new EventDTO
           {
+            Finished = x.Event.Finished,
             Name = x.Event.Name,
             Comission = x.Event.Comission,
             MatchesCount = x.Event.Matches.Count(),
@@ -396,6 +398,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       var @event = _eventDAL.Get(new List<Expression<Func<Event, bool>>> { x => eventId == x.Id })
         .Select(x => new EventDTO
         {
+          Finished = x.Finished,
           Name = x.Name,
           Comission = x.Comission,
           MatchesCount = x.Matches.Count(),

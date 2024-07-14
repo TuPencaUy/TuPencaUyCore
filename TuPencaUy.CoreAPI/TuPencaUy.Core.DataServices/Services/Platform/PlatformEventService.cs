@@ -314,6 +314,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
 
       return new EventDTO
       {
+        Finished = originEvent.Finished,
         Id = originEvent.Id,
         Name = originEvent.Name,
         EndDate = originEvent.EndDate,
@@ -454,6 +455,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         .Get(new List<Expression<Func<Event, bool>>> { ev => ev.Id == idEvent })?
         .Select(ev => new EventDTO
         {
+          Finished = ev.Finished,
           Id = ev.Id,
           Name = ev.Name,
           EndDate = ev.EndDate,
@@ -487,6 +489,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
 
       var newEvent = new Event
       {
+        Finished = false,
         Name = name,
         StartDate = startDate,
         EndDate = endDate,
@@ -501,6 +504,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
 
       return new EventDTO
       {
+        Finished = false,
         Id = newEvent.Id,
         Name = name,
         StartDate = startDate,
@@ -544,6 +548,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       IQueryable<EventDTO> events = _eventDAL.Get(conditions)
         .Select(x => new EventDTO
         {
+          Finished = x.Finished,
           Id = x.Id,
           Name = x.Name,
           StartDate = x.StartDate,

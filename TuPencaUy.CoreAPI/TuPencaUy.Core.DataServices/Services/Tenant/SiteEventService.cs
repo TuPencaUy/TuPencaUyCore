@@ -100,6 +100,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
 
       Event ev = new Event
       {
+        Finished = false,
         RefEvent = eventDTO.Id.Value,
         Comission = eventDTO.Comission,
         EndDate = eventDTO.EndDate,
@@ -119,6 +120,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       Tuple<EventDTO, List<MatchDTO>> result = new Tuple<EventDTO, List<MatchDTO>>(
         new EventDTO
         {
+          Finished = false,
           Id = ev.Id,
           ReferenceEvent = ev.RefEvent,
           Name = ev.Name,
@@ -452,6 +454,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
         .Get(new List<Expression<Func<Event, bool>>> { ev => ev.Id == idEvent })?
         .Select(ev => new EventDTO
         {
+          Finished = ev.Finished,
           ReferenceEvent = ev.RefEvent,
           Id = ev.Id,
           Name = ev.Name,
@@ -498,6 +501,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       IQueryable<EventDTO> events = _eventDAL.Get(conditions)
         .Select(x => new EventDTO
         {
+          Finished = x.Finished,
           ReferenceEvent = x.RefEvent,
           Id = x.Id,
           Name = x.Name,
@@ -681,6 +685,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
     {
       IQueryable<EventDTO> events = _eventDAL.Get([x => x.RefEvent == refEventId]).Select(x => new EventDTO
       {
+        Finished = x.Finished,
         ReferenceEvent = x.RefEvent,
         Id = x.Id,
         Name = x.Name,

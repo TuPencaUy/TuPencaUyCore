@@ -66,6 +66,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         },
         new EventDTO
         {
+          Finished = @event.Finished,
           Name = @event.Name,
           Id= @event.Id,
           ReferenceEvent = @event.RefEvent,
@@ -108,6 +109,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
           Events = x.Events != null ? x.Events.Select(ev =>
           new EventDTO
           {
+            Finished = ev.Finished,
             Id = ev.Id,
             ReferenceEvent = ev.RefEvent,
             Name = ev.Name,

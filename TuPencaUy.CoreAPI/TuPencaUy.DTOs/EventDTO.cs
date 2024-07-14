@@ -16,5 +16,6 @@ namespace TuPencaUy.Core.DTOs
     public SportDTO? Sport { get; set; }
     public int? Price { get; set; }
     public decimal? PrizePercentage { get; set; }
+    public bool? Finished { get; set; }
   }
 }

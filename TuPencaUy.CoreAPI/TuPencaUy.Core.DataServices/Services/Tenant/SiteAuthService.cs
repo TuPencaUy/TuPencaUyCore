@@ -53,6 +53,7 @@
           Events = user.Events != null ? user.Events.Select(ev =>
            new EventDTO
            {
+             Finished = ev.Finished,
              Id = ev.Id,
              ReferenceEvent = ev.RefEvent,
              Name = ev.Name,
@@ -106,6 +107,7 @@
           Events = user.Events != null ? user.Events.Select(ev =>
            new EventDTO
            {
+             Finished = ev.Finished,
              Id = ev.Id,
              ReferenceEvent = ev.RefEvent,
              Name = ev.Name,

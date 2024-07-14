@@ -42,6 +42,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
           PaypalEmail = x.PaypalEmail,
           Event = new EventDTO
           {
+            Finished = x.Event.Finished,
             Name = x.Event.Name,
             Comission = x.Event.Comission,
             MatchesCount = x.Event.Matches.Count(),
@@ -91,6 +92,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         PaypalEmail = payout.PaypalEmail,
         Event = new EventDTO
         {
+          Finished = payout.Event.Finished,
           Name = payout.Event.Name,
           Comission = payout.Event.Comission,
           MatchesCount = payout.Event.Matches.Count(),
