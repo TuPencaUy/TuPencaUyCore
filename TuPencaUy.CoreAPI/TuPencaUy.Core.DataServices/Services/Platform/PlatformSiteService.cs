@@ -33,7 +33,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         ConnectionString = x.ConnectionString,
         Color = x.Color,
         AccessType = x.AccessType,
-        UniqueID = x.UniqueID,
+        //UniqueID = x.UniqueID,
       }).ToList();
     }
 
@@ -49,7 +49,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
           Color = x.Color,
           AccessType = x.AccessType,
           PaypalEmail = x.PaypalEmail,
-          UniqueID = x.UniqueID,
+          //UniqueID = x.UniqueID,
         })
         .FirstOrDefault() ?? throw new SiteNotFoundException($"No site was found with domain {domain}");
     }
@@ -131,7 +131,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       site.Color = siteDTO.Color;
       site.AccessType = siteDTO.AccessType;
 
-      if()
+      //if()
 
       if(siteDTO.PaypalEmail != null) site.PaypalEmail = siteDTO.PaypalEmail;
 
