@@ -106,7 +106,13 @@ namespace TuPencaUy.Core.API.Controllers
     {
       try
       {
-        return Ok();
+        var sitesAnalytics = _analyticsService.GetSitesAnalytics();
+
+        return Ok(new ApiResponse
+        {
+          Data = sitesAnalytics,
+          Message = "Sites analytics returned"
+        });
       }
       catch (Exception ex)
       {

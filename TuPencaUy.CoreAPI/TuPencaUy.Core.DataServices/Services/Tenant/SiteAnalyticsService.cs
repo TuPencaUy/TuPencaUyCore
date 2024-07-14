@@ -138,5 +138,10 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
     {
       throw new NotImplementedException();
     }
+
+    public PlatformSitesAnalyticsDTO GetSitesAnalytics()
+    {
+      throw new NotImplementedException();
+    }
   }
 }

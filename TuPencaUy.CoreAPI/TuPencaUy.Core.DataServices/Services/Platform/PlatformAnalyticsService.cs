@@ -12,15 +12,21 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
     private readonly IServiceFactory _serviceFactory;
     private readonly IGenericRepository<Event> _eventDAL;
     private readonly IGenericRepository<Payment> _paymentDAL;
+    private readonly IGenericRepository<TuPencaUy.Platform.DAO.Models.Site> _siteDAL;
 
     private int _page = 1;
     private int _pageSize = 10;
 
-    public PlatformAnalyticsService(IConfiguration configuration, IGenericRepository<Event> eventDAL, IGenericRepository<Payment> paymentDAL)
+    public PlatformAnalyticsService(
+      IConfiguration configuration,
+      IGenericRepository<Event> eventDAL,
+      IGenericRepository<Payment> paymentDAL,
+      IGenericRepository<TuPencaUy.Platform.DAO.Models.Site> siteDAL)
     {
       _serviceFactory = new ServiceFactory(configuration);
       _paymentDAL = paymentDAL;
       _eventDAL = eventDAL;
+      _siteDAL = siteDAL;
     }
 
     public List<BetUserDTO> GetLeaderboard(out int count, int eventId, int? page = null, int? pageSize = null)
@@ -35,7 +41,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
           x.Sports.FirstOrDefault().ExactPoints,
         })?.FirstOrDefault() ?? throw new EventNotFoundException($"Event not found with id {eventId}");
 
-      var sites = _serviceFactory.GetService<ISiteService>().GetSites(); 
+      var sites = _siteDAL.Get().ToList(); 
 
       List<TuPencaUy.Site.DAO.Models.Bet> bets = new List<TuPencaUy.Site.DAO.Models.Bet>();
 
@@ -73,7 +79,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
 
       if (matchId != null) conditions.Add(x => x.Match_id == matchId);
 
-      var sites = _serviceFactory.GetService<ISiteService>().GetSites();
+      var sites = _siteDAL.Get().ToList();
 
       List<TuPencaUy.Site.DAO.Models.Bet> bets = new List<TuPencaUy.Site.DAO.Models.Bet>();
 
@@ -150,11 +156,29 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       };
     }
 
+    public PlatformSitesAnalyticsDTO GetSitesAnalytics()
+    {
+      var sites = _siteDAL.Get().ToList();
+
+      List<Tuple<int, int>> sitesList = new List<Tuple<int, int>>();
+
+      foreach(var site in sites)
+      {
+        _serviceFactory.CreateTenantServices(site.ConnectionString);
+        int cantUsers = _serviceFactory.GetService<IGenericRepository<TuPencaUy.Site.DAO.Models.User>>().Get().Count();
+        sitesList.Add(new Tuple<int, int> (site.Id, cantUsers));
+      }
+
+      return new PlatformSitesAnalyticsDTO
+      {
+        Sites = sitesList
+      };
+    }
+
     private void SetPagination(int? page, int? pageSize)
     {
       _page = page != null && page.Value > 0 ? page.Value : _page;
       _pageSize = pageSize != null && pageSize.Value > 0 ? pageSize.Value : _pageSize;
     }
-
   }
 }

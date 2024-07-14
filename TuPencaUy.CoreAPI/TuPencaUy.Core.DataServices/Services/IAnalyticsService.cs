@@ -8,5 +8,6 @@ namespace TuPencaUy.Core.DataServices.Services
     List<BetMatchDTO> GetMatchBets(int? matchId);
     List<BetEventDTO> GetEventBets(int? eventId);
     PlatformFinancesAnalyticsDTO GetFinances();
+    PlatformSitesAnalyticsDTO GetSitesAnalytics();
   }
 }
