@@ -27,7 +27,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       IGenericRepository<Match> matchDAL,
       IGenericRepository<User> userDAL,
       IGenericRepository<Payment> paymentDAL
-      )
+    )
     {
       _betDAL = betDAL;
       _eventDAL = eventDAL;
@@ -40,11 +40,6 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
     {
       var ev = _eventDAL.Get([x => x.Id == eventId])
         .FirstOrDefault() ?? throw new EventNotFoundException($"Not found event with id {eventId}");
-
-      ev.Finished = true;
-
-      _eventDAL.Update(ev);
-      _eventDAL.SaveChanges();
 
       var winner = _betDAL.Get([x => x.Event_id == eventId])
         .GroupBy(x => new { x.User_email })
@@ -68,8 +63,13 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
           Id = x.Id,
         }).FirstOrDefault();
 
+      ev.Finished = true;
+
+      _eventDAL.Update(ev);
+      _eventDAL.SaveChanges();
+
       double prizeAmount = (double)(payment * (1 - (decimal)ev.Comission.Value) * ev.PrizePercentage);
-      double siteRevenueAmount = (double)(payment * (1 - (decimal)ev.Comission.Value) - (decimal) prizeAmount);
+      double siteRevenueAmount = (double)(payment * (1 - (decimal)ev.Comission.Value) - (decimal)prizeAmount);
       return new EventPaymentDTO
       {
         PrizeAmount = prizeAmount,
@@ -77,15 +77,20 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
         SiteRevenueAmount = siteRevenueAmount,
       };
     }
+
     public BetDTO CreateBet(string userEmail, int matchId, int eventId, int firstTeamScore, int secondTeamScore)
     {
-      var existingBet = _betDAL.Get(new List<Expression<Func<Bet, bool>>> { x => x.Event_id == eventId && x.Match_id == matchId && x.User_email == userEmail }).Any();
-      if (existingBet) throw new BetAlreadyExists($"Bet already exists with event_id: {eventId}, user_email: {userEmail}, match_id: {matchId}");
+      var existingBet = _betDAL.Get(new List<Expression<Func<Bet, bool>>>
+        { x => x.Event_id == eventId && x.Match_id == matchId && x.User_email == userEmail }).Any();
+      if (existingBet)
+        throw new BetAlreadyExists(
+          $"Bet already exists with event_id: {eventId}, user_email: {userEmail}, match_id: {matchId}");
 
       var @event = _eventDAL.Get(new List<Expression<Func<Event, bool>>> { x => x.Id == eventId })
         .FirstOrDefault() ?? throw new EventNotFoundException($"Event not found with id {eventId}");
 
-      var match = _matchDAL.Get(new List<Expression<Func<Match, bool>>> { x => x.Id == matchId && x.Event_id == eventId })
+      var match = _matchDAL.Get(new List<Expression<Func<Match, bool>>>
+          { x => x.Id == matchId && x.Event_id == eventId })
         .FirstOrDefault() ?? throw new MatchNotFoundException($"Match not found with if {matchId} for event {eventId}");
 
       if (match.Date < DateTime.Now) throw new MatchAlreadyStartedException($"The match {matchId} has already started");
@@ -93,7 +98,8 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       var user = _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Email == userEmail })
         .FirstOrDefault() ?? throw new UserNotFoundException($"User not found with email {userEmail}");
 
-      var matchTie = _matchDAL.Get(new List<Expression<Func<Match, bool>>> { x => x.Id == matchId }).Select(x => x.Sport.Tie).FirstOrDefault();
+      var matchTie = _matchDAL.Get(new List<Expression<Func<Match, bool>>> { x => x.Id == matchId })
+        .Select(x => x.Sport.Tie).FirstOrDefault();
 
       if (!matchTie && firstTeamScore == secondTeamScore) throw new SportTieException();
 
@@ -199,8 +205,11 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
 
     public void DeleteBet(string userEmail, int matchId, int eventId)
     {
-      var bet = _betDAL.Get(new List<Expression<Func<Bet, bool>>> { x => x.Event_id == eventId && x.Match_id == matchId && x.User_email == userEmail })
-        .FirstOrDefault() ?? throw new BetNotFoundException($"Bet not found with event_id: {eventId}, user_email: {userEmail}, match_id: {matchId}");
+      var bet = _betDAL.Get(new List<Expression<Func<Bet, bool>>>
+                    { x => x.Event_id == eventId && x.Match_id == matchId && x.User_email == userEmail })
+                  .FirstOrDefault() ??
+                throw new BetNotFoundException(
+                  $"Bet not found with event_id: {eventId}, user_email: {userEmail}, match_id: {matchId}");
 
       _betDAL.Delete(bet);
       _betDAL.SaveChanges();
@@ -310,8 +319,11 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
 
     public BetDTO ModifyBet(string userEmail, int matchId, int eventId, int? firstTeamScore, int? secondTeamScore)
     {
-      var bet = _betDAL.Get(new List<Expression<Func<Bet, bool>>> { x => x.Event_id == eventId && x.Match_id == matchId && x.User_email == userEmail })
-        .FirstOrDefault() ?? throw new BetNotFoundException($"Bet not found with event_id: {eventId}, user_email: {userEmail}, match_id: {matchId}");
+      var bet = _betDAL.Get(new List<Expression<Func<Bet, bool>>>
+                    { x => x.Event_id == eventId && x.Match_id == matchId && x.User_email == userEmail })
+                  .FirstOrDefault() ??
+                throw new BetNotFoundException(
+                  $"Bet not found with event_id: {eventId}, user_email: {userEmail}, match_id: {matchId}");
 
       bool changes = false;
 
@@ -327,7 +339,8 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
         changes = changes || true;
       }
 
-      var matchTie = _matchDAL.Get(new List<Expression<Func<Match, bool>>> { x => x.Id == matchId }).Select(x => x.Sport.Tie).FirstOrDefault();
+      var matchTie = _matchDAL.Get(new List<Expression<Func<Match, bool>>> { x => x.Id == matchId })
+        .Select(x => x.Sport.Tie).FirstOrDefault();
 
       if (!matchTie && firstTeamScore == secondTeamScore) throw new SportTieException();
 
@@ -444,9 +457,10 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       if (!@event) throw new EventNotFoundException($"Event not found with id {eventId}");
 
       var user = _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Email == userEmail }).Any();
-      if(!user) throw new UserNotFoundException($"User not found with email {userEmail}");
+      if (!user) throw new UserNotFoundException($"User not found with email {userEmail}");
 
-      var match = _matchDAL.Get(new List<Expression<Func<Match, bool>>> { x => x.Id == matchId && x.Event_id == eventId })
+      var match = _matchDAL.Get(new List<Expression<Func<Match, bool>>>
+          { x => x.Id == matchId && x.Event_id == eventId })
         .Select(x => new
         {
           FirstTeamScore = x.FirstTeamScore,
@@ -459,10 +473,14 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
 
       if (match.Date >= DateTime.Now) throw new MatchDoesntStartException($"The match {matchId} doesn't start");
 
-      var bet = _betDAL.Get(new List<Expression<Func<Bet, bool>>> { x => x.Event_id == eventId && x.Match_id == matchId && x.User_email == userEmail })
-        .FirstOrDefault() ?? throw new BetNotFoundException($"Bet not found with event_id: {eventId}, user_email: {userEmail}, match_id: {matchId}");
+      var bet = _betDAL.Get(new List<Expression<Func<Bet, bool>>>
+                    { x => x.Event_id == eventId && x.Match_id == matchId && x.User_email == userEmail })
+                  .FirstOrDefault() ??
+                throw new BetNotFoundException(
+                  $"Bet not found with event_id: {eventId}, user_email: {userEmail}, match_id: {matchId}");
 
-      CalculatePoints(ref bet, match.FirstTeamScore.Value, match.SecondTeamScore.Value, match.PartialPoints.Value, match.ExactPoints.Value);
+      CalculatePoints(ref bet, match.FirstTeamScore.Value, match.SecondTeamScore.Value, match.PartialPoints.Value,
+        match.ExactPoints.Value);
 
       _betDAL.Update(bet);
       _betDAL.SaveChanges();
@@ -474,7 +492,8 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       _pageSize = pageSize != null && pageSize.Value > 0 ? pageSize.Value : _pageSize;
     }
 
-    private void CalculatePoints(ref Bet bet, int firstTeamScore, int secondTeamScore, int partialPoints, int exactPoints)
+    private void CalculatePoints(ref Bet bet, int firstTeamScore, int secondTeamScore, int partialPoints,
+      int exactPoints)
     {
       int points = 0;
 
@@ -482,7 +501,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       {
         points = exactPoints;
       }
-      else if(
+      else if (
         (firstTeamScore > secondTeamScore && bet.ScoreFirstTeam > bet.ScoreSecondTeam) ||
         (firstTeamScore < secondTeamScore && bet.ScoreFirstTeam < bet.ScoreSecondTeam) ||
         (firstTeamScore == secondTeamScore && bet.ScoreFirstTeam == bet.ScoreSecondTeam))
