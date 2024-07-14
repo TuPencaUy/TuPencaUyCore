@@ -54,7 +54,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
           PartialHits = x.Count(bet => bet.Points == points.PartialPoints),
         })
         .Union(
-          _userDAL.Get([x => x.Events.Any(e => e.Id == eventId)])
+          _userDAL.Get([x => x.Events.Any(e => e.Id == eventId) && x.Bets.FirstOrDefault(b => b.Event_id == eventId) == null])
             .Select(u => new BetUserDTO
             {
               Name = u.Name,
