@@ -92,7 +92,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         Domain = site.Domain,
         Color = site.Color,
         AccessType = site.AccessType,
-        UniqueID = site.AccessType == SiteAccessTypeEnum.ByInvite ? new Guid().ToString() : null
+        UniqueID = site.AccessType == SiteAccessTypeEnum.ByInvite ? Guid.NewGuid().ToString() : null
       };
 
       _siteDAL.Insert(newSite);
@@ -131,7 +131,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       site.Color = siteDTO.Color;
       site.AccessType = siteDTO.AccessType;
 
-      if (siteDTO.AccessType == SiteAccessTypeEnum.ByInvite && string.IsNullOrEmpty(site.UniqueID)) site.UniqueID = new Guid().ToString();
+      if (siteDTO.AccessType == SiteAccessTypeEnum.ByInvite && string.IsNullOrEmpty(site.UniqueID)) site.UniqueID = Guid.NewGuid().ToString();
 
       if(siteDTO.PaypalEmail != null) site.PaypalEmail = siteDTO.PaypalEmail;
 
