@@ -47,7 +47,7 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
         .Select(x => new AccessRequestDTO
         {
           AccessStatusCode = x.AccessStatus,
-          AccessStatus = Enum.GetName(typeof(AccessStatusEnum), x.AccessStatus),
+          // AccessStatus = Enum.GetName(typeof(AccessStatusEnum), x.AccessStatus),
           RequestTime = x.RequestTime,
           User = new UserDTO
           {
@@ -59,12 +59,28 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
 
       count = query.Count();
 
-      if (pageSize == int.MaxValue && page == int.MaxValue) return query.ToList();
+      List<AccessRequestDTO> result = new List<AccessRequestDTO>();
+      if (pageSize == int.MaxValue && page == int.MaxValue)
+      {
+        result = query.ToList();
+        result.ForEach(x =>
+        {
+          x.AccessStatus = Enum.GetName(typeof(AccessStatusEnum), x.AccessStatusCode);
+        });
+
+        return result;
+      }
 
       if (pageSize == null || pageSize == 0) pageSize = 10;
       if (page == null || page == 0) page = 1;
 
-      return query.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value).ToList();
+      result = query.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value).ToList();
+      result.ForEach(x =>
+      {
+        x.AccessStatus = Enum.GetName(typeof(AccessStatusEnum), x.AccessStatusCode);
+      });
+
+      return result;
     }
   }
 }

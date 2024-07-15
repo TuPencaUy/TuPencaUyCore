@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using TuPencaUy.Core.API.Model.Responses;
+using TuPencaUy.Core.DataServices;
 using TuPencaUy.Core.DataServices.Services;
 using TuPencaUy.Core.Enums;
 using TuPencaUy.CoreAPI.Controllers.Base;
@@ -11,9 +12,13 @@ namespace TuPencaUy.Core.API.Controllers
 {
   [ApiController]
   [Route("[controller]")]
-  public class AccessRequestController(IAccessRequestService accessRequestService) : BaseController
+  public class AccessRequestController : BaseController
   {
-    private readonly IAccessRequestService _accessRequestService = accessRequestService;
+    private readonly IAccessRequestService _accessRequestService;
+    public AccessRequestController(IServiceFactory serviceFactory)
+    {
+      _accessRequestService = serviceFactory.GetService<IAccessRequestService>();
+    }
 
     [HttpGet]
     [Authorize]
