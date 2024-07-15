@@ -24,7 +24,7 @@
       _roleDAL = roleDAL;
       _authLogic = authLogic;
     }
-    public UserDTO? Authenticate(string email, string password, bool? auth = false)
+    public UserDTO? Authenticate(string email, string password, SiteAccessTypeEnum siteAccess)
     {
       var user = _userDAL
         .Get(new List<Expression<Func<User, bool>>> { x => x.Email == email })
@@ -61,7 +61,7 @@
       return user.Password.Equals(_authLogic.HashPassword(password, user.Password.Split('$')[0])) ? user : null;
     }
 
-    public UserDTO? Authenticate(string token, bool? auth = false)
+    public UserDTO? Authenticate(string token, SiteAccessTypeEnum siteAccess, bool allowedRegister)
     {
       var tokenHandler = new JwtSecurityTokenHandler();
 
@@ -113,7 +113,7 @@
       }
     }
 
-    public UserDTO? SignUp(string email, string password, string name, bool? auth = false)
+    public UserDTO? SignUp(string email, string password, string name, SiteAccessTypeEnum siteAccess)
     {
       var existingUser = _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Email == email });
       if (existingUser.Any()) return null;
