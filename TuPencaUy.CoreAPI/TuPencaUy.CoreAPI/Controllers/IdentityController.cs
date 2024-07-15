@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using TuPencaUy.Core.API.Model.Requests;
 using TuPencaUy.Core.API.Model.Responses;
 using TuPencaUy.Core.DataServices;
 using TuPencaUy.Core.DataServices.Services;
 using TuPencaUy.Core.DataServices.Services.CommonLogic;
+using TuPencaUy.Core.Enums;
 using TuPencaUy.CoreAPI.Controllers.Base;
 using TuPencaUy.Exceptions;
 
@@ -16,6 +18,7 @@ namespace TuPencaUy.CoreAPI.Controllers
   {
     private readonly IAuthLogic _authLogic;
     private readonly IAuthService _authService;
+
     public IdentityController(IServiceFactory serviceFactory)
     {
       _authService = serviceFactory.GetService<IAuthService>();
@@ -23,13 +26,11 @@ namespace TuPencaUy.CoreAPI.Controllers
     }
 
     [HttpPost("BasicLogin")]
-    public IActionResult BasicLogin([FromBody] LoginRequest login, bool? withAuth)
+    public IActionResult BasicLogin([FromBody] LoginRequest login, [Required] SiteAccessTypeEnum siteAccess)
     {
       try
       {
-        if (string.IsNullOrEmpty(ObtainTenantFromToken())) withAuth = null;
-
-        var user = _authService.Authenticate(login.Email, login.Password, withAuth);
+        var user = _authService.Authenticate(login.Email, login.Password, siteAccess);
         if (user != null)
         {
           Request.Headers.TryGetValue("currentTenant", out var currentTenant);
@@ -53,73 +54,83 @@ namespace TuPencaUy.CoreAPI.Controllers
         };
 
         return StatusCode((int)HttpStatusCode.NotFound, errorResponse);
-
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
         return ManageException(ex);
       }
     }
 
     [HttpPost("BasicSignup")]
-    public IActionResult BasicSignup([FromBody] SignUpRequest request, bool? withAuth)
+    public IActionResult BasicSignup([FromBody] SignUpRequest request, [Required] SiteAccessTypeEnum siteAccess)
     {
-      if (string.IsNullOrEmpty(ObtainTenantFromToken())) withAuth = null;
-      var user = _authService.SignUp(request.Email, request.Password, request.Name, withAuth);
-
-      if (user != null)
+      try
       {
-        Request.Headers.TryGetValue("currentTenant", out var currentTenant);
-        var tokenTuple = _authLogic.GenerateToken(user, currentTenant);
-        var token = tokenTuple.Item1;
-        var expiration = tokenTuple.Item2;
+        var user = _authService.SignUp(request.Email, request.Password, request.Name, siteAccess);
 
-        var successResponse = new ApiResponse
+        if (user != null)
         {
-          Message = $"Welcome {user.Name}",
-          Data = new { token, expiration, user },
+          Request.Headers.TryGetValue("currentTenant", out var currentTenant);
+          var tokenTuple = _authLogic.GenerateToken(user, currentTenant);
+          var token = tokenTuple.Item1;
+          var expiration = tokenTuple.Item2;
+
+          var successResponse = new ApiResponse
+          {
+            Message = $"Welcome {user.Name}",
+            Data = new { token, expiration, user },
+          };
+
+          return StatusCode((int)HttpStatusCode.Created, successResponse);
+        }
+
+        var errorResponse = new ApiResponse
+        {
+          Error = true,
+          Message = $"The email {request.Email} is in use",
         };
 
-        return StatusCode((int)HttpStatusCode.Created, successResponse);
-      }
-
-      var errorResponse = new ApiResponse
+        return StatusCode((int)HttpStatusCode.Conflict, errorResponse);
+      }catch (Exception ex)
       {
-        Error = true,
-        Message = $"The email {request.Email} is in use",
-      };
-
-      return StatusCode((int)HttpStatusCode.Conflict, errorResponse);
+        return ManageException(ex);
+      }
     }
 
     [HttpPost("OAuthLogin")]
-    public IActionResult OAuthLogin([FromBody] string authToken, bool? withAuth)
+    public IActionResult OAuthLogin([FromBody] OauthRequest request, [Required] SiteAccessTypeEnum siteAccess)
     {
-      if (string.IsNullOrEmpty(ObtainTenantFromToken())) withAuth = null;
-      var user = _authService.Authenticate(authToken, withAuth);
-
-      if (user != null)
+      try
       {
-        Request.Headers.TryGetValue("currentTenant", out var currentTenant);
-        var tokenTuple = _authLogic.GenerateToken(user, currentTenant);
-        var token = tokenTuple.Item1;
-        var expiration = tokenTuple.Item2;
+        var user = _authService.Authenticate(request.Token, siteAccess, request.IsAllowedRegister);
 
-        var successResponse = new ApiResponse
+        if (user != null)
         {
-          Message = $"Welcome {user.Name}",
-          Data = new { token, expiration, user },
+          Request.Headers.TryGetValue("currentTenant", out var currentTenant);
+          var tokenTuple = _authLogic.GenerateToken(user, currentTenant);
+          var token = tokenTuple.Item1;
+          var expiration = tokenTuple.Item2;
+
+          var successResponse = new ApiResponse
+          {
+            Message = $"Welcome {user.Name}",
+            Data = new { token, expiration, user },
+          };
+
+          return Ok(successResponse);
+        }
+
+        var errorResponse = new ApiResponse
+        {
+          Error = true,
+          Message = "User not found",
         };
-
-        return Ok(successResponse);
+        return StatusCode((int)HttpStatusCode.NotFound, errorResponse);
       }
-
-      var errorResponse = new ApiResponse
+      catch (Exception ex)
       {
-        Error = true,
-        Message = "User not found",
-      };
-      return StatusCode((int)HttpStatusCode.NotFound, errorResponse);
+        return ManageException(ex);
+      }
     }
   }
 }

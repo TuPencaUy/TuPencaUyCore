@@ -25,9 +25,10 @@
       _roleDAL = roleDAL;
       _authLogic = authLogic;
     }
-    public UserDTO? Authenticate(string email, string password, bool? auth = false)
+    public UserDTO? Authenticate(string email, string password, SiteAccessTypeEnum siteAccess)
     {
-      if (auth != null && auth.Value)
+      bool auth = siteAccess != SiteAccessTypeEnum.Open && siteAccess != SiteAccessTypeEnum.Closed;
+      if (auth)
       {
         var accessStatus = _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Email == email }).Select(x => x.AccessRequest.AccessStatus)
           .FirstOrDefault();
@@ -80,78 +81,75 @@
 
       return user.Password.Equals(_authLogic.HashPassword(password, user.Password.Split('$')[0])) ? user : null;
     }
-    public UserDTO? Authenticate(string token, bool? auth = false)
+    public UserDTO? Authenticate(string token, SiteAccessTypeEnum siteAccess, bool allowedRegister)
     {
       var tokenHandler = new JwtSecurityTokenHandler();
+      bool auth = siteAccess != SiteAccessTypeEnum.Open && siteAccess != SiteAccessTypeEnum.Closed;
 
-      try
+      var jwtToken = tokenHandler.ReadJwtToken(token);
+      var userEmail = jwtToken.Claims.FirstOrDefault(x => x.Type == "email")?.Value;
+
+      var user = _userDAL
+      .Get(new List<Expression<Func<User, bool>>> { x => x.Email == userEmail })
+      .Select(user => new UserDTO
       {
-        var jwtToken = tokenHandler.ReadJwtToken(token);
-        var userEmail = jwtToken.Claims.FirstOrDefault(x => x.Type == "email")?.Value;
-
-        var user = _userDAL
-        .Get(new List<Expression<Func<User, bool>>> { x => x.Email == userEmail })
-        .Select(user => new UserDTO
+        Email = user.Email,
+        Id = user.Id,
+        Name = user.Name,
+        Role = user.Role != null ? new RoleDTO
         {
-          Email = user.Email,
-          Id = user.Id,
-          Name = user.Name,
-          Role = user.Role != null ? new RoleDTO
-          {
-            Name = user.Role.Name,
-            Id = user.Role.Id,
-            Permissions = user.Role.Permissions
-             .Select(y => new PermissionDTO { Id = y.Id, Name = y.Name })
-             .ToList() ?? new List<PermissionDTO>()
-          } : null,
-          Events = user.Events != null ? user.Events.Select(ev =>
-           new EventDTO
+          Name = user.Role.Name,
+          Id = user.Role.Id,
+          Permissions = user.Role.Permissions
+           .Select(y => new PermissionDTO { Id = y.Id, Name = y.Name })
+           .ToList() ?? new List<PermissionDTO>()
+        } : null,
+        Events = user.Events != null ? user.Events.Select(ev =>
+         new EventDTO
+         {
+           Finished = ev.Finished,
+           Id = ev.Id,
+           ReferenceEvent = ev.RefEvent,
+           Name = ev.Name,
+           Comission = ev.Comission,
+           EndDate = ev.EndDate,
+           StartDate = ev.StartDate,
+           Instantiable = ev.Instantiable,
+           MatchesCount = ev.Matches.Count(),
+           TeamType = ev.TeamType,
+           Sport = new SportDTO
            {
-             Finished = ev.Finished,
              Id = ev.Id,
-             ReferenceEvent = ev.RefEvent,
-             Name = ev.Name,
-             Comission = ev.Comission,
-             EndDate = ev.EndDate,
-             StartDate = ev.StartDate,
-             Instantiable = ev.Instantiable,
-             MatchesCount = ev.Matches.Count(),
-             TeamType = ev.TeamType,
-             Sport = new SportDTO
-             {
-               Id = ev.Id,
-               ReferenceSport = ev.Sports.FirstOrDefault().Id,
-               Name = ev.Sports.FirstOrDefault().Name,
-               Tie = ev.Sports.FirstOrDefault().Tie,
-               PartialPoints = ev.Sports.FirstOrDefault().PartialPoints,
-               ExactPoints = ev.Sports.FirstOrDefault().ExactPoints,
-             }
-           }).ToList() : new List<EventDTO>()
-        })
-        .FirstOrDefault();
+             ReferenceSport = ev.Sports.FirstOrDefault().Id,
+             Name = ev.Sports.FirstOrDefault().Name,
+             Tie = ev.Sports.FirstOrDefault().Tie,
+             PartialPoints = ev.Sports.FirstOrDefault().PartialPoints,
+             ExactPoints = ev.Sports.FirstOrDefault().ExactPoints,
+           }
+         }).ToList() : new List<EventDTO>()
+      })
+      .FirstOrDefault();
 
-        if (user == null)
-        {
-          var userName = jwtToken.Claims.FirstOrDefault(x => x.Type == "name")?.Value;
-          return CreateNewUser(userEmail, userName, null, auth);
-        }
+      if(user == null && (siteAccess == SiteAccessTypeEnum.Closed || (siteAccess == SiteAccessTypeEnum.ByInvite && !allowedRegister))) throw new UserNotAdmitedException($"User {userEmail} not admited.");
 
-        if (auth != null && auth.Value)
-        {
-          var accessStatus = _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Email == userEmail }).Select(x => x.AccessRequest.AccessStatus)
-            .FirstOrDefault();
-          if (accessStatus != AccessStatusEnum.Accepted) throw new UserNotAdmitedException($"User {userEmail} not admited.");
-        }
-
-        return user;
-      }
-      catch (Exception)
+      if (user == null)
       {
-        throw;
+        var userName = jwtToken.Claims.FirstOrDefault(x => x.Type == "name")?.Value;
+        return CreateNewUser(userEmail, userName, null, auth);
       }
+
+      if (auth && user.Role.Id != (int)UserRoleEnum.Admin)
+      {
+        var accessStatus = _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Email == userEmail }).Select(x => x.AccessRequest.AccessStatus)
+          .FirstOrDefault();
+        if (accessStatus != AccessStatusEnum.Accepted) throw new UserNotAdmitedException($"User {userEmail} not admited.");
+      }
+
+      return user;
     }
-    public UserDTO? SignUp(string email, string password, string name, bool? auth = false)
+    public UserDTO? SignUp(string email, string password, string name, SiteAccessTypeEnum siteAccess)
     {
+      bool auth = siteAccess != SiteAccessTypeEnum.Open && siteAccess != SiteAccessTypeEnum.Closed;
       var existingUser = _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Email == email });
       if (existingUser.Any()) return null;
 
