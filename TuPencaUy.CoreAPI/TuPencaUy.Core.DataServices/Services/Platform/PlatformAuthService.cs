@@ -30,6 +30,7 @@
         .Get(new List<Expression<Func<User, bool>>> { x => x.Email == email })
         .Select(user => new UserDTO
         {
+          AccessStatus = AccessStatusEnum.Accepted,
           Site = user.Sites != null ? user.Sites.Where(site => !site.Inactive)
             .Select(site => new SiteDTO
             {
@@ -73,6 +74,7 @@
         var user = _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Email == userEmail })
         .Select(user => new UserDTO
         {
+          AccessStatus = AccessStatusEnum.Accepted,
           Site = user.Sites != null ? user.Sites.Where(site => !site.Inactive)
             .Select(site => new SiteDTO
             {
@@ -139,6 +141,7 @@
 
       var userDTO =  new UserDTO
       {
+        AccessStatus = AccessStatusEnum.Accepted,
         Email = email,
         Name = name
       };

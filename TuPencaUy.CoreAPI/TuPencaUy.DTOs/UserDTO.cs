@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using TuPencaUy.Core.DTOs;
+using TuPencaUy.Core.Enums;
 
 namespace TuPencaUy.DTOs
 {
@@ -19,5 +20,6 @@ namespace TuPencaUy.DTOs
     public RoleDTO? Role { get; set; }
     public SiteDTO? Site { get; set; }
     public List<EventDTO>? Events { get; set; }
+    public AccessStatusEnum? AccessStatus { get; set; }
   }
 }

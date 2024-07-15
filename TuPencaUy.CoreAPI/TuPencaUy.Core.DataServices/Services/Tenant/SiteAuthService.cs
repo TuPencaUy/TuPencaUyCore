@@ -39,6 +39,7 @@
         .Get(new List<Expression<Func<User, bool>>> { x => x.Email == email })
         .Select(user => new UserDTO
         {
+          AccessStatus = user.AccessRequest.AccessStatus,
           Password = user.Password,
           Email = user.Email,
           Id = user.Id,
@@ -93,6 +94,7 @@
       .Get(new List<Expression<Func<User, bool>>> { x => x.Email == userEmail })
       .Select(user => new UserDTO
       {
+        AccessStatus = user.AccessRequest.AccessStatus,
         Email = user.Email,
         Id = user.Id,
         Name = user.Name,
@@ -186,7 +188,8 @@
       {
         Id = user.Id,
         Email = email,
-        Name = name
+        Name = name,
+        AccessStatus = AccessStatusEnum.Pending,
       };
 
       if (role != null)
