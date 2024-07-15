@@ -139,7 +139,7 @@
       if (user == null)
       {
         var userName = jwtToken.Claims.FirstOrDefault(x => x.Type == "name")?.Value;
-        return CreateNewUser(userEmail, userName, null, auth);
+        return CreateNewUser(siteAccess, userEmail, userName, null, auth);
       }
 
       if (auth && user.Role.Id != (int)UserRoleEnum.Admin)
@@ -157,9 +157,9 @@
       var existingUser = _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Email == email });
       if (existingUser.Any()) return null;
 
-      return CreateNewUser(email, name, _authLogic.HashPassword(password), auth);
+      return CreateNewUser(siteAccess, email, name, _authLogic.HashPassword(password), auth);
     }
-    private UserDTO CreateNewUser(string email, string name, string password = null, bool? auth = false)
+    private UserDTO CreateNewUser(SiteAccessTypeEnum siteAccess, string email, string name, string password = null, bool? auth = false)
     {
       Role role = _roleDAL
         .Get(new List<Expression<Func<Role, bool>>> { x => x.Id == (int)UserRoleEnum.BasicUser })
@@ -173,15 +173,12 @@
         Password = password
       };
 
-      if (auth != null && auth.Value)
+      user.AccessRequest = new AccessRequest
       {
-        user.AccessRequest = new AccessRequest
-        {
-          User_email = email,
-          AccessStatus = AccessStatusEnum.Pending,
-          RequestTime = DateTime.Now,
-        };
-      }
+        User_email = email,
+        AccessStatus = siteAccess == SiteAccessTypeEnum.Open ? AccessStatusEnum.Accepted : AccessStatusEnum.Pending,
+        RequestTime = DateTime.Now,
+      };
 
       _userDAL.Insert(user);
       _userDAL.SaveChanges();
@@ -191,7 +188,7 @@
         Id = user.Id,
         Email = email,
         Name = name,
-        AccessStatus = AccessStatusEnum.Pending,
+        AccessStatus = user.AccessRequest.AccessStatus,
         PaypalEmail = user.PaypalEmail,
       };
 
