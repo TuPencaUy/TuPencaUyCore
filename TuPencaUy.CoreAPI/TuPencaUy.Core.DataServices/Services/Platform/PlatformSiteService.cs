@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using System.Linq.Expressions;
 using TuPencaUy.Core.DataAccessLogic;
 using TuPencaUy.Core.DTOs;
+using TuPencaUy.Core.Enums;
 using TuPencaUy.Core.Exceptions;
 using TuPencaUy.Site.DAO.Models.Data;
 
@@ -49,7 +50,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
           Color = x.Color,
           AccessType = x.AccessType,
           PaypalEmail = x.PaypalEmail,
-          //UniqueID = x.UniqueID,
+          UniqueID = x.UniqueID,
         })
         .FirstOrDefault() ?? throw new SiteNotFoundException($"No site was found with domain {domain}");
     }
@@ -91,6 +92,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         Domain = site.Domain,
         Color = site.Color,
         AccessType = site.AccessType,
+        UniqueID = site.AccessType == SiteAccessTypeEnum.ByInvite ? new Guid().ToString() : null
       };
 
       //TODO: Insert enums data
@@ -131,7 +133,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       site.Color = siteDTO.Color;
       site.AccessType = siteDTO.AccessType;
 
-      //if()
+      if (siteDTO.AccessType == SiteAccessTypeEnum.ByInvite && string.IsNullOrEmpty(site.UniqueID)) site.UniqueID = new Guid().ToString();
 
       if(siteDTO.PaypalEmail != null) site.PaypalEmail = siteDTO.PaypalEmail;
 

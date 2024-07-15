@@ -23,9 +23,9 @@ namespace TuPencaUy.Platform.DAO.Models
     [Column("ConnectionString", Order = 3, TypeName = "varchar")]
     public required string ConnectionString { get; set; }
 
-    //[MaxLength(50)]
-    //[Column("UniqueID", Order = 4, TypeName = "varchar")]
-    //public string? UniqueID { get; set; }
+    [MaxLength(50)]
+    [Column("UniqueID", Order = 4, TypeName = "varchar")]
+    public string? UniqueID { get; set; }
     public SiteAccessTypeEnum? AccessType { get; set; }
     public SiteColorEnum? Color { get; set; }
     public string? PaypalEmail { get; set; }
