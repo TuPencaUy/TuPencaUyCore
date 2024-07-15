@@ -51,6 +51,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       return new Tuple<UserDTO, EventDTO>(
         new UserDTO
         {
+          PaypalEmail = user.PaypalEmail,
           Id = userId,
           Email = user.Email,
           Role = user.Role == null ? null : new RoleDTO
@@ -92,6 +93,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       return _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Id == id })
         .Select(x => new UserDTO
         {
+          PaypalEmail = x.PaypalEmail,
           Name = x.Name,
           Email = x.Email,
           Id = id,
@@ -146,6 +148,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       ICollection<User> users = _eventDAL.Get(new List<Expression<Func<Event, bool>>> { x => x.Id == eventId }).Select(x => x.Users).FirstOrDefault();
       List<UserDTO> usersDTO = users.Select(x => new UserDTO
       {
+        PaypalEmail = x.PaypalEmail,
         Email = x.Email,
         Name = x.Name,
         Id = x.Id,
@@ -168,6 +171,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
       return _userDAL.Get(new List<Expression<Func<User, bool>>> { x => x.Email == email })
         .Select(x => new UserDTO
         {
+          PaypalEmail = x.PaypalEmail,
           Name = x.Name,
           Email = email,
           Id = x.Id,

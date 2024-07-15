@@ -34,7 +34,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         ConnectionString = x.ConnectionString,
         Color = x.Color,
         AccessType = x.AccessType,
-        //UniqueID = x.UniqueID,
+        UniqueID = x.UniqueID,
       }).ToList();
     }
 
@@ -94,8 +94,6 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
         AccessType = site.AccessType,
         UniqueID = site.AccessType == SiteAccessTypeEnum.ByInvite ? new Guid().ToString() : null
       };
-
-      //TODO: Insert enums data
 
       _siteDAL.Insert(newSite);
       _siteDAL.SaveChanges();
