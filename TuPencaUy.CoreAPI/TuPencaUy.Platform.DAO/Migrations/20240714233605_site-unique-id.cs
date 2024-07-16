@@ -1,7 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.Json;
-using Microsoft.Extensions.Options;
 
 #nullable disable
 
@@ -21,14 +18,12 @@ namespace TuPencaUy.Platform.DAO.Migrations
           nullable: true)
           .Annotation("Relational:ColumnOrder", 4);// Add "Copa america" teams
 
-      IConfigurationRoot configuration = new ConfigurationBuilder()
-        .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-        .AddJsonFile("appsettings.json")
-        .Build();
-
-      string teamsSQL = File.ReadAllText(configuration["Dump:Teams"]);
-      string eventsSQL = File.ReadAllText(configuration["Dump:Events"]);
-      string matchesSQL = File.ReadAllText(configuration["Dump:Matches"]);
+      string teamsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Dump", "teams.sql");
+      string eventsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Dump", "events.sql");
+      string matchesPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Dump", "matches.sql");
+      string teamsSQL = File.ReadAllText(teamsPath);
+      string eventsSQL = File.ReadAllText(eventsPath);
+      string matchesSQL = File.ReadAllText(matchesPath);
 
       migrationBuilder.Sql(eventsSQL);
       migrationBuilder.Sql(teamsSQL);
