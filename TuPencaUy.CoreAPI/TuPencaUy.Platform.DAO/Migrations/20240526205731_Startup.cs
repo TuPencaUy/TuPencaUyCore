@@ -315,40 +315,20 @@ namespace TuPencaUy.Platform.DAO.Migrations
         "values ('Test basic user', 'test@basic.com', 'UwD/uVElf9TKLz/VW9S32Q==$dVucn2tjpMgcvAhSif8MisQZORWzv6KAkqhUPXAHT3M=', 2, 0, GETDATE(), GETDATE()), " +
         "('Admin user', 'test@admin.com', 'UwD/uVElf9TKLz/VW9S32Q==$dVucn2tjpMgcvAhSif8MisQZORWzv6KAkqhUPXAHT3M=', 1, 0, GETDATE(), GETDATE())");
 
-      // Add "Copa america" teams
-      migrationBuilder.Sql(
-        "insert into Team ([Name],[Logo],[Sport_id],[Inactive],[CreationDate],[LastModificationDate],[TeamType]) " +
-        "values " +
-        "('Argentina', null, 1, 0, GETDATE(), GETDATE(), 1), " +
-        "('Canadá', null, 1, 0, GETDATE(), GETDATE(), 1), " +
-        "('Perú', null, 1, 0, GETDATE(), GETDATE(), 1), " +
-        "('Chile', null, 1, 0, GETDATE(), GETDATE(), 1), " +
-        "('México', null, 1, 0, GETDATE(), GETDATE(), 1), " +
-        "('Ecuador', null, 1, 0, GETDATE(), GETDATE(), 1), " +
-        "('Venezuela', null, 1, 0, GETDATE(), GETDATE(), 1), " +
-        "('Jamaica', null, 1, 0, GETDATE(), GETDATE(), 1), " +
-        "('United States', null, 1, 0, GETDATE(), GETDATE(), 1), " +
-        "('Uruguay', null, 1, 0, GETDATE(), GETDATE(), 1), " +
-        "('Panamá', null, 1, 0, GETDATE(), GETDATE(), 1), " +
-        "('Bolivia', null, 1, 0, GETDATE(), GETDATE(), 1), " +
-        "('Brazil', null, 1, 0, GETDATE(), GETDATE(), 1), " +
-        "('Colombia', null, 1, 0, GETDATE(), GETDATE(), 1), " +
-        "('Paraguay', null, 1, 0, GETDATE(), GETDATE(), 1), " +
-        "('Costa Rica', null, 1, 0, GETDATE(), GETDATE(), 1)");
+      
     }
 
 
     /// <inheritdoc />
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-      // Delete teams
-      migrationBuilder.Sql("delete from Team;");
       // Delete users
       migrationBuilder.Sql("delete from [User];");
       // Delete roles
       migrationBuilder.Sql("delete from Role;");
       // Delete sports
       migrationBuilder.Sql("delete from Sport;");
+
 
       migrationBuilder.DropTable(
           name: "EventSport");
