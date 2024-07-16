@@ -188,6 +188,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
           Color = x.Color,
           Domain = x.Domain,
           Name = x.Name,
+          ConnectionString = x.ConnectionString,
         }).ToList();
       foreach(var site in sites)
       {
@@ -208,6 +209,7 @@ namespace TuPencaUy.Core.DataServices.Services.Platform
           Color = x.Color,
           Domain = x.Domain,
           Name = x.Name,
+          ConnectionString = x.ConnectionString,
         }).ToList();
 
       var globalEvents = new List<EventDTO>();
