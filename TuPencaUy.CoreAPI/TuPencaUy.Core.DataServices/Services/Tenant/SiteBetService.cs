@@ -54,14 +54,14 @@ namespace TuPencaUy.Core.DataServices.Services.Tenant
       var payment = _paymentDAL.Get([x => x.Event_id == eventId])
         .Sum(x => x.Amount);
 
-      var user = _userDAL.Get([x => x.Email == winner.UserEmail])
+      var user = winner != null ? _userDAL.Get([x => x.Email == winner.UserEmail])
         .Select(x => new UserDTO
         {
           Email = x.Email,
           PaypalEmail = x.PaypalEmail,
           Name = x.Name,
           Id = x.Id,
-        }).FirstOrDefault();
+        }).FirstOrDefault() : null;
 
       ev.Finished = true;
 
